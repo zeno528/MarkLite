@@ -73,8 +73,11 @@ export function CodeEditor({
   const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
   const setCursor = useEditorStore((s) => s.setCursor);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
+  const scrollPercent = useEditorStore((s) => s.scrollPercent);
+  const scrollSource = useEditorStore((s) => s.scrollSource);
 
   const viewRef = useRef<EditorView | null>(null);
+  const [editorReady, setEditorReady] = useState(false);
   const [mod, setMod] = useState("Mod-");
   const [throttleDelay, setThrottleDelay] = useState(32);
 
@@ -151,14 +154,26 @@ export function CodeEditor({
       const top = dom.scrollTop;
       const height = dom.scrollHeight - dom.clientHeight;
       const percent = height > 0 ? top / height : 0;
-      setScrollPercent(percent);
+      setScrollPercent(percent, "editor");
     }, throttleDelay);
 
     dom.addEventListener("scroll", handler, { passive: true });
     return () => {
       dom.removeEventListener("scroll", handler);
     };
-  }, [throttleDelay, setScrollPercent]);
+  }, [editorReady, throttleDelay, setScrollPercent]);
+
+  // 滚动同步：预览 → 编辑器
+  useEffect(() => {
+    if (scrollSource !== "preview") return;
+    const view = viewRef.current;
+    if (!view) return;
+    const dom = view.scrollDOM;
+    const scrollHeight = dom.scrollHeight - dom.clientHeight;
+    if (scrollHeight > 0) {
+      dom.scrollTop = scrollPercent * scrollHeight;
+    }
+  }, [scrollPercent, scrollSource]);
 
   // CSS 变量
   const editorStyle = {
@@ -180,6 +195,7 @@ export function CodeEditor({
         onChange={onChange}
         onCreateEditor={(view) => {
           viewRef.current = view;
+          setEditorReady(true);
         }}
         basicSetup={{
           lineNumbers: lineNumbersEnabled,

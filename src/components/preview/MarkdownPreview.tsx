@@ -16,6 +16,8 @@ export function MarkdownPreview() {
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
   const scrollPercent = useEditorStore((s) => s.scrollPercent);
+  const scrollSource = useEditorStore((s) => s.scrollSource);
+  const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
   const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,16 +43,32 @@ export function MarkdownPreview() {
     };
   }, [content, resolvedTheme]);
 
-  // 滚动同步：编辑器 → 预览
+  // 滚动同步：编辑器 → 预览（仅响应编辑器发起的滚动）
   useEffect(() => {
-    if (!scrollSync) return;
+    if (!scrollSync || scrollSource !== "editor") return;
     const el = containerRef.current;
     if (!el) return;
     const scrollHeight = el.scrollHeight - el.clientHeight;
     if (scrollHeight > 0) {
       el.scrollTop = scrollPercent * scrollHeight;
     }
-  }, [scrollPercent, scrollSync, html]);
+  }, [scrollPercent, scrollSource, scrollSync, html]);
+
+  // 滚动同步：预览 → 编辑器（监听预览区滚动）
+  useEffect(() => {
+    if (!scrollSync) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handler = () => {
+      const scrollHeight = el.scrollHeight - el.clientHeight;
+      const percent = scrollHeight > 0 ? el.scrollTop / scrollHeight : 0;
+      setScrollPercent(percent, "preview");
+    };
+
+    el.addEventListener("scroll", handler, { passive: true });
+    return () => el.removeEventListener("scroll", handler);
+  }, [scrollSync, setScrollPercent, html]);
 
   return (
     <div

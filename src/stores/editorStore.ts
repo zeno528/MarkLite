@@ -29,7 +29,9 @@ interface EditorState {
 
   // === 滚动位置 ===
   scrollPercent: number;
-  setScrollPercent: (p: number) => void;
+  /** 滚动来源，用于双向同步防循环 */
+  scrollSource: "editor" | "preview" | null;
+  setScrollPercent: (p: number, source: "editor" | "preview") => void;
 
   // === 查找替换 ===
   searchVisible: boolean;
@@ -50,10 +52,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   currentFile: null,
   cursor: { line: 1, ch: 0 },
   scrollPercent: 0,
+  scrollSource: null,
   searchVisible: false,
 
   setCursor: (cursor) => set({ cursor }),
-  setScrollPercent: (scrollPercent) => set({ scrollPercent }),
+  setScrollPercent: (scrollPercent, source) => set({ scrollPercent, scrollSource: source }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
 
   openFile: (path, title, content) => {
