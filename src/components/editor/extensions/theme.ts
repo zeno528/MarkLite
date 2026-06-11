@@ -22,8 +22,14 @@ export const lightTheme = EditorView.theme(
     },
     ".cm-content": {
       caretColor: "var(--color-accent)",
+      fontFamily: "var(--font-editor)",
+      fontSize: "var(--editor-font-size, 14px)",
       padding: "16px 0",
       minHeight: "100%",
+    },
+    ".cm-line": {
+      fontFamily: "var(--font-editor)",
+      fontSize: "var(--editor-font-size, 14px)",
     },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: "var(--color-accent)",
@@ -83,8 +89,14 @@ export const darkTheme = EditorView.theme(
     },
     ".cm-content": {
       caretColor: "var(--color-accent)",
+      fontFamily: "var(--font-editor)",
+      fontSize: "var(--editor-font-size, 14px)",
       padding: "16px 0",
       minHeight: "100%",
+    },
+    ".cm-line": {
+      fontFamily: "var(--font-editor)",
+      fontSize: "var(--editor-font-size, 14px)",
     },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: "var(--color-accent)",

@@ -17,9 +17,8 @@ export function FileTree() {
 
   if (!rootFolder) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-sm text-[var(--color-text-subtle)]">
-        <p>未打开文件夹</p>
-        <p className="text-xs">顶部菜单 → 文件 → 打开文件夹</p>
+      <div className="flex h-full items-center justify-center p-4 text-xs text-[var(--color-text-subtle)]">
+        未打开文件夹
       </div>
     );
   }
