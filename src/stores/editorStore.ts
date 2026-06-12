@@ -2,6 +2,10 @@
  * 编辑器状态：当前文件、光标、滚动位置、字数
  */
 import { create } from "zustand";
+import type { EditorView } from "@codemirror/view";
+
+/** 编辑器 view 引用（非响应式，供大纲等组件直接访问） */
+export const editorViewRef: { current: EditorView | null } = { current: null };
 
 interface OpenFile {
   path: string;

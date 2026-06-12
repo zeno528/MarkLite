@@ -43,7 +43,7 @@ import {
   wordCountInit,
 } from "./extensions/wordcount";
 import { createAutoSave } from "./extensions/autoSave";
-import { useEditorStore } from "@/stores/editorStore";
+import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { getCmMod, getScrollThrottle } from "@/lib/utils/platform";
@@ -195,6 +195,7 @@ export function CodeEditor({
         onChange={onChange}
         onCreateEditor={(view) => {
           viewRef.current = view;
+          editorViewRef.current = view;
           setEditorReady(true);
         }}
         basicSetup={{

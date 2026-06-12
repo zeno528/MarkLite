@@ -23,6 +23,8 @@ interface UIState {
   showSidebar: boolean;
   toggleSidebar: () => void;
   setShowSidebar: (show: boolean) => void;
+  sidebarTab: "files" | "outline";
+  setSidebarTab: (tab: "files" | "outline") => void;
 
   // 状态栏
   showStatusBar: boolean;
@@ -86,6 +88,8 @@ export const useUIStore = create<UIState>((set, get) => ({
   showSidebar: true,
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
   setShowSidebar: (showSidebar) => set({ showSidebar }),
+  sidebarTab: "files",
+  setSidebarTab: (sidebarTab) => set({ sidebarTab }),
 
   // 状态栏
   showStatusBar: true,
