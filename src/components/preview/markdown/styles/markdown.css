@@ -21,6 +21,15 @@
   word-wrap: break-word;
 }
 
+/* 提升为独立合成层（GPU 滚动），避免滚动时主线程重排
+ *
+ * 注意：不能用 `contain: content` / `contain: layout` —— 会让父级
+ * 看不到 article 的内容溢出，导致 `overflow-auto` 父容器没东西可滚，
+ * 同步滚动失效。只用 will-change 即可获得 GPU 合成层收益。 */
+.markdown-body {
+  will-change: scroll-position;
+}
+
 .markdown-body > *:first-child {
   margin-top: 0;
 }

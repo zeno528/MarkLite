@@ -6,25 +6,41 @@
  * - 跟随配色方案（resolvedTheme）
  */
 import { useEffect, useRef, useState } from "react";
-import { useEditorStore } from "@/stores/editorStore";
+import { useEditorStore, previewContainerRef, editorViewRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { parseMarkdown } from "@/lib/markdown/parser";
 import { cn } from "@/lib/utils/cn";
+import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { openExternalUrl } from "@/lib/utils/openUrl";
 import "./markdown/styles/markdown.css";
+
+// 复制按钮图标（模块级常量，避免每次 render 重建）
+const COPY_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const CHECK_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
 export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const layout = useUIStore((s) => s.layout);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
-  const scrollPercent = useEditorStore((s) => s.scrollPercent);
-  const scrollSource = useEditorStore((s) => s.scrollSource);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
   const [html, setHtml] = useState("");
   const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // 把滚动容器暴露到共享 ref，让编辑器滚动 handler 直接写（绕过 React 中转，消除 2~3 帧延迟）
+  useEffect(() => {
+    previewContainerRef.current = containerRef.current;
+    return () => {
+      if (previewContainerRef.current === containerRef.current) {
+        previewContainerRef.current = null;
+      }
+    };
+  }, []);
 
   // 解析 Markdown → HTML
   useEffect(() => {
@@ -46,18 +62,18 @@ export function MarkdownPreview() {
     };
   }, [content, resolvedTheme]);
 
-  // 复制按钮图标（lucide: copy / check）
-  const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-
   // 给每个代码块注入复制按钮（GitHub 风格：图标，hover 显示，融入代码块）
-  // 用 MutationObserver 监听 DOM 变化，保证任何情况下（渲染、切主题、shiki 重算）代码块都有按钮
+  // MutationObserver 监听 childList（不含 subtree，避免滚动时 content-visibility 重排触发高频回调）
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
 
+    let raf = 0;
     const ensureButtons = () => {
-      root.querySelectorAll("pre").forEach((pre) => {
+      // 只遍历直接子树里的 pre（markdown-body 的直接子元素）
+      const inner = root.querySelector(".markdown-body");
+      if (!inner) return;
+      inner.querySelectorAll("pre").forEach((pre) => {
         if (pre.querySelector(".copy-btn")) return;
         if (!pre.querySelector("code")) return;
         const btn = document.createElement("button");
@@ -69,68 +85,101 @@ export function MarkdownPreview() {
         pre.appendChild(btn);
       });
     };
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        ensureButtons();
+      });
+    };
     ensureButtons();
 
-    const observer = new MutationObserver(() => ensureButtons());
+    const observer = new MutationObserver(schedule);
+    // subtree:true 必需（shiki 替换 pre 内容在深层），但用 rAF 合并避免高频
     observer.observe(root, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // 事件委托：容器统一处理复制按钮点击（避免 DOM 重建后监听器丢失）
+  // 同时拦截 <a> 链接点击 → 系统默认浏览器（避免 WebView 内导航）
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
     const onClick = async (e: MouseEvent) => {
-      const btn = (e.target as HTMLElement).closest(".copy-btn") as HTMLButtonElement | null;
-      if (!btn) return;
-      const pre = btn.parentElement;
-      const codeEl = pre?.querySelector("code");
-      if (!codeEl) return;
-      e.preventDefault();
-      try {
-        await navigator.clipboard.writeText(codeEl.textContent ?? "");
-        btn.innerHTML = CHECK_ICON;
-        btn.classList.add("copied");
-      } catch {
-        btn.innerHTML = COPY_ICON;
-      }
-      window.setTimeout(() => {
-        if (document.body.contains(btn)) {
+      const target = e.target as HTMLElement;
+
+      // 1) 复制按钮
+      const btn = target.closest(".copy-btn") as HTMLButtonElement | null;
+      if (btn) {
+        const pre = btn.parentElement;
+        const codeEl = pre?.querySelector("code");
+        if (!codeEl) return;
+        e.preventDefault();
+        try {
+          await navigator.clipboard.writeText(codeEl.textContent ?? "");
+          btn.innerHTML = CHECK_ICON;
+          btn.classList.add("copied");
+        } catch {
           btn.innerHTML = COPY_ICON;
-          btn.classList.remove("copied");
         }
-      }, 1500);
+        window.setTimeout(() => {
+          if (document.body.contains(btn)) {
+            btn.innerHTML = COPY_ICON;
+            btn.classList.remove("copied");
+          }
+        }, 1500);
+        return;
+      }
+
+      // 2) 外部链接 → 系统默认浏览器
+      const anchor = target.closest("a") as HTMLAnchorElement | null;
+      if (anchor && anchor.href) {
+        e.preventDefault();
+        openExternalUrl(anchor.getAttribute("href"));
+      }
     };
     root.addEventListener("click", onClick);
     return () => root.removeEventListener("click", onClick);
   }, []);
 
-  // 滚动同步：编辑器 → 预览（仅响应编辑器发起的滚动）
-  useEffect(() => {
-    if (!scrollSync || scrollSource !== "editor") return;
-    const el = containerRef.current;
-    if (!el) return;
-    const scrollHeight = el.scrollHeight - el.clientHeight;
-    if (scrollHeight > 0) {
-      el.scrollTop = scrollHeight * scrollPercent;
-    }
-  }, [scrollPercent, scrollSource, scrollSync, html]);
-
-  // 滚动同步：预览 → 编辑器（监听预览区滚动）
+  // 滚动同步：预览 → 编辑器（直接写编辑器 scrollTop，绕过 React 中转，1 帧延迟）
+  // 锁机制：程序主动写 scrollTop 前置锁，对方的 scroll handler 检测到锁就跳过
   useEffect(() => {
     if (!scrollSync) return;
     const el = containerRef.current;
     if (!el) return;
 
+    let ticking = false;
     const handler = () => {
-      const scrollHeight = el.scrollHeight - el.clientHeight;
-      const percent = scrollHeight > 0 ? el.scrollTop / scrollHeight : 0;
-      setScrollPercent(percent, "preview");
+      if (isScrollSyncing()) return; // 程序触发的滚动（如编辑器同步过来的），跳过
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const scrollHeight = el.scrollHeight - el.clientHeight;
+        const percent = scrollHeight > 0 ? el.scrollTop / scrollHeight : 0;
+
+        // 直接写编辑器 scrollTop
+        const view = editorViewRef.current;
+        if (view) {
+          const dom = view.scrollDOM;
+          const editorHeight = dom.scrollHeight - dom.clientHeight;
+          if (editorHeight > 0) {
+            lockScrollSync();
+            dom.scrollTop = editorHeight * percent;
+          }
+        }
+
+        setScrollPercent(percent, "preview");
+      });
     };
 
     el.addEventListener("scroll", handler, { passive: true });
     return () => el.removeEventListener("scroll", handler);
-  }, [scrollSync, setScrollPercent, html]);
+  }, [scrollSync, setScrollPercent]);
 
   // 仅预览模式用卡片包裹，双栏模式直接平铺（无卡片）
   const isCardMode = layout === "preview-only";

@@ -19,6 +19,8 @@ export const lightTheme = EditorView.theme(
       height: "100%",
       maxHeight: "100%",
       overflow: "auto",
+      willChange: "scroll-position",
+      contain: "strict",
     },
     ".cm-content": {
       caretColor: "var(--color-accent)",
@@ -88,6 +90,8 @@ export const darkTheme = EditorView.theme(
       height: "100%",
       maxHeight: "100%",
       overflow: "auto",
+      willChange: "scroll-position",
+      contain: "strict",
     },
     ".cm-content": {
       caretColor: "var(--color-accent)",
