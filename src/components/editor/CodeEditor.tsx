@@ -69,7 +69,7 @@ export function CodeEditor({
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const fontSize = useUIStore((s) => s.fontSize);
   const fontFamily = useUIStore((s) => s.fontFamily);
-  // 纯编辑模式：编辑器按内容自然高度撑开（外层卡片整体滚动）+ 不换行（文本填满卡片宽度）
+  // 纯编辑模式：.cm-content 填满宽度（去掉 680 居中），配合软换行自适应窗口宽度
   const isStandalone = useUIStore((s) => s.layout) === "editor-only";
   const lineNumbersEnabled = useSettingsStore((s) => s.lineNumbers);
   const wordWrapEnabled = useSettingsStore((s) => s.wordWrap);
@@ -141,8 +141,7 @@ export function CodeEditor({
       createHyperlinkHandler(),
     ];
 
-    // 纯编辑模式（卡片全宽）不换行，让文本填满卡片宽度；分屏窄栏尊重 wordWrap 设置
-    if (wordWrapEnabled && !isStandalone) {
+    if (wordWrapEnabled) {
       exts.push(CMEditorView.lineWrapping);
     }
 
@@ -164,7 +163,6 @@ export function CodeEditor({
     resolvedTheme,
     lineNumbersEnabled,
     wordWrapEnabled,
-    isStandalone,
     autoSaveEnabled,
     autoSaveDelay,
   ]);
@@ -213,17 +211,14 @@ export function CodeEditor({
     "--font-editor": fontFamily,
   } as React.CSSProperties;
 
-  // 纯编辑模式：根容器不固定高度/不裁剪，CodeMirror 也不传 height → 按内容自然撑开，
-  // 由外层卡片+滚动容器整体滚动（卡片随滚动移动）。分屏模式固定高度 + CodeMirror 内部滚动。
+  // 两种模式都用 height:100% 内部滚动（与双栏一致）；纯编辑模式加 cm-grow 让 .cm-content 填满宽度，
+  // 配合软换行实现"窗口够宽不换行、不够宽自动折行"。
   return (
-    <div
-      className={cn("w-full", isStandalone ? "" : "h-full overflow-hidden")}
-      style={editorStyle}
-    >
+    <div className="h-full w-full overflow-hidden" style={editorStyle}>
       <CodeMirror
-        className={isStandalone ? "cm-grow w-full" : "h-full"}
+        className={cn("h-full", isStandalone && "cm-grow")}
         value={value}
-        height={isStandalone ? undefined : "100%"}
+        height="100%"
         theme="none"
         extensions={extensions}
         onChange={onChange}

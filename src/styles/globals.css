@@ -158,23 +158,10 @@ aside ::-webkit-scrollbar-thumb:hover {
   background-color: color-mix(in oklch, var(--color-text) 28%, transparent);
 }
 
-/* 纯编辑模式（.cm-grow）：CodeMirror 按内容自然高度撑开，外层卡片整体滚动。
-   lightTheme/darkTheme（theme.ts）和 @uiw 都把 .cm-editor/.cm-scroller 锁成 height:100%
-   （固定高编辑器的假设），在 auto 高度下会坍缩为 0、内容空白。
-   这里用更高特异性（.cm-grow .cm-editor .cm-scroller = 3 class）+ !important 覆盖回 auto，
-   特异性压过 CodeMirror 运行时注入的 0,2,0 规则，不依赖源顺序，稳定生效。 */
-.cm-grow .cm-editor {
-  height: auto !important;
-  max-height: none !important;
-}
-.cm-grow .cm-editor .cm-scroller {
-  height: auto !important;
-  max-height: none !important;
-  flex-basis: auto !important; /* 默认 flex-basis:0 在 auto 高度容器里会坍缩为 0 */
-  contain: none !important;    /* lightTheme 的 contain:strict 含 size containment，强制 scroller 高度独立于内容→0，必须去掉 */
-}
+/* 纯编辑模式（.cm-grow）：.cm-content 填满编辑器宽度（去掉 split 的 680px 居中阅读宽度），
+   配合软换行实现"窗口够宽不换行、不够宽自动折行"。height 走默认（height:100% 内部滚动，与双栏一致）。 */
 .cm-grow .cm-editor .cm-content {
-  max-width: none !important; /* 纯编辑卡片宽，填满宽度（不沿用 split 的 680px 居中阅读宽度） */
+  max-width: none !important;
   margin: 0 !important;
 }
 
