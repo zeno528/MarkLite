@@ -1,6 +1,6 @@
 /**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
- * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 配色 | 侧栏 | 设置）
+ * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
  */
 import { useEffect, useState } from "react";
@@ -9,7 +9,8 @@ import {
   Save,
   Columns2,
   File as FileIcon,
-  Eye,
+  PencilLine,
+  BookOpen,
   Settings,
   PanelLeft,
   ChevronRight,
@@ -18,7 +19,6 @@ import logoSvg from "@/assets/logo.svg";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
-import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
 import { openFileViaDialog, openFolderViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
@@ -38,8 +38,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
   const layout = useUIStore((s) => s.layout);
   const setLayout = useUIStore((s) => s.setLayout);
-  const resolvedScheme = useUIStore((s) => s.resolvedScheme);
-  const setColorScheme = useUIStore((s) => s.setColorScheme);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
@@ -48,10 +46,10 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
     ? rootFolder.split(/[\\/]/).filter(Boolean).pop() ?? rootFolder
     : null;
 
-  const layouts: { mode: LayoutMode; icon: React.ReactNode; title: string }[] = [
-    { mode: "editor-only", icon: <FileIcon size={15} />, title: "仅编辑" },
-    { mode: "split", icon: <Columns2 size={15} />, title: "双栏" },
-    { mode: "preview-only", icon: <Eye size={15} />, title: "仅预览" },
+  const layouts: { mode: LayoutMode; icon: React.ReactNode; label: string }[] = [
+    { mode: "editor-only", icon: <PencilLine size={14} />, label: "编辑视图" },
+    { mode: "split", icon: <Columns2 size={14} />, label: "分屏" },
+    { mode: "preview-only", icon: <BookOpen size={14} />, label: "沉浸式阅读" },
   ];
 
   return (
@@ -120,7 +118,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           <span>文件夹</span>
         </button>
 
-        {/* 次操作 pill 组：保存 + 布局 + 配色 */}
+        {/* 次操作 pill 组：保存 + 布局 */}
         <div className="tool-group">
           <button
             className={cn("tbtn", currentFile?.isDirty && "active")}
@@ -137,29 +135,12 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           {layouts.map((l) => (
             <button
               key={l.mode}
-              className={cn("tbtn icon", layout === l.mode && "active")}
+              className={cn("tbtn", layout === l.mode && "active")}
               onClick={() => setLayout(l.mode)}
-              title={l.title}
+              title={l.label}
             >
               {l.icon}
-            </button>
-          ))}
-        </div>
-
-        <div className="tool-group">
-          {COLOR_SCHEMES.map((scheme) => (
-            <button
-              key={scheme.id}
-              className={cn("tbtn icon", resolvedScheme === scheme.id && "active")}
-              onClick={() => setColorScheme(scheme.id)}
-              title={scheme.name}
-            >
-              <span
-                className="h-[14px] w-[14px] rounded-full border-2 border-white/30 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]"
-                style={{
-                  background: `linear-gradient(135deg, ${scheme.swatch.bg} 50%, ${scheme.swatch.accent} 50%)`,
-                }}
-              />
+              <span>{l.label}</span>
             </button>
           ))}
         </div>
