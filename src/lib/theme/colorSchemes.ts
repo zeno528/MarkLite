@@ -28,23 +28,23 @@ export interface SchemeMeta {
 /** 全部配色方案 */
 export const COLOR_SCHEMES: readonly SchemeMeta[] = [
   {
-    id: "violet",
-    name: "柔和紫",
-    desc: "浅蓝灰底 · 紫色点缀",
-    mode: "light",
-    swatch: { bg: "#eef0f7", surface: "#ffffff", accent: "#7c6ff0" },
-  },
-  {
     id: "paper",
-    name: "纯净纸白",
-    desc: "暖白纸感 · 暖棕点缀",
+    name: "纸白",
+    desc: "暖白纸感",
     mode: "light",
     swatch: { bg: "#faf9f6", surface: "#ffffff", accent: "#b8865b" },
   },
   {
+    id: "violet",
+    name: "薰衣草",
+    desc: "淡紫柔和",
+    mode: "light",
+    swatch: { bg: "#eef0f7", surface: "#ffffff", accent: "#7c6ff0" },
+  },
+  {
     id: "midnight",
-    name: "深空蓝",
-    desc: "深蓝夜色 · 青蓝点缀",
+    name: "子夜",
+    desc: "深蓝夜色",
     mode: "dark",
     swatch: { bg: "#1b1f27", surface: "#232833", accent: "#38bdf8" },
   },
@@ -57,9 +57,9 @@ export const SCHEME_MODE: Record<SchemeId, SchemeMode> = {
   midnight: "dark",
 };
 
-/** 跟随系统时：系统深色 → 深空蓝，系统浅色 → 柔和紫（默认浅色方案） */
+/** 跟随系统时：系统深色 → 子夜，系统浅色 → 纸白（默认浅色方案） */
 export function resolveSystemScheme(isDark: boolean): SchemeId {
-  return isDark ? "midnight" : "violet";
+  return isDark ? "midnight" : "paper";
 }
 
 /** 把（可能为 system 的）配色方案解析为具体方案 id */
@@ -67,7 +67,7 @@ export function resolveScheme(scheme: ColorScheme, systemIsDark: boolean): Schem
   return scheme === "system" ? resolveSystemScheme(systemIsDark) : scheme;
 }
 
-/** 按 id 取方案元数据，找不到时回退到首个（violet） */
+/** 按 id 取方案元数据，找不到时回退到首个（纸白） */
 export function getSchemeMeta(id: SchemeId): SchemeMeta {
   return COLOR_SCHEMES.find((s) => s.id === id) ?? COLOR_SCHEMES[0];
 }
