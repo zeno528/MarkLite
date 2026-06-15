@@ -8,9 +8,9 @@
  * - 滚动同步（编辑器 → 预览）
  * - 查找替换（内置 searchKeymap）
  */
-import { useMemo, useEffect, useState, useRef } from "react";
+import { useMemo, useEffect, useState, useRef, useCallback } from "react";
 import CodeMirror from "@uiw/react-codemirror";
-import type { EditorView } from "@codemirror/view";
+import type { EditorView, ViewUpdate } from "@codemirror/view";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { EditorView as CMEditorView } from "@codemirror/view";
@@ -43,11 +43,12 @@ import {
   wordCountInit,
 } from "./extensions/wordcount";
 import { createAutoSave } from "./extensions/autoSave";
-import { useEditorStore, editorViewRef } from "@/stores/editorStore";
+import { createHyperlinkHandler } from "./extensions/hyperlinks";
+import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { getCmMod, getScrollThrottle } from "@/lib/utils/platform";
-import { throttle } from "@/lib/utils/throttle";
+import { getCmMod } from "@/lib/utils/platform";
+import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
 
 interface CodeEditorProps {
   value: string;
@@ -73,8 +74,19 @@ export function CodeEditor({
   const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
   const setCursor = useEditorStore((s) => s.setCursor);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
-  const scrollPercent = useEditorStore((s) => s.scrollPercent);
-  const scrollSource = useEditorStore((s) => s.scrollSource);
+
+  // onUpdate 稳定引用（避免 @uiw 因 onUpdate 变化 reconfigure 全部 extensions，导致打字吞字符）
+  // 只在选区（光标）变化时同步，docChanged 不重复触发
+  const onUpdate = useCallback(
+    (vu: ViewUpdate) => {
+      if (!vu.selectionSet) return;
+      const state = vu.state;
+      const pos = state.selection.main.head;
+      const line = state.doc.lineAt(pos);
+      setCursor({ line: line.number, ch: pos - line.from });
+    },
+    [setCursor],
+  );
 
   const viewRef = useRef<EditorView | null>(null);
   /** 回调的稳定引用：autoSave/shortcuts 读 ref.current，保证扩展只创建一次、闭包始终最新 */
@@ -84,11 +96,9 @@ export function CodeEditor({
   }, [onSave, onTogglePreview, onToggleSidebar]);
   const [editorReady, setEditorReady] = useState(false);
   const [mod, setMod] = useState("Mod-");
-  const [throttleDelay, setThrottleDelay] = useState(32);
 
   useEffect(() => {
     getCmMod().then(setMod);
-    getScrollThrottle().then(setThrottleDelay);
   }, []);
 
   // 卸载时清空共享 view 引用，避免纯预览模式下大纲误用已销毁的 view
@@ -125,6 +135,7 @@ export function CodeEditor({
         onTogglePreview: cbRef.current.onTogglePreview ?? undefined,
         onToggleSidebar: cbRef.current.onToggleSidebar ?? undefined,
       })),
+      createHyperlinkHandler(),
     ];
 
     if (wordWrapEnabled) {
@@ -153,36 +164,43 @@ export function CodeEditor({
     autoSaveDelay,
   ]);
 
-  // 滚动同步：编辑器 → 预览
+  // 滚动同步：编辑器 → 预览（直接写预览 scrollTop，绕过 React 中转，1 帧延迟）
+  // 不走 store → useEffect 中转（那会多 2~3 帧），而是同 rAF 内直接 DOM-to-DOM
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
     const dom = view.scrollDOM;
 
-    const handler = throttle(() => {
-      const top = dom.scrollTop;
-      const height = dom.scrollHeight - dom.clientHeight;
-      const percent = height > 0 ? top / height : 0;
-      setScrollPercent(percent, "editor");
-    }, throttleDelay);
+    let ticking = false;
+    const handler = () => {
+      if (isScrollSyncing()) return; // 程序触发的滚动（如预览同步过来的），跳过
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const top = dom.scrollTop;
+        const height = dom.scrollHeight - dom.clientHeight;
+        const percent = height > 0 ? top / height : 0;
+
+        // 直接写预览 scrollTop
+        const preview = previewContainerRef.current;
+        if (preview) {
+          const previewHeight = preview.scrollHeight - preview.clientHeight;
+          if (previewHeight > 0) {
+            lockScrollSync();
+            preview.scrollTop = previewHeight * percent;
+          }
+        }
+
+        setScrollPercent(percent, "editor");
+      });
+    };
 
     dom.addEventListener("scroll", handler, { passive: true });
     return () => {
       dom.removeEventListener("scroll", handler);
     };
-  }, [editorReady, throttleDelay, setScrollPercent]);
-
-  // 滚动同步：预览 → 编辑器
-  useEffect(() => {
-    if (scrollSource !== "preview") return;
-    const view = viewRef.current;
-    if (!view) return;
-    const dom = view.scrollDOM;
-    const scrollHeight = dom.scrollHeight - dom.clientHeight;
-    if (scrollHeight > 0) {
-      dom.scrollTop = scrollPercent * scrollHeight;
-    }
-  }, [scrollPercent, scrollSource]);
+  }, [editorReady, setScrollPercent]);
 
   // CSS 变量
   const editorStyle = {
@@ -219,13 +237,7 @@ export function CodeEditor({
           indentOnInput: false,
           tabSize: 2,
         }}
-        onUpdate={(view) => {
-          if (!view) return;
-          const state = view.state;
-          const pos = state.selection.main.head;
-          const line = state.doc.lineAt(pos);
-          setCursor({ line: line.number, ch: pos - line.from });
-        }}
+        onUpdate={onUpdate}
       />
     </div>
   );
