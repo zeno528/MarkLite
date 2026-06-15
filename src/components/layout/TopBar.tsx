@@ -21,7 +21,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
-import { openFileViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
+import { openFileViaDialog, openFolderViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
 
 interface TopBarProps {
   onOpenSettings?: () => void;
@@ -102,14 +102,22 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         className="flex items-center gap-2"
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
-        {/* 主操作：打开（黑色填充） */}
+        {/* 主操作：打开文件 / 打开文件夹 */}
         <button
           className="btn-primary"
           onClick={openFileViaDialog}
           title="打开文件 (Ctrl+O)"
         >
-          <FolderOpen size={14} />
+          <FileIcon size={14} />
           <span>打开</span>
+        </button>
+        <button
+          className="btn-primary"
+          onClick={openFolderViaDialog}
+          title="打开文件夹"
+        >
+          <FolderOpen size={14} />
+          <span>文件夹</span>
         </button>
 
         {/* 次操作 pill 组：保存 + 布局 + 配色 */}
