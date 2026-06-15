@@ -37,20 +37,19 @@ function extractHeadings(md: string): Heading[] {
   return headings;
 }
 
-/** 根据标题层级返回样式（字号 + 字重 + 颜色三重区分，H4+ 弱化为更小更淡） */
+/** 根据标题层级返回样式：字号/字重按层级（选中与非选中一致，避免切换时行高跳动），只颜色不同 */
 function getLevelStyle(level: number, isActive: boolean): string {
-  // 选中态颜色由调用方统一控制（主题色），这里只返回层级基础样式
-  if (isActive) return "";
-  switch (level) {
-    case 1:
-      return "text-[13px] font-semibold text-[var(--color-text)]";
-    case 2:
-      return "text-[12.5px] font-medium text-[var(--color-text)]";
-    case 3:
-      return "text-[12px] font-normal text-[var(--color-text-muted)]";
-    default:
-      return "text-[11.5px] font-light text-[var(--color-text-subtle)]";
-  }
+  const sizeWeight =
+    level === 1 ? "text-[13px] font-semibold"
+      : level === 2 ? "text-[12.5px] font-medium"
+      : level === 3 ? "text-[12px] font-normal"
+      : "text-[11.5px] font-light";
+  const color = isActive
+    ? "text-[var(--color-accent)]"
+    : level <= 2 ? "text-[var(--color-text)]"
+    : level === 3 ? "text-[var(--color-text-muted)]"
+    : "text-[var(--color-text-subtle)]";
+  return cn(sizeWeight, color);
 }
 
 /** 让编辑器跳到指定行（需 view 已就绪） */
@@ -161,11 +160,9 @@ export function Outline() {
             key={`${h.line}-${h.text}`}
             onClick={() => handleClick(i)}
             className={cn(
-              "group relative flex cursor-pointer items-center rounded-md py-[5px] pr-2 transition-colors",
+              "group relative flex my-0.5 cursor-pointer items-center rounded-md py-[5px] pr-2 transition-colors",
               "hover:bg-[var(--color-bg-muted)]",
-              isActive
-                ? "text-[12.5px] font-medium text-[var(--color-accent)]"
-                : getLevelStyle(h.level, false),
+              getLevelStyle(h.level, isActive),
             )}
             style={{
               paddingLeft: `${(h.level - 1) * 14 + 12}px`,

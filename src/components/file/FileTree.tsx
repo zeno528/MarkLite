@@ -45,17 +45,21 @@ function FileTreeItem({ node, depth }: { node: FileNode; depth: number }) {
   const isMd = /\.(md|markdown|mdx)$/i.test(node.name);
 
   const handleClick = async () => {
-    setSelected(node.path);
     if (node.isDir) {
+      setSelected(node.path);
       toggleExpand(node.path);
-    } else {
-      try {
-        const content = await readTextFile(node.path);
-        const title = node.name.replace(/\.(md|markdown|mdx)$/i, "");
-        openFile(node.path, title, content);
-      } catch (e) {
-        console.error("[FileTree] open file failed:", e);
-      }
+      return;
+    }
+    // 非 Markdown 文件不打开：readTextFile 读取二进制/大文件会返回超大乱码字符串，
+    // 塞给 CodeMirror 渲染会卡死主线程
+    if (!isMd) return;
+    setSelected(node.path);
+    try {
+      const content = await readTextFile(node.path);
+      const title = node.name.replace(/\.(md|markdown|mdx)$/i, "");
+      openFile(node.path, title, content);
+    } catch (e) {
+      console.error("[FileTree] open file failed:", e);
     }
   };
 
@@ -64,7 +68,7 @@ function FileTreeItem({ node, depth }: { node: FileNode; depth: number }) {
       <div
         onClick={handleClick}
         className={cn(
-          "relative flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-[var(--color-text)] transition-colors",
+          "relative flex h-7 my-0.5 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-[var(--color-text)] transition-colors",
           "hover:bg-[var(--color-bg-muted)]",
           isSelected && [
             "bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)]",

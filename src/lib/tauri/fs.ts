@@ -134,6 +134,8 @@ export const FileService = {
 
       const fullPath = await join(dir, entry.name);
       const isDir = entry.isDirectory;
+      // markdown 编辑器：只收录 .md/.markdown/.mdx 文件 + 目录，其他文件不进树
+      if (!isDir && !/\.(md|markdown|mdx)$/i.test(entry.name ?? "")) continue;
       const node: FileNode = {
         name: entry.name ?? "",
         path: fullPath,
