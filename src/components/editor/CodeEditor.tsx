@@ -229,6 +229,9 @@ export function CodeEditor({
           viewRef.current = view;
           editorViewRef.current = view;
           setEditorReady(true);
+          // 切换文件会按 key=path 重建编辑器：重置光标到开头，避免上一文件的 cursor 残留，
+          // 否则大纲用过期的 currentLine 算 active，永远高亮到最后一个标题
+          setCursor({ line: 1, ch: 0 });
         }}
         basicSetup={{
           lineNumbers: lineNumbersEnabled,

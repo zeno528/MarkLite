@@ -160,22 +160,14 @@ export function Outline() {
             key={`${h.line}-${h.text}`}
             onClick={() => handleClick(i)}
             className={cn(
-              "group relative flex my-0.5 cursor-pointer items-center rounded-md py-[5px] pr-2 transition-colors",
+              "group relative flex my-0.5 cursor-pointer select-none items-center rounded-md py-[5px] pr-2 transition-colors",
               "hover:bg-[var(--color-bg-muted)]",
               getLevelStyle(h.level, isActive),
+              isActive && "item-active",
             )}
-            style={{
-              paddingLeft: `${(h.level - 1) * 14 + 12}px`,
-              ...(isActive
-                ? { backgroundColor: "color-mix(in oklch, var(--color-accent) 10%, transparent)" }
-                : {}),
-            }}
+            style={{ paddingLeft: `${(h.level - 1) * 14 + 12}px` }}
             title={`${h.text} (L${h.line})`}
           >
-            {/* 选中态左侧边条 */}
-            {isActive && (
-              <span className="absolute left-1 top-1/2 h-3.5 w-[2px] -translate-y-1/2 rounded-full bg-[var(--color-accent)]" />
-            )}
             <span className="truncate">{h.text}</span>
           </div>
         );

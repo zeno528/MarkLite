@@ -181,6 +181,22 @@ aside ::-webkit-scrollbar-thumb:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* 列表项选中态（文件树 / 大纲共用）：淡 accent 背景 + 左侧高亮条。行需 position: relative */
+.item-active {
+  background: color-mix(in oklch, var(--color-accent) 10%, transparent);
+}
+.item-active::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  height: 16px;
+  width: 2px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
 /* 工具类：填充当前文本色 */
 .text-balance {
   text-wrap: balance;
