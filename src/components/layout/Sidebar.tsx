@@ -2,29 +2,15 @@
  * 侧边栏 - 文件树 / 文档大纲
  * 圆角浮起卡片 + 药丸 tabs（柔和文档风）
  */
-import { RefreshCw, FileText, List } from "lucide-react";
+import { FileText, List } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
-import { useFileStore } from "@/stores/fileStore";
 import { useUIStore } from "@/stores/uiStore";
-import { FileService } from "@/lib/tauri/fs";
 import { cn } from "@/lib/utils/cn";
 
 export function Sidebar() {
-  const rootFolder = useFileStore((s) => s.rootFolder);
-  const setFileTree = useFileStore((s) => s.setFileTree);
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
-
-  const handleRefresh = async () => {
-    if (!rootFolder) return;
-    try {
-      const tree = await FileService.readFolderTree(rootFolder);
-      setFileTree(tree);
-    } catch (e) {
-      console.error("[Sidebar] refresh failed:", e);
-    }
-  };
 
   return (
     <aside
@@ -56,15 +42,6 @@ export function Sidebar() {
           >
             <List size={13} /> 大纲
           </button>
-          {rootFolder && sidebarTab === "files" && (
-            <button
-              onClick={handleRefresh}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)]"
-              title="刷新"
-            >
-              <RefreshCw size={13} />
-            </button>
-          )}
         </div>
         {/* 内容 */}
         <div className="mt-1 flex-1 overflow-hidden px-1 pb-2">
