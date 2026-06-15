@@ -130,22 +130,20 @@ body,
   text-rendering: optimizeLegibility;
 }
 
-/* 滚动条（轻量胶囊式，参考 macOS / Notion overlay 风格） */
+/* 滚动条（细而可点：7px 实心胶囊，无内缩，hover 加深） */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklch, var(--color-text) 18%, transparent);
+  background-color: color-mix(in oklch, var(--color-text) 22%, transparent);
   border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklch, var(--color-text) 32%, transparent);
+  background-color: color-mix(in oklch, var(--color-text) 40%, transparent);
 }
 
 /* 选区 */

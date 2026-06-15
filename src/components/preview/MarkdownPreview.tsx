@@ -10,11 +10,13 @@ import { useEditorStore } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { parseMarkdown } from "@/lib/markdown/parser";
+import { cn } from "@/lib/utils/cn";
 import "./markdown/styles/markdown.css";
 
 export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
+  const layout = useUIStore((s) => s.layout);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
   const scrollPercent = useEditorStore((s) => s.scrollPercent);
   const scrollSource = useEditorStore((s) => s.scrollSource);
@@ -130,10 +132,24 @@ export function MarkdownPreview() {
     return () => el.removeEventListener("scroll", handler);
   }, [scrollSync, setScrollPercent, html]);
 
+  // 仅预览模式用卡片包裹，双栏模式直接平铺（无卡片）
+  const isCardMode = layout === "preview-only";
+
   return (
-    <div ref={containerRef} className="h-full w-full overflow-auto bg-[var(--color-bg-muted)]">
+    <div
+      ref={containerRef}
+      className={cn(
+        "h-full w-full overflow-auto",
+        isCardMode ? "bg-[var(--color-bg-muted)]" : "bg-[var(--color-bg-elevated)]",
+      )}
+    >
       <article
-        className="markdown-body mx-auto my-3 flex min-h-[calc(100%-1.5rem)] w-[95%] flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-12 py-10 shadow-[var(--shadow-md)]"
+        className={cn(
+          "markdown-body mx-auto flex flex-col px-12 py-10",
+          isCardMode
+            ? "my-3 min-h-[calc(100%-1.5rem)] w-[95%] rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-md)]"
+            : "h-full w-full",
+        )}
       >
         {loading && !html ? (
           <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
