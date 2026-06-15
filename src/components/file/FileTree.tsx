@@ -59,12 +59,17 @@ function FileTreeItem({ node, depth }: { node: FileNode; depth: number }) {
   };
 
   return (
-    <div>
+    <div className="relative">
       <div
         onClick={handleClick}
         className={cn(
-          "flex h-6 cursor-pointer items-center gap-1 rounded-sm px-1 text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]",
-          isSelected && "bg-[var(--color-bg-muted)]",
+          "relative flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-[var(--color-text)] transition-colors",
+          "hover:bg-[var(--color-bg-muted)]",
+          isSelected && [
+            "bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)]",
+            "text-[var(--color-accent)] font-medium",
+            "before:absolute before:left-0 before:top-1/2 before:h-4 before:w-[2px] before:-translate-y-1/2 before:rounded-full before:bg-[var(--color-accent)]",
+          ],
         )}
         style={{ paddingLeft: `${depth * 12 + 4}px` }}
         title={node.path}

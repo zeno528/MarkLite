@@ -37,17 +37,19 @@ function extractHeadings(md: string): Heading[] {
   return headings;
 }
 
-/** 根据标题层级返回样式 */
-function getLevelStyle(level: number): string {
+/** 根据标题层级返回样式（字号 + 字重 + 颜色三重区分，H4+ 弱化为更小更淡） */
+function getLevelStyle(level: number, isActive: boolean): string {
+  // 选中态颜色由调用方统一控制（主题色），这里只返回层级基础样式
+  if (isActive) return "";
   switch (level) {
     case 1:
-      return "text-[13px] font-semibold";
+      return "text-[13px] font-semibold text-[var(--color-text)]";
     case 2:
-      return "text-[12px] font-medium";
+      return "text-[12.5px] font-medium text-[var(--color-text)]";
     case 3:
-      return "text-[11px] font-normal";
+      return "text-[12px] font-normal text-[var(--color-text-muted)]";
     default:
-      return "text-[11px] font-light text-[var(--color-text-muted)]";
+      return "text-[11.5px] font-light text-[var(--color-text-subtle)]";
   }
 }
 
@@ -152,12 +154,24 @@ export function Outline() {
             key={`${h.line}-${h.text}`}
             onClick={() => handleClick(i)}
             className={cn(
-              "flex cursor-pointer items-center rounded-sm px-2 py-[3px] text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]",
-              getLevelStyle(h.level),
-              isActive && "bg-[var(--color-bg-muted)] text-[var(--color-accent)]",
+              "group relative flex cursor-pointer items-center rounded-md py-[5px] pr-2 transition-colors",
+              "hover:bg-[var(--color-bg-muted)]",
+              isActive
+                ? "text-[12.5px] font-medium text-[var(--color-accent)]"
+                : getLevelStyle(h.level, false),
             )}
-            style={{ paddingLeft: `${(h.level - 1) * 14 + 8}px` }}
+            style={{
+              paddingLeft: `${(h.level - 1) * 14 + 12}px`,
+              ...(isActive
+                ? { backgroundColor: "color-mix(in oklch, var(--color-accent) 10%, transparent)" }
+                : {}),
+            }}
+            title={`${h.text} (L${h.line})`}
           >
+            {/* 选中态左侧边条 */}
+            {isActive && (
+              <span className="absolute left-1 top-1/2 h-3.5 w-[2px] -translate-y-1/2 rounded-full bg-[var(--color-accent)]" />
+            )}
             <span className="truncate">{h.text}</span>
           </div>
         );

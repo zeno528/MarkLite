@@ -32,15 +32,15 @@ export function Sidebar() {
       style={{ minWidth: "var(--sidebar-min-width)", maxWidth: "var(--sidebar-max-width)" }}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-2 shadow-[var(--shadow-sm)]">
-        {/* Tab 切换（药丸） */}
-        <div className="flex shrink-0 items-center gap-1 p-1">
+        {/* Tab 切换（药丸 - iOS 风格：背景层 + 高亮浮起卡） */}
+        <div className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--color-bg-muted)] p-1">
           <button
             onClick={() => setSidebarTab("files")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
               sidebarTab === "files"
-                ? "bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
-                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)]",
+                ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] shadow-[var(--shadow-sm)]"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
             )}
           >
             <FileText size={13} /> 文件
@@ -48,10 +48,10 @@ export function Sidebar() {
           <button
             onClick={() => setSidebarTab("outline")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
               sidebarTab === "outline"
-                ? "bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
-                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)]",
+                ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] shadow-[var(--shadow-sm)]"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
             )}
           >
             <List size={13} /> 大纲
@@ -59,7 +59,7 @@ export function Sidebar() {
           {rootFolder && sidebarTab === "files" && (
             <button
               onClick={handleRefresh}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)]"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)]"
               title="刷新"
             >
               <RefreshCw size={13} />

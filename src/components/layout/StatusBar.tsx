@@ -2,11 +2,12 @@
  * 底部状态栏
  * - 光标位置（行:列）
  * - 字数（中英混合）
- * - 文件状态（已保存/未保存）
+ * - 文件状态（已保存/未保存，圆点 + 文字）
  * - 文件类型
  */
 import { useEffect, useState } from "react";
 import { useEditorStore } from "@/stores/editorStore";
+import { cn } from "@/lib/utils/cn";
 
 export function StatusBar() {
   const cursor = useEditorStore((s) => s.cursor);
@@ -35,24 +36,33 @@ export function StatusBar() {
         <span>
           Ln {cursor.line}, Col {cursor.ch + 1}
         </span>
-        <span>·</span>
+        <span className="text-[var(--color-text-subtle)]">·</span>
         <span>{wc.words} 字</span>
-        <span>·</span>
+        <span className="text-[var(--color-text-subtle)]">·</span>
         <span>{wc.lines} 行</span>
       </div>
       <div className="flex items-center gap-3">
         {currentFile && (
           <>
-            <span>{currentFile.ext.toUpperCase()}</span>
-            <span>·</span>
+            <span className="rounded px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-[var(--color-text-muted)]">
+              {currentFile.ext.toUpperCase()}
+            </span>
+            <span className="text-[var(--color-text-subtle)]">·</span>
             <span
-              className={
-                currentFile.isDirty
-                  ? "text-[var(--color-accent)]"
-                  : "text-[var(--color-success)]"
-              }
+              className={cn(
+                "flex items-center gap-1.5",
+                currentFile.isDirty ? "text-[var(--color-warning)]" : "text-[var(--color-success)]",
+              )}
             >
-              {currentFile.isDirty ? "●未保存" : "已保存"}
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full",
+                  currentFile.isDirty
+                    ? "bg-[var(--color-warning)] shadow-[0_0_0_2px_color-mix(in_oklch,var(--color-warning)_25%,transparent)]"
+                    : "bg-[var(--color-success)]",
+                )}
+              />
+              <span className="font-medium">{currentFile.isDirty ? "未保存" : "已保存"}</span>
             </span>
           </>
         )}

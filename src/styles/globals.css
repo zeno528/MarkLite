@@ -213,3 +213,100 @@ body {
   background: var(--color-accent);
   box-shadow: 0 2px 6px color-mix(in oklch, var(--color-accent) 35%, transparent);
 }
+
+/* ===== 主操作按钮（顶栏"打开"等关键 CTA，黑色填充与 pill 工具组视觉分层） ===== */
+.btn-primary {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: oklch(1 0 0);
+  background: oklch(0.32 0.012 275);
+  height: 30px;
+  padding: 0 13px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background-color 0.14s ease, transform 0.06s ease;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+.btn-primary:hover:not(:disabled) {
+  background: oklch(0.24 0.012 275);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0.5px);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+/* 跟随深夜方案（midnight）：主按钮改为深色加亮，与卡片背景拉开层次 */
+:root[data-scheme="midnight"] .btn-primary {
+  background: oklch(0.95 0.01 250);
+  color: oklch(0.18 0.02 250);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+}
+:root[data-scheme="midnight"] .btn-primary:hover:not(:disabled) {
+  background: oklch(1 0 0);
+}
+
+/* ===== 单图标按钮（顶栏右侧"侧栏 / 设置"等独立 toggle） ===== */
+.icon-btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.14s ease, background-color 0.14s ease;
+}
+.icon-btn:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-bg-muted);
+}
+.icon-btn.active {
+  color: var(--color-accent);
+  background: color-mix(in oklch, var(--color-accent) 12%, transparent);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ===== 次级按钮（空状态卡片"打开文件夹"等辅助动作，无填充+轻边框） ===== */
+.btn-ghost {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border-strong);
+}
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
