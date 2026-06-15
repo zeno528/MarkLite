@@ -19,6 +19,8 @@ export type LayoutMode = "split" | "editor-only" | "preview-only";
 
 const STORAGE_KEY = "marklite:colorscheme";
 const LEGACY_KEY = "marklite:theme";
+const FONT_SIZE_KEY = "marklite:fontsize";
+const FONT_FAMILY_KEY = "marklite:fontfamily";
 
 interface UIState {
   // 配色方案
@@ -111,9 +113,15 @@ export const useUIStore = create<UIState>((set, get) => ({
 
   // 字体
   fontSize: 14,
-  setFontSize: (fontSize) => set({ fontSize }),
+  setFontSize: (fontSize) => {
+    set({ fontSize });
+    try { localStorage.setItem(FONT_SIZE_KEY, String(fontSize)); } catch {}
+  },
   fontFamily: "JetBrains Mono",
-  setFontFamily: (fontFamily) => set({ fontFamily }),
+  setFontFamily: (fontFamily) => {
+    set({ fontFamily });
+    try { localStorage.setItem(FONT_FAMILY_KEY, fontFamily); } catch {}
+  },
 }));
 
 // 启动时恢复配色方案（含旧 marklite:theme 迁移）
@@ -133,5 +141,13 @@ if (typeof window !== "undefined") {
       }
     }
     useUIStore.getState().setColorScheme(saved ?? "system");
+
+    // 恢复字体设置（fontSize / fontFamily）
+    const savedFontSize = localStorage.getItem(FONT_SIZE_KEY);
+    if (savedFontSize && Number.isFinite(+savedFontSize)) {
+      useUIStore.setState({ fontSize: +savedFontSize });
+    }
+    const savedFontFamily = localStorage.getItem(FONT_FAMILY_KEY);
+    if (savedFontFamily) useUIStore.setState({ fontFamily: savedFontFamily });
   } catch {}
 }

@@ -73,6 +73,8 @@ export function CodeEditor({
   const isStandalone = useUIStore((s) => s.layout) === "editor-only";
   const lineNumbersEnabled = useSettingsStore((s) => s.lineNumbers);
   const wordWrapEnabled = useSettingsStore((s) => s.wordWrap);
+  const tabSize = useSettingsStore((s) => s.tabSize);
+  const scrollSync = useSettingsStore((s) => s.scrollSync);
   const autoSaveEnabled = useSettingsStore((s) => s.autoSave);
   const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
   const setCursor = useEditorStore((s) => s.setCursor);
@@ -170,6 +172,7 @@ export function CodeEditor({
   // 滚动同步：编辑器 → 预览（直接写预览 scrollTop，绕过 React 中转，1 帧延迟）
   // 不走 store → useEffect 中转（那会多 2~3 帧），而是同 rAF 内直接 DOM-to-DOM
   useEffect(() => {
+    if (!scrollSync) return; // 关闭滚动同步时不挂监听
     const view = viewRef.current;
     if (!view) return;
     const dom = view.scrollDOM;
@@ -203,7 +206,7 @@ export function CodeEditor({
     return () => {
       dom.removeEventListener("scroll", handler);
     };
-  }, [editorReady, setScrollPercent]);
+  }, [editorReady, scrollSync, setScrollPercent]);
 
   // CSS 变量
   const editorStyle = {
@@ -237,7 +240,7 @@ export function CodeEditor({
           bracketMatching: false,
           closeBrackets: false,
           indentOnInput: false,
-          tabSize: 2,
+          tabSize,
         }}
         onUpdate={onUpdate}
       />
