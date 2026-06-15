@@ -17,8 +17,15 @@ interface Heading {
 function extractHeadings(md: string): Heading[] {
   const headings: Heading[] = [];
   const lines = md.split("\n");
+  let inCodeFence = false; // 跳过 ``` 围栏代码块内的内容（里面的 # 不算标题）
   for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/^(#{1,6})\s+(.*)/);
+    const line = lines[i];
+    if (/^\s*```/.test(line)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) continue;
+    const m = line.match(/^(#{1,6})\s+(.*)/);
     if (m) {
       headings.push({
         level: m[1].length,
