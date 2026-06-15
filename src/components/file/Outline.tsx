@@ -132,15 +132,21 @@ export function Outline() {
     );
   }
 
+  // 计算当前光标所在的"最具体"标题索引（唯一高亮，不高亮祖先）
+  let activeIndex = -1;
+  for (let i = 0; i < headings.length; i++) {
+    const h = headings[i];
+    const nextSameOrHigher = headings.slice(i + 1).find((n) => n.level <= h.level);
+    const sectionEnd = nextSameOrHigher ? nextSameOrHigher.line - 1 : Infinity;
+    if (currentLine >= h.line && currentLine <= sectionEnd) {
+      activeIndex = i; // 取最后一个满足的（最深层级）
+    }
+  }
+
   return (
     <div className="h-full overflow-auto py-1">
       {headings.map((h, i) => {
-        const nextSameOrHigher = headings
-          .slice(i + 1)
-          .find((n) => n.level <= h.level);
-        const sectionEnd = nextSameOrHigher ? nextSameOrHigher.line - 1 : Infinity;
-        const isActive = currentLine >= h.line && currentLine <= sectionEnd;
-
+        const isActive = i === activeIndex;
         return (
           <div
             key={`${h.line}-${h.text}`}
