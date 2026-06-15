@@ -8,11 +8,10 @@ import { FolderOpen, FileText, Save, Columns2, File as FileIcon, Eye, Settings, 
 import logoSvg from "@/assets/logo.svg";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useEditorStore } from "@/stores/editorStore";
-import { useFileStore } from "@/stores/fileStore";
 import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
-import { FileService } from "@/lib/tauri/fs";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
+import { openFileViaDialog, openFolderViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
 
 interface TopBarProps {
   onOpenSettings?: () => void;
@@ -25,10 +24,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   }, []);
 
   const currentFile = useEditorStore((s) => s.currentFile);
-  const openFile = useEditorStore((s) => s.openFile);
-  const markSaved = useEditorStore((s) => s.markSaved);
-  const setRootFolder = useFileStore((s) => s.setRootFolder);
-  const setFileTree = useFileStore((s) => s.setFileTree);
 
   const layout = useUIStore((s) => s.layout);
   const setLayout = useUIStore((s) => s.setLayout);
@@ -36,32 +31,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   const setColorScheme = useUIStore((s) => s.setColorScheme);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
-
-  const handleOpenFile = async () => {
-    const file = await FileService.openFile();
-    if (file) openFile(file.path, file.title, file.content);
-  };
-  const handleOpenFolder = async () => {
-    const { pickFolder } = await import("@/lib/tauri/dialog");
-    const folder = await pickFolder();
-    if (!folder) return;
-    setRootFolder(folder);
-    try {
-      const tree = await FileService.readFolderTree(folder);
-      setFileTree(tree);
-    } catch (e) {
-      console.error("[TopBar] read folder failed:", e);
-    }
-  };
-  const handleSave = async () => {
-    if (!currentFile) return;
-    try {
-      await FileService.saveFile(currentFile.path, currentFile.content);
-      markSaved(currentFile.path);
-    } catch (e) {
-      console.error("[TopBar] save failed:", e);
-    }
-  };
 
   const layouts: { mode: LayoutMode; icon: React.ReactNode; title: string }[] = [
     { mode: "editor-only", icon: <FileIcon size={15} />, title: "仅编辑" },
@@ -100,15 +69,15 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
         <div className="tool-group">
-          <button className="tbtn" onClick={handleOpenFile} title="打开文件 (Ctrl+O)">
+          <button className="tbtn" onClick={openFileViaDialog} title="打开文件 (Ctrl+O)">
             <FileText size={15} /> 打开
           </button>
-          <button className="tbtn" onClick={handleOpenFolder} title="打开文件夹">
+          <button className="tbtn" onClick={openFolderViaDialog} title="打开文件夹">
             <FolderOpen size={15} /> 文件夹
           </button>
           <button
             className="tbtn"
-            onClick={handleSave}
+            onClick={saveCurrentFile}
             disabled={!currentFile || !currentFile.isDirty}
             title="保存 (Ctrl+S)"
           >

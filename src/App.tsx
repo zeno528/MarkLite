@@ -14,6 +14,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
+import { openFileViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
 
 export default function App() {
   const layout = useUIStore((s) => s.layout);
@@ -65,16 +66,33 @@ export default function App() {
     });
   }, []);
 
-  // 全局快捷键：Cmd/Ctrl+, 打开设置
+  // 全局快捷键（不依赖编辑器焦点，任何位置都生效）
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
-      if (mod && e.key === ",") {
-        e.preventDefault();
-        setSettingsOpen((v) => !v);
+      if (!mod) {
+        if (e.key === "Escape" && settingsOpen) setSettingsOpen(false);
+        return;
       }
-      if (e.key === "Escape" && settingsOpen) {
-        setSettingsOpen(false);
+      switch (e.key) {
+        case ",":
+          e.preventDefault();
+          setSettingsOpen((v) => !v);
+          break;
+        case "o":
+        case "O":
+          e.preventDefault();
+          openFileViaDialog();
+          break;
+        case "s":
+        case "S":
+          e.preventDefault(); // 阻止浏览器/Tauri 默认保存
+          saveCurrentFile();
+          break;
+        case "\\":
+          e.preventDefault();
+          useUIStore.getState().toggleSidebar();
+          break;
       }
     };
     document.addEventListener("keydown", handler);
