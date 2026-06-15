@@ -41,17 +41,20 @@ export function StatusBar() {
         <span className="text-[var(--color-text-subtle)]">·</span>
         <span>{wc.lines} 行</span>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {currentFile && (
           <>
-            <span className="rounded px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-[var(--color-text-muted)]">
+            {/* 文件类型徽章：accent 淡底胶囊 */}
+            <span className="rounded-md bg-[color-mix(in_oklch,var(--color-accent)_14%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--color-accent)]">
               {currentFile.ext.toUpperCase()}
             </span>
-            <span className="text-[var(--color-text-subtle)]">·</span>
+            {/* 保存状态：圆点 + 文字；未保存 warning 醒目，已保存 subtle 低调（常态不抢眼） */}
             <span
               className={cn(
                 "flex items-center gap-1.5",
-                currentFile.isDirty ? "text-[var(--color-warning)]" : "text-[var(--color-success)]",
+                currentFile.isDirty
+                  ? "text-[var(--color-warning)]"
+                  : "text-[var(--color-text-subtle)]",
               )}
             >
               <span

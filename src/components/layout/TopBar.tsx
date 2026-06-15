@@ -123,10 +123,10 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         {/* 次操作 pill 组：保存 + 布局 + 配色 */}
         <div className="tool-group">
           <button
-            className="tbtn"
+            className={cn("tbtn", currentFile?.isDirty && "active")}
             onClick={saveCurrentFile}
             disabled={!currentFile || !currentFile.isDirty}
-            title="保存 (Ctrl+S)"
+            title={currentFile?.isDirty ? "保存 (Ctrl+S) — 有未保存的修改" : "保存 (Ctrl+S)"}
           >
             <Save size={14} />
             <span>保存</span>
