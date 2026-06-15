@@ -40,22 +40,22 @@ function wrapSelection(view: EditorView, before: string, after: string, placehol
 
 export function createShortcuts(
   mod: string,
-  handlers: ShortcutHandlers,
+  getHandlers: () => ShortcutHandlers,
 ) {
   const commands: Record<string, Command> = {
     [`${mod}s`]: () => {
-      handlers.onSave?.();
+      getHandlers().onSave?.();
       return true;
     },
     [`${mod}b`]: (view) => wrapSelection(view, "**", "**", "bold text"),
     [`${mod}i`]: (view) => wrapSelection(view, "_", "_", "italic text"),
     [`${mod}k`]: (view) => wrapSelection(view, "[", "](https://)", "link text"),
     [`${mod}Shift-p`]: () => {
-      handlers.onTogglePreview?.();
+      getHandlers().onTogglePreview?.();
       return true;
     },
     [`${mod}\\`]: () => {
-      handlers.onToggleSidebar?.();
+      getHandlers().onToggleSidebar?.();
       return true;
     },
   };

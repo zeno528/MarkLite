@@ -77,6 +77,11 @@ export function CodeEditor({
   const scrollSource = useEditorStore((s) => s.scrollSource);
 
   const viewRef = useRef<EditorView | null>(null);
+  /** 回调的稳定引用：autoSave/shortcuts 读 ref.current，保证扩展只创建一次、闭包始终最新 */
+  const cbRef = useRef({ onSave: onSave ?? null, onTogglePreview: onTogglePreview ?? null, onToggleSidebar: onToggleSidebar ?? null });
+  useEffect(() => {
+    cbRef.current = { onSave: onSave ?? null, onTogglePreview: onTogglePreview ?? null, onToggleSidebar: onToggleSidebar ?? null };
+  }, [onSave, onTogglePreview, onToggleSidebar]);
   const [editorReady, setEditorReady] = useState(false);
   const [mod, setMod] = useState("Mod-");
   const [throttleDelay, setThrottleDelay] = useState(32);
@@ -115,11 +120,11 @@ export function CodeEditor({
       wordCountUpdate,
       wordCountInit,
       keymap.of(baseKeymap),
-      createShortcuts(mod, {
-        onSave,
-        onTogglePreview,
-        onToggleSidebar,
-      }),
+      createShortcuts(mod, () => ({
+        onSave: cbRef.current.onSave ?? undefined,
+        onTogglePreview: cbRef.current.onTogglePreview ?? undefined,
+        onToggleSidebar: cbRef.current.onToggleSidebar ?? undefined,
+      })),
     ];
 
     if (wordWrapEnabled) {
@@ -132,8 +137,8 @@ export function CodeEditor({
       exts.push(highlightActiveLine());
     }
 
-    if (autoSaveEnabled && onSave) {
-      exts.push(createAutoSave(onSave, autoSaveDelay));
+    if (autoSaveEnabled) {
+      exts.push(createAutoSave(() => cbRef.current.onSave?.(), autoSaveDelay));
     }
 
     exts.push(resolvedTheme === "dark" ? darkTheme : lightTheme);
@@ -146,9 +151,6 @@ export function CodeEditor({
     wordWrapEnabled,
     autoSaveEnabled,
     autoSaveDelay,
-    onSave,
-    onTogglePreview,
-    onToggleSidebar,
   ]);
 
   // 滚动同步：编辑器 → 预览
