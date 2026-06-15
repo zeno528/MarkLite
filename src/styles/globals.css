@@ -52,9 +52,9 @@
   /* 布局尺寸 */
   --titlebar-height: 28px;
   --statusbar-height: 24px;
-  --sidebar-width: 240px;
-  --sidebar-min-width: 180px;
-  --sidebar-max-width: 480px;
+  --sidebar-width: 280px;
+  --sidebar-min-width: 200px;
+  --sidebar-max-width: 520px;
 }
 
 /* ---------- 方案：纯净纸白 (paper) ---------- */

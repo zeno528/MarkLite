@@ -44,7 +44,11 @@ export function MarkdownPreview() {
     };
   }, [content, resolvedTheme]);
 
-  // 给每个代码块注入复制按钮（GitHub 风格：hover 显示，点击复制）
+  // 复制按钮图标（lucide: copy / check）
+  const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const CHECK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  // 给每个代码块注入复制按钮（GitHub 风格：图标，hover 显示，融入代码块）
   // 用 MutationObserver 监听 DOM 变化，保证任何情况下（渲染、切主题、shiki 重算）代码块都有按钮
   useEffect(() => {
     const root = containerRef.current;
@@ -57,7 +61,9 @@ export function MarkdownPreview() {
         const btn = document.createElement("button");
         btn.className = "copy-btn";
         btn.type = "button";
-        btn.textContent = "复制";
+        btn.title = "复制";
+        btn.setAttribute("aria-label", "复制代码");
+        btn.innerHTML = COPY_ICON;
         pre.appendChild(btn);
       });
     };
@@ -81,14 +87,14 @@ export function MarkdownPreview() {
       e.preventDefault();
       try {
         await navigator.clipboard.writeText(codeEl.textContent ?? "");
-        btn.textContent = "已复制";
+        btn.innerHTML = CHECK_ICON;
         btn.classList.add("copied");
       } catch {
-        btn.textContent = "复制失败";
+        btn.innerHTML = COPY_ICON;
       }
       window.setTimeout(() => {
         if (document.body.contains(btn)) {
-          btn.textContent = "复制";
+          btn.innerHTML = COPY_ICON;
           btn.classList.remove("copied");
         }
       }, 1500);
