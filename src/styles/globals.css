@@ -130,10 +130,10 @@ body,
   text-rendering: optimizeLegibility;
 }
 
-/* 滚动条（细而可点：7px 实心胶囊，无内缩，hover 加深） */
+/* 滚动条（overlay 风格：默认视觉 5px 极低调，hover 撑满 8px 易点；容器恒定 8px 避免宽度变化抖动） */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -141,9 +141,13 @@ body,
 ::-webkit-scrollbar-thumb {
   background-color: color-mix(in oklch, var(--color-text) 22%, transparent);
   border-radius: 999px;
+  border: 1.5px solid transparent; /* 透明内缩：8 - 1.5×2 = 视觉 5px */
+  background-clip: content-box;
+  transition: background-color 0.15s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklch, var(--color-text) 40%, transparent);
+  border-width: 0; /* hover 时 thumb 撑满容器，视觉变粗到 8px */
+  background-color: color-mix(in oklch, var(--color-text) 42%, transparent);
 }
 
 /* 选区 */

@@ -39,8 +39,6 @@ export function StatusBar() {
         <span>{wc.words} 字</span>
         <span>·</span>
         <span>{wc.lines} 行</span>
-        <span>·</span>
-        <span>{Math.max(1, Math.round(wc.words / 300))} 分钟阅读</span>
       </div>
       <div className="flex items-center gap-3">
         {currentFile && (
