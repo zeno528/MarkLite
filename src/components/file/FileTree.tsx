@@ -10,6 +10,7 @@ import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { cn } from "@/lib/utils/cn";
+import { MdFileIcon } from "@/components/file/MdFileIcon";
 
 export function FileTree() {
   const fileTree = useFileStore((s) => s.fileTree);
@@ -90,13 +91,11 @@ function FileTreeItem({ node, depth }: { node: FileNode; depth: number }) {
         ) : (
           <>
             <span className="w-3 shrink-0" />
-            <FileIcon
-              size={14}
-              className={cn(
-                "shrink-0",
-                isMd ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]",
-              )}
-            />
+            {isMd ? (
+              <MdFileIcon size={14} className="shrink-0 text-[var(--color-accent)]" />
+            ) : (
+              <FileIcon size={14} className="shrink-0 text-[var(--color-text-muted)]" />
+            )}
           </>
         )}
         <span className="truncate">{node.name}</span>
