@@ -42,9 +42,6 @@ export const lightTheme = EditorView.theme(
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
     },
-    ".cm-dimmed": {
-      opacity: "0.3",
-    },
     ".cm-gutters": {
       backgroundColor: "var(--color-bg-elevated)",
       color: "var(--color-text-subtle)",
@@ -113,9 +110,6 @@ export const darkTheme = EditorView.theme(
     },
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
-    },
-    ".cm-dimmed": {
-      opacity: "0.3",
     },
     ".cm-gutters": {
       backgroundColor: "var(--color-bg-elevated)",

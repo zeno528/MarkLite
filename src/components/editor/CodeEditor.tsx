@@ -36,8 +36,6 @@ import {
 } from "@codemirror/view";
 
 import { lightTheme, darkTheme } from "./extensions/theme";
-import { focusMode } from "./extensions/focusMode";
-import { typewriterMode } from "./extensions/typewriterMode";
 import { createShortcuts } from "./extensions/shortcuts";
 import {
   wordCountField,
@@ -67,7 +65,6 @@ export function CodeEditor({
   onToggleSidebar,
 }: CodeEditorProps) {
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
-  const writingMode = useUIStore((s) => s.writingMode);
   const fontSize = useUIStore((s) => s.fontSize);
   const fontFamily = useUIStore((s) => s.fontFamily);
   const lineNumbersEnabled = useSettingsStore((s) => s.lineNumbers);
@@ -139,17 +136,12 @@ export function CodeEditor({
       exts.push(createAutoSave(onSave, autoSaveDelay));
     }
 
-    // 沉浸写作模式（专注：淡化非当前段 / 打字机：当前行居中）
-    if (writingMode === "focus") exts.push(focusMode);
-    if (writingMode === "typewriter") exts.push(typewriterMode);
-
     exts.push(resolvedTheme === "dark" ? darkTheme : lightTheme);
 
     return exts;
   }, [
     mod,
     resolvedTheme,
-    writingMode,
     lineNumbersEnabled,
     wordWrapEnabled,
     autoSaveEnabled,

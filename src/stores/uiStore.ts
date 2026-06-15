@@ -16,8 +16,6 @@ import {
 
 export type ResolvedTheme = "light" | "dark";
 export type LayoutMode = "split" | "editor-only" | "preview-only";
-/** 写作模式：普通 / 专注(淡化非当前段) / 打字机(当前行居中) */
-export type WritingMode = "normal" | "focus" | "typewriter";
 
 const STORAGE_KEY = "marklite:colorscheme";
 const LEGACY_KEY = "marklite:theme";
@@ -30,10 +28,6 @@ interface UIState {
   setColorScheme: (scheme: ColorScheme) => void;
   /** 系统明暗变化时调用，仅当 colorScheme==="system" 时生效 */
   applySystemScheme: (isDark: boolean) => void;
-
-  // 写作模式
-  writingMode: WritingMode;
-  setWritingMode: (mode: WritingMode) => void;
 
   // 布局
   layout: LayoutMode;
@@ -93,10 +87,6 @@ export const useUIStore = create<UIState>((set, get) => ({
     const mode = applyScheme(root, resolved);
     set({ resolvedScheme: resolved, resolvedTheme: mode });
   },
-
-  // 写作模式
-  writingMode: "normal",
-  setWritingMode: (writingMode) => set({ writingMode }),
 
   // 布局
   layout: "split",

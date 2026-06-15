@@ -1,10 +1,10 @@
 /**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
- * 左：品牌 + 文件名(dirty)   右：药丸工具组（打开/保存 | 布局 | 配色 | 侧边栏 | 设置）
+ * 左：品牌 + 文件名(dirty)   右：药丸工具组（打开/保存 | 布局 | 配色 | 主侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
  */
 import { useEffect, useState } from "react";
-import { FolderOpen, FileText, Save, Columns2, File as FileIcon, Eye, Settings, Pencil, Focus, MoveVertical } from "lucide-react";
+import { FolderOpen, FileText, Save, Columns2, File as FileIcon, Eye, Settings, PanelLeft } from "lucide-react";
 import logoSvg from "@/assets/logo.svg";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useEditorStore } from "@/stores/editorStore";
@@ -34,8 +34,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   const setLayout = useUIStore((s) => s.setLayout);
   const resolvedScheme = useUIStore((s) => s.resolvedScheme);
   const setColorScheme = useUIStore((s) => s.setColorScheme);
-  const writingMode = useUIStore((s) => s.writingMode);
-  const setWritingMode = useUIStore((s) => s.setWritingMode);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
@@ -149,38 +147,11 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
         <div className="tool-group">
           <button
-            className={cn("tbtn", writingMode !== "normal" && "active")}
-            onClick={() =>
-              setWritingMode(
-                writingMode === "normal"
-                  ? "focus"
-                  : writingMode === "focus"
-                    ? "typewriter"
-                    : "normal",
-              )
-            }
-            title={`写作模式（点击切换）：${
-              writingMode === "normal" ? "普通" : writingMode === "focus" ? "专注" : "打字机"
-            }`}
-          >
-            {writingMode === "normal" ? (
-              <Pencil size={15} />
-            ) : writingMode === "focus" ? (
-              <Focus size={15} />
-            ) : (
-              <MoveVertical size={15} />
-            )}
-            {writingMode === "normal" ? "普通" : writingMode === "focus" ? "专注" : "打字机"}
-          </button>
-        </div>
-
-        <div className="tool-group">
-          <button
-            className={cn("tbtn", showSidebar && "active")}
+            className={cn("tbtn icon", showSidebar && "active")}
             onClick={toggleSidebar}
-            title="侧边栏 (Ctrl+\\)"
+            title="主侧栏 (Ctrl+\\)"
           >
-            <FolderOpen size={15} /> 文件
+            <PanelLeft size={15} />
           </button>
         </div>
 
