@@ -24,7 +24,9 @@ export const lightTheme = EditorView.theme(
       caretColor: "var(--color-accent)",
       fontFamily: "var(--font-editor)",
       fontSize: "var(--editor-font-size, 14px)",
-      padding: "16px 0",
+      padding: "32px 16px",
+      maxWidth: "680px",
+      margin: "0 auto",
       minHeight: "100%",
     },
     ".cm-line": {
@@ -39,6 +41,9 @@ export const lightTheme = EditorView.theme(
     },
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
+    },
+    ".cm-dimmed": {
+      opacity: "0.3",
     },
     ".cm-gutters": {
       backgroundColor: "var(--color-bg-elevated)",
@@ -91,7 +96,9 @@ export const darkTheme = EditorView.theme(
       caretColor: "var(--color-accent)",
       fontFamily: "var(--font-editor)",
       fontSize: "var(--editor-font-size, 14px)",
-      padding: "16px 0",
+      padding: "32px 16px",
+      maxWidth: "680px",
+      margin: "0 auto",
       minHeight: "100%",
     },
     ".cm-line": {
@@ -106,6 +113,9 @@ export const darkTheme = EditorView.theme(
     },
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
+    },
+    ".cm-dimmed": {
+      opacity: "0.3",
     },
     ".cm-gutters": {
       backgroundColor: "var(--color-bg-elevated)",

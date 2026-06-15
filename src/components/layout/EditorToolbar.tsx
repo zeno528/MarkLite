@@ -1,13 +1,14 @@
 /**
  * 工具栏（顶部菜单模拟 - macOS 走系统菜单，Windows 在窗口内显示）
  * - 打开文件 / 打开文件夹 / 保存
- * - 主题切换（亮/暗/系统）
+ * - 配色方案切换（柔和紫 / 纯净纸白 / 深空蓝）
  * - 布局切换（双栏/编辑/预览）
  * - 侧边栏切换
  */
 import { useEffect, useState } from "react";
-import { FolderOpen, FileText, Save, Sun, Moon, Monitor, Columns2, File as FileIcon, Eye, Settings } from "lucide-react";
+import { FolderOpen, FileText, Save, Columns2, File as FileIcon, Eye, Settings } from "lucide-react";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
+import { COLOR_SCHEMES, type ColorScheme, type SchemeId } from "@/lib/theme/colorSchemes";
 import { FileService } from "@/lib/tauri/fs";
 import { useEditorStore } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
@@ -20,8 +21,8 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
   const [mac, setMac] = useState(false);
-  const theme = useUIStore((s) => s.theme);
-  const setTheme = useUIStore((s) => s.setTheme);
+  const resolvedScheme = useUIStore((s) => s.resolvedScheme);
+  const setColorScheme = useUIStore((s) => s.setColorScheme);
   const layout = useUIStore((s) => s.layout);
   const setLayout = useUIStore((s) => s.setLayout);
   const showSidebar = useUIStore((s) => s.showSidebar);
@@ -77,8 +78,8 @@ export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
         <span className="text-sm font-semibold tracking-tight">MarkLite</span>
         <div className="flex-1" />
         <ToolbarRight
-          theme={theme}
-          setTheme={setTheme}
+          resolvedScheme={resolvedScheme}
+          setColorScheme={setColorScheme}
           layout={layout}
           setLayout={setLayout}
           showSidebar={showSidebar}
@@ -116,8 +117,8 @@ export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
       </button>
       <div className="mx-1 h-4 w-px bg-[var(--color-border)]" />
       <ToolbarRight
-        theme={theme}
-        setTheme={setTheme}
+        resolvedScheme={resolvedScheme}
+        setColorScheme={setColorScheme}
         layout={layout}
         setLayout={setLayout}
         showSidebar={showSidebar}
@@ -129,16 +130,16 @@ export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
 }
 
 function ToolbarRight({
-  theme,
-  setTheme,
+  resolvedScheme,
+  setColorScheme,
   layout,
   setLayout,
   showSidebar,
   toggleSidebar,
   onOpenSettings,
 }: {
-  theme: string;
-  setTheme: (t: any) => void;
+  resolvedScheme: SchemeId;
+  setColorScheme: (s: ColorScheme) => void;
   layout: LayoutMode;
   setLayout: (l: LayoutMode) => void;
   showSidebar: boolean;
@@ -171,27 +172,29 @@ function ToolbarRight({
           </button>
         ))}
       </div>
-      {/* 主题切换 */}
+      {/* 配色方案切换（色点 = 方案 accent 色；选中 = 当前实际生效方案） */}
       <div className="flex items-center rounded border border-[var(--color-border)]">
-        {[
-          { mode: "light", icon: <Sun size={13} />, title: "亮色" },
-          { mode: "dark", icon: <Moon size={13} />, title: "暗色" },
-          { mode: "system", icon: <Monitor size={13} />, title: "跟随系统" },
-        ].map((t) => (
-          <button
-            key={t.mode}
-            onClick={() => setTheme(t.mode as any)}
-            className={cn(
-              "flex h-6 w-7 items-center justify-center",
-              theme === t.mode
-                ? "bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
-                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)]",
-            )}
-            title={t.title}
-          >
-            {t.icon}
-          </button>
-        ))}
+        {COLOR_SCHEMES.map((scheme) => {
+          const active = resolvedScheme === scheme.id;
+          return (
+            <button
+              key={scheme.id}
+              onClick={() => setColorScheme(scheme.id)}
+              className={cn(
+                "flex h-6 w-7 items-center justify-center",
+                active ? "bg-[var(--color-accent)]" : "hover:bg-[var(--color-bg-muted)]",
+              )}
+              title={scheme.name}
+            >
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{
+                  backgroundColor: active ? "var(--color-accent-foreground)" : scheme.swatch.accent,
+                }}
+              />
+            </button>
+          );
+        })}
       </div>
       {/* 侧边栏切换 */}
       <button

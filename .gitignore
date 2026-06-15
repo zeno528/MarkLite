@@ -15,6 +15,12 @@ dist-ssr
 # Playwright MCP
 .playwright-mcp/
 
+# 临时测试/演示文件
+test-*.html
+test-*.png
+ui-demo.html
+ui-redesign-demo.html
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

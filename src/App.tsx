@@ -3,8 +3,7 @@
  * 布局：标题栏 + 工具栏 + 主体（侧边栏 + 双栏） + 状态栏
  */
 import { useEffect, useState } from "react";
-import { TitleBar } from "@/components/layout/TitleBar";
-import { EditorToolbar } from "@/components/layout/EditorToolbar";
+import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
@@ -40,14 +39,11 @@ export default function App() {
     };
   }, []);
 
-  // 监听系统主题变化
+  // 监听系统明暗变化（仅当配色方案为「跟随系统」时生效）
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = (e: MediaQueryListEvent) => {
-      const theme = useUIStore.getState().theme;
-      if (theme === "system") {
-        useUIStore.getState().setResolvedTheme(e.matches ? "dark" : "light");
-      }
+      useUIStore.getState().applySystemScheme(e.matches);
     };
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
@@ -87,8 +83,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
-      <TitleBar />
-      <EditorToolbar onOpenSettings={() => setSettingsOpen(true)} />
+      <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         {showSidebar && <Sidebar />}
         <main className="flex min-h-0 flex-1 overflow-hidden">

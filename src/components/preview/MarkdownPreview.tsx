@@ -1,8 +1,9 @@
 /**
  * Markdown 预览组件
  * - 异步解析 marked + Shiki
- * - 滚动同步（编辑器 → 预览）
- * - 跟随主题（亮/暗）
+ * - 滚动同步（编辑器 ↔ 预览）
+ * - 行宽限制 ~70ch 居中 + 卡片化（阅读优先排版）
+ * - 跟随配色方案（resolvedTheme）
  */
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/stores/editorStore";
@@ -50,7 +51,7 @@ export function MarkdownPreview() {
     if (!el) return;
     const scrollHeight = el.scrollHeight - el.clientHeight;
     if (scrollHeight > 0) {
-      el.scrollTop = scrollPercent * scrollHeight;
+      el.scrollTop = scrollHeight * scrollPercent;
     }
   }, [scrollPercent, scrollSource, scrollSync, html]);
 
@@ -71,21 +72,22 @@ export function MarkdownPreview() {
   }, [scrollSync, setScrollPercent, html]);
 
   return (
-    <div
-      ref={containerRef}
-      className="markdown-body h-full w-full overflow-auto px-8 py-6"
-    >
-      {loading && !html ? (
-        <div className="flex h-full items-center justify-center text-sm text-[var(--color-text-subtle)]">
-          渲染中...
-        </div>
-      ) : html ? (
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-      ) : (
-        <div className="flex h-full items-center justify-center text-sm text-[var(--color-text-subtle)]">
-          预览将在这里显示
-        </div>
-      )}
+    <div ref={containerRef} className="h-full w-full overflow-auto bg-[var(--color-bg-muted)]">
+      <article
+        className="markdown-body mx-auto my-3 flex min-h-[calc(100%-1.5rem)] w-[95%] flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-12 py-10 shadow-[var(--shadow-md)]"
+      >
+        {loading && !html ? (
+          <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
+            渲染中...
+          </div>
+        ) : html ? (
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        ) : (
+          <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
+            预览将在这里显示
+          </div>
+        )}
+      </article>
     </div>
   );
 }

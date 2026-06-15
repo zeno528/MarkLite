@@ -1,0 +1,197 @@
+/**
+ * 顶栏（合并自 TitleBar + EditorToolbar，单层）
+ * 左：品牌 + 文件名(dirty)   右：药丸工具组（打开/保存 | 布局 | 配色 | 侧边栏 | 设置）
+ * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
+ */
+import { useEffect, useState } from "react";
+import { FolderOpen, FileText, Save, Columns2, File as FileIcon, Eye, Settings, Pencil, Focus, MoveVertical } from "lucide-react";
+import logoSvg from "@/assets/logo.svg";
+import { useUIStore, type LayoutMode } from "@/stores/uiStore";
+import { useEditorStore } from "@/stores/editorStore";
+import { useFileStore } from "@/stores/fileStore";
+import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
+import { FileService } from "@/lib/tauri/fs";
+import { isMac } from "@/lib/utils/platform";
+import { cn } from "@/lib/utils/cn";
+
+interface TopBarProps {
+  onOpenSettings?: () => void;
+}
+
+export function TopBar({ onOpenSettings }: TopBarProps) {
+  const [mac, setMac] = useState(false);
+  useEffect(() => {
+    isMac().then(setMac);
+  }, []);
+
+  const currentFile = useEditorStore((s) => s.currentFile);
+  const openFile = useEditorStore((s) => s.openFile);
+  const markSaved = useEditorStore((s) => s.markSaved);
+  const setRootFolder = useFileStore((s) => s.setRootFolder);
+  const setFileTree = useFileStore((s) => s.setFileTree);
+
+  const layout = useUIStore((s) => s.layout);
+  const setLayout = useUIStore((s) => s.setLayout);
+  const resolvedScheme = useUIStore((s) => s.resolvedScheme);
+  const setColorScheme = useUIStore((s) => s.setColorScheme);
+  const writingMode = useUIStore((s) => s.writingMode);
+  const setWritingMode = useUIStore((s) => s.setWritingMode);
+  const showSidebar = useUIStore((s) => s.showSidebar);
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+
+  const handleOpenFile = async () => {
+    const file = await FileService.openFile();
+    if (file) openFile(file.path, file.title, file.content);
+  };
+  const handleOpenFolder = async () => {
+    const { pickFolder } = await import("@/lib/tauri/dialog");
+    const folder = await pickFolder();
+    if (!folder) return;
+    setRootFolder(folder);
+    try {
+      const tree = await FileService.readFolderTree(folder);
+      setFileTree(tree);
+    } catch (e) {
+      console.error("[TopBar] read folder failed:", e);
+    }
+  };
+  const handleSave = async () => {
+    if (!currentFile) return;
+    try {
+      await FileService.saveFile(currentFile.path, currentFile.content);
+      markSaved(currentFile.path);
+    } catch (e) {
+      console.error("[TopBar] save failed:", e);
+    }
+  };
+
+  const layouts: { mode: LayoutMode; icon: React.ReactNode; title: string }[] = [
+    { mode: "editor-only", icon: <FileIcon size={15} />, title: "仅编辑" },
+    { mode: "split", icon: <Columns2 size={15} />, title: "双栏" },
+    { mode: "preview-only", icon: <Eye size={15} />, title: "仅预览" },
+  ];
+
+  return (
+    <header
+      data-tauri-drag-region
+      className="flex h-[50px] w-full shrink-0 items-center gap-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg-elevated)] pr-4"
+      style={{ paddingLeft: mac ? "78px" : "16px", WebkitAppRegion: "drag" } as React.CSSProperties}
+    >
+      {/* 品牌 */}
+      <div className="flex items-center gap-2">
+        <img src={logoSvg} alt="MarkLite" className="h-[22px] w-[22px]" />
+        <span className="text-[14.5px] font-bold tracking-tight">MarkLite</span>
+      </div>
+
+      {/* 文件名 + dirty */}
+      {currentFile && (
+        <div className="flex min-w-0 items-center gap-2 text-[13px]">
+          <span className="text-[var(--color-text-subtle)]">/</span>
+          <span className="truncate font-medium text-[var(--color-text)]">{currentFile.title}</span>
+          {currentFile.isDirty && (
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-accent)]" />
+          )}
+        </div>
+      )}
+
+      <div className="flex-1" />
+
+      {/* 工具按钮组（不参与拖拽） */}
+      <div
+        className="flex items-center gap-2"
+        style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+      >
+        <div className="tool-group">
+          <button className="tbtn" onClick={handleOpenFile} title="打开文件 (Ctrl+O)">
+            <FileText size={15} /> 打开
+          </button>
+          <button className="tbtn" onClick={handleOpenFolder} title="打开文件夹">
+            <FolderOpen size={15} /> 文件夹
+          </button>
+          <button
+            className="tbtn"
+            onClick={handleSave}
+            disabled={!currentFile || !currentFile.isDirty}
+            title="保存 (Ctrl+S)"
+          >
+            <Save size={15} /> 保存
+          </button>
+        </div>
+
+        <div className="tool-group">
+          {layouts.map((l) => (
+            <button
+              key={l.mode}
+              className={cn("tbtn icon", layout === l.mode && "active")}
+              onClick={() => setLayout(l.mode)}
+              title={l.title}
+            >
+              {l.icon}
+            </button>
+          ))}
+        </div>
+
+        <div className="tool-group">
+          {COLOR_SCHEMES.map((scheme) => (
+            <button
+              key={scheme.id}
+              className={cn("tbtn icon", resolvedScheme === scheme.id && "active")}
+              onClick={() => setColorScheme(scheme.id)}
+              title={scheme.name}
+            >
+              <span
+                className="h-[11px] w-[11px] rounded-full border-[1.5px] border-white/40"
+                style={{ backgroundColor: scheme.swatch.accent }}
+              />
+            </button>
+          ))}
+        </div>
+
+        <div className="tool-group">
+          <button
+            className={cn("tbtn", writingMode !== "normal" && "active")}
+            onClick={() =>
+              setWritingMode(
+                writingMode === "normal"
+                  ? "focus"
+                  : writingMode === "focus"
+                    ? "typewriter"
+                    : "normal",
+              )
+            }
+            title={`写作模式（点击切换）：${
+              writingMode === "normal" ? "普通" : writingMode === "focus" ? "专注" : "打字机"
+            }`}
+          >
+            {writingMode === "normal" ? (
+              <Pencil size={15} />
+            ) : writingMode === "focus" ? (
+              <Focus size={15} />
+            ) : (
+              <MoveVertical size={15} />
+            )}
+            {writingMode === "normal" ? "普通" : writingMode === "focus" ? "专注" : "打字机"}
+          </button>
+        </div>
+
+        <div className="tool-group">
+          <button
+            className={cn("tbtn", showSidebar && "active")}
+            onClick={toggleSidebar}
+            title="侧边栏 (Ctrl+\\)"
+          >
+            <FolderOpen size={15} /> 文件
+          </button>
+        </div>
+
+        {onOpenSettings && (
+          <div className="tool-group">
+            <button className="tbtn icon" onClick={onOpenSettings} title="设置 (Ctrl+,)">
+              <Settings size={15} />
+            </button>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}

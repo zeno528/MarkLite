@@ -41,6 +41,10 @@ interface EditorState {
   searchVisible: boolean;
   setSearchVisible: (show: boolean) => void;
 
+  // === 待跳转行（纯预览模式下点击大纲触发：先切 split，再由编辑器消费） ===
+  pendingJumpLine: number | null;
+  setPendingJumpLine: (line: number | null) => void;
+
   // === 操作 ===
   openFile: (path: string, title: string, content: string) => void;
   closeFile: (path: string) => void;
@@ -58,10 +62,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   scrollPercent: 0,
   scrollSource: null,
   searchVisible: false,
+  pendingJumpLine: null,
 
   setCursor: (cursor) => set({ cursor }),
   setScrollPercent: (scrollPercent, source) => set({ scrollPercent, scrollSource: source }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
+  setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),
 
   openFile: (path, title, content) => {
     const { openFiles } = get();

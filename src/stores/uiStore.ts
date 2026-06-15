@@ -1,18 +1,39 @@
 /**
- * UI 状态：主题、布局、侧边栏可见性、字体大小等
+ * UI 状态：配色方案、写作模式、布局、侧边栏可见性、字体大小等
+ *
+ * 配色架构「配色即外观」(Typola 式)：
+ * - colorScheme 决定 <html data-scheme>，驱动全部 CSS 变量（编辑器/预览/组件全联动）
+ * - resolvedTheme 从方案 mode 派生，供 CodeMirror / Shiki 选择亮/暗渲染
  */
 import { create } from "zustand";
+import {
+  type ColorScheme,
+  type SchemeId,
+  SCHEME_MODE,
+  resolveScheme,
+  resolveSystemScheme,
+} from "@/lib/theme/colorSchemes";
 
-export type ThemeMode = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
 export type LayoutMode = "split" | "editor-only" | "preview-only";
+/** 写作模式：普通 / 专注(淡化非当前段) / 打字机(当前行居中) */
+export type WritingMode = "normal" | "focus" | "typewriter";
+
+const STORAGE_KEY = "marklite:colorscheme";
+const LEGACY_KEY = "marklite:theme";
 
 interface UIState {
-  // 主题
-  theme: ThemeMode;
-  resolvedTheme: ResolvedTheme;
-  setTheme: (theme: ThemeMode) => void;
-  setResolvedTheme: (theme: ResolvedTheme) => void;
+  // 配色方案
+  colorScheme: ColorScheme; // 用户选择（含 "system"）
+  resolvedScheme: SchemeId; // 实际生效方案
+  resolvedTheme: ResolvedTheme; // 派生明暗（供 CodeMirror / Shiki）
+  setColorScheme: (scheme: ColorScheme) => void;
+  /** 系统明暗变化时调用，仅当 colorScheme==="system" 时生效 */
+  applySystemScheme: (isDark: boolean) => void;
+
+  // 写作模式
+  writingMode: WritingMode;
+  setWritingMode: (mode: WritingMode) => void;
 
   // 布局
   layout: LayoutMode;
@@ -39,40 +60,43 @@ interface UIState {
   setFontFamily: (family: string) => void;
 }
 
+/** 把具体方案应用到 <html data-scheme>，返回其明暗模式 */
+function applyScheme(root: HTMLElement, scheme: SchemeId): ResolvedTheme {
+  root.setAttribute("data-scheme", scheme);
+  return SCHEME_MODE[scheme];
+}
+
 export const useUIStore = create<UIState>((set, get) => ({
-  // 主题默认跟随系统
-  theme: "system",
+  // 配色默认跟随系统
+  colorScheme: "system",
+  resolvedScheme: "violet",
   resolvedTheme: "light",
-  setTheme: (theme) => {
-    set({ theme });
-    // 立即应用
-    if (typeof window !== "undefined") {
-      const root = document.documentElement;
-      if (theme === "system") {
-        const mq = window.matchMedia("(prefers-color-scheme: dark)");
-        const resolved = mq.matches ? "dark" : "light";
-        root.classList.remove("light", "dark");
-        root.classList.add(resolved);
-        set({ resolvedTheme: resolved });
-      } else {
-        root.classList.remove("light", "dark");
-        root.classList.add(theme);
-        set({ resolvedTheme: theme });
-      }
-      // 持久化
-      try {
-        localStorage.setItem("marklite:theme", theme);
-      } catch {}
-    }
+
+  setColorScheme: (colorScheme) => {
+    set({ colorScheme });
+    if (typeof window === "undefined") return;
+    const root = document.documentElement;
+    const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const resolved = resolveScheme(colorScheme, systemIsDark);
+    const mode = applyScheme(root, resolved);
+    set({ resolvedScheme: resolved, resolvedTheme: mode });
+    try {
+      localStorage.setItem(STORAGE_KEY, colorScheme);
+    } catch {}
   },
-  setResolvedTheme: (resolvedTheme) => {
-    set({ resolvedTheme });
-    if (typeof window !== "undefined") {
-      const root = document.documentElement;
-      root.classList.remove("light", "dark");
-      root.classList.add(resolvedTheme);
-    }
+
+  applySystemScheme: (isDark) => {
+    // 仅当用户选择「跟随系统」时才响应系统明暗变化
+    if (get().colorScheme !== "system") return;
+    const root = document.documentElement;
+    const resolved = resolveSystemScheme(isDark);
+    const mode = applyScheme(root, resolved);
+    set({ resolvedScheme: resolved, resolvedTheme: mode });
   },
+
+  // 写作模式
+  writingMode: "normal",
+  setWritingMode: (writingMode) => set({ writingMode }),
 
   // 布局
   layout: "split",
@@ -102,17 +126,22 @@ export const useUIStore = create<UIState>((set, get) => ({
   setFontFamily: (fontFamily) => set({ fontFamily }),
 }));
 
-// 启动时从 localStorage 恢复主题
+// 启动时恢复配色方案（含旧 marklite:theme 迁移）
+// setColorScheme 在模块导入时同步执行，早于 React 首帧，配合 Tauri win.show() rAF 闸门防闪烁
 if (typeof window !== "undefined") {
   try {
-    const saved = localStorage.getItem("marklite:theme") as ThemeMode | null;
-    if (saved) {
-      useUIStore.getState().setTheme(saved);
-    } else {
-      // 应用系统主题
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      const resolved = mq.matches ? "dark" : "light";
-      useUIStore.getState().setResolvedTheme(resolved);
+    let saved = localStorage.getItem(STORAGE_KEY) as ColorScheme | null;
+    // 兼容迁移旧 marklite:theme（light/dark/system）
+    if (!saved) {
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy === "light") saved = "violet";
+      else if (legacy === "dark") saved = "midnight";
+      else if (legacy === "system") saved = "system";
+      if (saved) {
+        localStorage.setItem(STORAGE_KEY, saved);
+        localStorage.removeItem(LEGACY_KEY);
+      }
     }
+    useUIStore.getState().setColorScheme(saved ?? "system");
   } catch {}
 }

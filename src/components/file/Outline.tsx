@@ -1,9 +1,8 @@
 /**
  * 文档大纲 - 从 Markdown 源码提取标题
- * - 点击标题滚动编辑器到对应行
- * - 内容变化时自动刷新
+ * - 点击标题：若有编辑器则直接跳转；否则（纯预览模式）先切到 split 布局并记下待跳转行
  */
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { EditorView } from "@codemirror/view";
 import { cn } from "@/lib/utils/cn";
@@ -45,21 +44,77 @@ function getLevelStyle(level: number): string {
   }
 }
 
+/** 让编辑器跳到指定行（需 view 已就绪） */
+function jumpToLine(view: EditorView, line: number) {
+  const target = Math.min(Math.max(1, line), view.state.doc.lines);
+  const lineObj = view.state.doc.line(target);
+  view.dispatch({
+    selection: { anchor: lineObj.from },
+    effects: EditorView.scrollIntoView(lineObj.from, { y: "start", yMargin: 60 }),
+  });
+  view.focus();
+}
+
 export function Outline() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
   const currentLine = useEditorStore((s) => s.cursor.line);
+  const pendingJumpLine = useEditorStore((s) => s.pendingJumpLine);
+  const setPendingJumpLine = useEditorStore((s) => s.setPendingJumpLine);
 
   const headings = useMemo(() => extractHeadings(content), [content]);
 
-  const handleClick = (line: number) => {
+  // 消费 pendingJumpLine：编辑器就绪后跳转并清空
+  useEffect(() => {
+    if (pendingJumpLine == null) return;
     const view = editorViewRef.current;
     if (!view) return;
-    const lineObj = view.state.doc.line(Math.min(line, view.state.doc.lines));
-    view.dispatch({
-      selection: { anchor: lineObj.from },
-      effects: EditorView.scrollIntoView(lineObj.from, { y: "start", yMargin: 60 }),
-    });
-    view.focus();
+    jumpToLine(view, pendingJumpLine);
+    setPendingJumpLine(null);
+  });
+
+  /** 纯预览模式下：滚动预览区到第 index 个标题
+   *  预览异步渲染中找不到标题时轮询等待，绝不返回失败（避免误切布局） */
+  function jumpInPreview(index: number): boolean {
+    const tryJump = () => {
+      const preview = document.querySelector(".markdown-body");
+      if (!preview) return false;
+      const heads = preview.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6");
+      const el = heads[index];
+      if (!el) return false;
+      let scroller: HTMLElement | null = preview.parentElement;
+      while (scroller && getComputedStyle(scroller).overflowY !== "auto") {
+        scroller = scroller.parentElement;
+      }
+      if (!scroller) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return true;
+      }
+      const scrollerRect = scroller.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const target = scroller.scrollTop + (elRect.top - scrollerRect.top);
+      scroller.scrollTo({ top: target, behavior: "smooth" });
+      return true;
+    };
+    if (tryJump()) return true;
+    // 预览尚未渲染好：轮询等待最多 1s
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      if (tryJump() || ++tries > 20) window.clearInterval(timer);
+    }, 50);
+    return true; // 始终返回 true，避免上层兜底切布局
+  }
+
+  const handleClick = (index: number) => {
+    const line = headings[index]?.line;
+    if (line == null) return;
+    // 仅当编辑器真实存在于 DOM 时才走编辑器跳转（避免纯预览模式用了孤儿 view）
+    const view = editorViewRef.current;
+    if (view && document.body.contains(view.dom)) {
+      jumpToLine(view, line);
+      return;
+    }
+    // 无编辑器（纯预览）：滚动预览，永不切布局
+    jumpInPreview(index);
   };
 
   if (headings.length === 0) {
@@ -82,7 +137,7 @@ export function Outline() {
         return (
           <div
             key={`${h.line}-${h.text}`}
-            onClick={() => handleClick(h.line)}
+            onClick={() => handleClick(i)}
             className={cn(
               "flex cursor-pointer items-center rounded-sm px-2 py-[3px] text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]",
               getLevelStyle(h.level),
