@@ -12,6 +12,9 @@ import { Marked } from "marked";
 import DOMPurify from "dompurify";
 import { highlightCode } from "./shiki";
 
+/** 代码块占位符自增 id（每次解析重新计数） */
+let nextCodeId = 0;
+
 /**
  * 解析 Markdown → 安全的 HTML
  * @param md Markdown 源文
@@ -22,6 +25,7 @@ export async function parseMarkdown(
   theme: "light" | "dark",
 ): Promise<string> {
   if (!md.trim()) return "";
+  nextCodeId = 0; // 每次解析重置占位符 id
 
   // === 阶段 1：marked 解析 ===
   const syncMarked = new Marked({
@@ -29,11 +33,12 @@ export async function parseMarkdown(
     breaks: false,
   });
 
-  // 自定义代码渲染器：先输出占位符
+  // 自定义代码渲染器：输出带唯一 id 的占位符，供 enhanceCodeBlocks 替换为 Shiki 高亮
   syncMarked.use({
     renderer: {
       code({ text, lang }) {
-        return `<pre class="shiki-placeholder" data-lang="${lang || ""}"><code>${escapeHtml(text)}</code></pre>`;
+        const id = `cb${nextCodeId++}`;
+        return `<pre class="shiki-placeholder" data-shiki-id="${id}" data-lang="${lang || ""}"><code>${escapeHtml(text)}</code></pre>`;
       },
     },
   });

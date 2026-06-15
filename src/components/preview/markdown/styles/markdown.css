@@ -117,15 +117,20 @@
   border-radius: var(--radius-sm);
 }
 
-/* 代码块（Shiki 输出，自带内联背景 github-light/dark） */
+/* 代码块（Shiki 输出，覆盖其内联背景，让容器在卡片内有明确边界） */
 .markdown-body pre {
+  position: relative;
   margin: 1.2em 0;
-  padding: 1em 1.2em;
-  border-radius: var(--radius-lg);
+  padding: 1em 1.2em !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--color-border) !important;
+  /* 用 color-mix 让背景比卡片底色略深一阶，确保容器可见 */
+  background: color-mix(in oklch, var(--color-bg-elevated) 85%, var(--color-text) 6%) !important;
   overflow-x: auto;
   font-family: var(--font-editor);
   font-size: var(--md-code-size);
   line-height: 1.65;
+  box-shadow: var(--shadow-sm);
 }
 .markdown-body pre code {
   padding: 0;
@@ -135,6 +140,45 @@
 }
 .markdown-body pre.shiki-placeholder {
   color: var(--color-text-muted);
+}
+
+/* 代码块复制按钮（GitHub 风格：右上角，hover 显示，主题感知高对比） */
+.markdown-body .copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  z-index: 1;
+}
+.markdown-body pre:hover .copy-btn {
+  opacity: 1;
+}
+.markdown-body .copy-btn:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  border-color: var(--color-accent);
+}
+.markdown-body .copy-btn.copied {
+  color: var(--color-accent-foreground);
+  border-color: var(--color-success);
+  background: var(--color-success);
+}
+.markdown-body .copy-btn.copied::before {
+  content: "✓ ";
 }
 
 /* 表格（整体宽度始终 = 容器宽度，列按内容比例分配，超长内容单元格内换行，不撑破） */

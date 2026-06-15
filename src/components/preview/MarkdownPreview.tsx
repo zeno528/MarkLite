@@ -44,6 +44,59 @@ export function MarkdownPreview() {
     };
   }, [content, resolvedTheme]);
 
+  // 给每个代码块注入复制按钮（GitHub 风格：hover 显示，点击复制）
+  // 用 MutationObserver 监听 DOM 变化，保证任何情况下（渲染、切主题、shiki 重算）代码块都有按钮
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+
+    const ensureButtons = () => {
+      root.querySelectorAll("pre").forEach((pre) => {
+        if (pre.querySelector(".copy-btn")) return;
+        if (!pre.querySelector("code")) return;
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.type = "button";
+        btn.textContent = "复制";
+        pre.appendChild(btn);
+      });
+    };
+    ensureButtons();
+
+    const observer = new MutationObserver(() => ensureButtons());
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
+  // 事件委托：容器统一处理复制按钮点击（避免 DOM 重建后监听器丢失）
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+    const onClick = async (e: MouseEvent) => {
+      const btn = (e.target as HTMLElement).closest(".copy-btn") as HTMLButtonElement | null;
+      if (!btn) return;
+      const pre = btn.parentElement;
+      const codeEl = pre?.querySelector("code");
+      if (!codeEl) return;
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText(codeEl.textContent ?? "");
+        btn.textContent = "已复制";
+        btn.classList.add("copied");
+      } catch {
+        btn.textContent = "复制失败";
+      }
+      window.setTimeout(() => {
+        if (document.body.contains(btn)) {
+          btn.textContent = "复制";
+          btn.classList.remove("copied");
+        }
+      }, 1500);
+    };
+    root.addEventListener("click", onClick);
+    return () => root.removeEventListener("click", onClick);
+  }, []);
+
   // 滚动同步：编辑器 → 预览（仅响应编辑器发起的滚动）
   useEffect(() => {
     if (!scrollSync || scrollSource !== "editor") return;
