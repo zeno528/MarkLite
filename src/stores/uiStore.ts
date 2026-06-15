@@ -21,6 +21,7 @@ const STORAGE_KEY = "marklite:colorscheme";
 const LEGACY_KEY = "marklite:theme";
 const FONT_SIZE_KEY = "marklite:fontsize";
 const FONT_FAMILY_KEY = "marklite:fontfamily";
+const LAYOUT_KEY = "marklite:layout";
 
 interface UIState {
   // 配色方案
@@ -91,8 +92,11 @@ export const useUIStore = create<UIState>((set, get) => ({
   },
 
   // 布局
-  layout: "split",
-  setLayout: (layout) => set({ layout }),
+  layout: "editor-only",
+  setLayout: (layout) => {
+    set({ layout });
+    try { localStorage.setItem(LAYOUT_KEY, layout); } catch {}
+  },
   toggleLayout: () => {
     const cur = get().layout;
     const next: LayoutMode =
@@ -149,5 +153,9 @@ if (typeof window !== "undefined") {
     }
     const savedFontFamily = localStorage.getItem(FONT_FAMILY_KEY);
     if (savedFontFamily) useUIStore.setState({ fontFamily: savedFontFamily });
+
+    // 恢复布局（layout）
+    const savedLayout = localStorage.getItem(LAYOUT_KEY) as LayoutMode | null;
+    if (savedLayout) useUIStore.setState({ layout: savedLayout });
   } catch {}
 }

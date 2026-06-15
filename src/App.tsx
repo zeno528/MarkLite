@@ -12,6 +12,8 @@ import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useFileStore, ROOTFOLDER_KEY } from "@/stores/fileStore";
+import { FileService } from "@/lib/tauri/fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import { openFileViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
@@ -24,6 +26,23 @@ export default function App() {
   // 初始化设置
   useEffect(() => {
     useSettingsStore.getState().init();
+  }, []);
+
+  // 启动恢复上次打开的文件夹（持久化），并重建文件树
+  useEffect(() => {
+    const restore = async () => {
+      try {
+        const saved = localStorage.getItem(ROOTFOLDER_KEY);
+        if (!saved) return;
+        const { setRootFolder, setFileTree } = useFileStore.getState();
+        setRootFolder(saved);
+        const tree = await FileService.readFolderTree(saved);
+        setFileTree(tree);
+      } catch (e) {
+        console.error("[App] restore rootFolder failed:", e);
+      }
+    };
+    restore();
   }, []);
 
   // 启动后预热 Shiki（idle 时）

@@ -3,6 +3,9 @@
  */
 import { create } from "zustand";
 
+/** 持久化上次打开的文件夹（localStorage key） */
+export const ROOTFOLDER_KEY = "marklite:rootfolder";
+
 export interface FileNode {
   name: string;
   path: string;
@@ -36,6 +39,10 @@ export const useFileStore = create<FileState>((set, get) => ({
 
   setRootFolder: (rootFolder) => {
     set({ rootFolder, fileTree: [], expanded: new Set(), selectedPath: null });
+    try {
+      if (rootFolder) localStorage.setItem(ROOTFOLDER_KEY, rootFolder);
+      else localStorage.removeItem(ROOTFOLDER_KEY);
+    } catch {}
   },
   setFileTree: (fileTree) => set({ fileTree }),
   toggleExpand: (path) => {

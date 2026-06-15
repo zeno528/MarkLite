@@ -13,7 +13,8 @@ import {
   mkdir,
   readDir,
 } from "@tauri-apps/plugin-fs";
-import { join, basename, dirname, homeDir, sep } from "@tauri-apps/api/path";
+import { join, basename, dirname, sep } from "@tauri-apps/api/path";
+import { getDefaultPath, rememberPath } from "@/lib/tauri/dialog";
 import type { FileNode } from "@/stores/fileStore";
 
 /** 提取标题（文件名去后缀） */
@@ -40,17 +41,18 @@ export const FileService = {
     ext: string;
   } | null> {
     const { open } = await import("@tauri-apps/plugin-dialog");
-    const home = await homeDir();
+    const defaultPath = await getDefaultPath();
     const selected = await open({
       multiple: false,
       directory: false,
-      defaultPath: home,
+      defaultPath,
       filters: [
         { name: "Markdown", extensions: ["md", "markdown", "mdx"] },
         { name: "All Files", extensions: ["*"] },
       ],
     });
     if (!selected || typeof selected !== "string") return null;
+    await rememberPath(selected, false);
 
     const content = await readTextFile(selected);
     return {
@@ -70,15 +72,16 @@ export const FileService = {
     defaultName = "untitled.md",
   ): Promise<string | null> {
     const { save } = await import("@tauri-apps/plugin-dialog");
-    const home = await homeDir();
+    const defaultPath = await getDefaultPath();
     const target = await save({
-      defaultPath: await join(home, defaultName),
+      defaultPath: await join(defaultPath, defaultName),
       filters: [
         { name: "Markdown", extensions: ["md", "markdown"] },
         { name: "All Files", extensions: ["*"] },
       ],
     });
     if (!target) return null;
+    await rememberPath(target, false);
     await writeTextFile(target, content);
     return target;
   },
