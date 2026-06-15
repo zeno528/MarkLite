@@ -171,6 +171,16 @@ aside ::-webkit-scrollbar-thumb:hover {
   color: var(--color-accent-foreground);
 }
 
+/* 设置弹窗进场动画（遮罩淡入 + 面板上浮，150ms；class 在 SettingsDialog.tsx 引用） */
+@keyframes settings-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes settings-pop {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* 工具类：填充当前文本色 */
 .text-balance {
   text-wrap: balance;

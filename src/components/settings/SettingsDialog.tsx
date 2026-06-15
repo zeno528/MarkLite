@@ -1,14 +1,13 @@
 /**
- * 设置对话框
- * - 外观（配色方案、字体、字号）
- * - 编辑器（行号、自动换行、自动保存、Tab 大小）
- * - Markdown（滚动同步）
+ * 设置对话框（外壳）
+ * 左分类导航 + 右内容区，分类由 sections.ts 注册表驱动
+ * 进场动画：遮罩淡入 + 面板上浮（纯 CSS keyframes，见 globals.css）
+ * open/onClose 受控，由 App.tsx 管理
  */
-import { X, Monitor } from "lucide-react";
-import { useUIStore } from "@/stores/uiStore";
-import { useSettingsStore } from "@/stores/settingsStore";
-import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/colorSchemes";
+import { useState } from "react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { SECTIONS, type SectionId } from "./sections";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -16,220 +15,64 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
-  const fontSize = useUIStore((s) => s.fontSize);
-  const setFontSize = useUIStore((s) => s.setFontSize);
-  const fontFamily = useUIStore((s) => s.fontFamily);
-  const setFontFamily = useUIStore((s) => s.setFontFamily);
+  const [active, setActive] = useState<SectionId>("appearance");
+  const current = SECTIONS.find((s) => s.id === active);
 
-  const lineNumbers = useSettingsStore((s) => s.lineNumbers);
-  const wordWrap = useSettingsStore((s) => s.wordWrap);
-  const autoSave = useSettingsStore((s) => s.autoSave);
-  const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
-  const scrollSync = useSettingsStore((s) => s.scrollSync);
-  const update = useSettingsStore((s) => s.update);
-
-  if (!open) return null;
+  if (!open || !current) return null;
+  const Current = current.Component;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-[settings-fade_150ms_ease_forwards]"
       onClick={onClose}
     >
       <div
-        className="w-[480px] max-w-[90vw] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-lg)]"
+        className="flex h-[600px] max-h-[85vh] w-[680px] max-w-[90vw] overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-lg)] animate-[settings-pop_150ms_ease_forwards]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
-          <h2 className="text-base font-semibold">设置</h2>
-          <button
-            onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded hover:bg-[var(--color-bg-muted)]"
-          >
-            <X size={14} />
-          </button>
-        </div>
-        <div className="max-h-[70vh] space-y-5 overflow-auto p-4 text-sm">
-          {/* 外观 */}
-          <Section title="外观">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[var(--color-text)]">配色方案</span>
-              <SchemePicker />
-            </div>
-            <Row label="编辑器字号">
-              <input
-                type="number"
-                min={10}
-                max={24}
-                value={fontSize}
-                onChange={(e) => setFontSize(Number(e.target.value))}
-                className="w-16 rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1 text-xs"
-              />
-              <span className="text-xs text-[var(--color-text-subtle)]">px</span>
-            </Row>
-            <Row label="字体">
-              <select
-                value={fontFamily}
-                onChange={(e) => setFontFamily(e.target.value)}
-                className="rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1 text-xs"
+        {/* 左导航 */}
+        <nav className="flex w-[160px] shrink-0 flex-col gap-0.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] p-2">
+          <h2 className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
+            设置
+          </h2>
+          {SECTIONS.map((s) => {
+            const Icon = s.icon;
+            const isActive = active === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setActive(s.id)}
+                className={cn(
+                  "flex items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-[13px] transition-colors",
+                  isActive
+                    ? "bg-[var(--color-bg-subtle)] font-medium text-[var(--color-accent)]"
+                    : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+                )}
               >
-                <option value="JetBrains Mono">JetBrains Mono</option>
-                <option value="SF Mono">SF Mono</option>
-                <option value="Cascadia Code">Cascadia Code</option>
-                <option value="Menlo">Menlo</option>
-                <option value="Consolas">Consolas</option>
-                <option value="monospace">系统默认</option>
-              </select>
-            </Row>
-          </Section>
+                <Icon size={15} className="shrink-0" />
+                <span>{s.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* 编辑器 */}
-          <Section title="编辑器">
-            <Row label="显示行号">
-              <input
-                type="checkbox"
-                checked={lineNumbers}
-                onChange={(e) => update("lineNumbers", e.target.checked)}
-              />
-            </Row>
-            <Row label="自动换行">
-              <input
-                type="checkbox"
-                checked={wordWrap}
-                onChange={(e) => update("wordWrap", e.target.checked)}
-              />
-            </Row>
-            <Row label="自动保存">
-              <input
-                type="checkbox"
-                checked={autoSave}
-                onChange={(e) => update("autoSave", e.target.checked)}
-              />
-            </Row>
-            {autoSave && (
-              <Row label="保存延迟">
-                <input
-                  type="number"
-                  min={500}
-                  max={10000}
-                  step={500}
-                  value={autoSaveDelay}
-                  onChange={(e) => update("autoSaveDelay", Number(e.target.value))}
-                  className="w-20 rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-2 py-1 text-xs"
-                />
-                <span className="text-xs text-[var(--color-text-subtle)]">ms</span>
-              </Row>
-            )}
-          </Section>
-
-          {/* Markdown */}
-          <Section title="Markdown">
-            <Row label="滚动同步">
-              <input
-                type="checkbox"
-                checked={scrollSync}
-                onChange={(e) => update("scrollSync", e.target.checked)}
-              />
-            </Row>
-          </Section>
+        {/* 右内容 */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
+            <h3 className="text-sm font-semibold text-[var(--color-text)]">{current.label}</h3>
+            <button
+              onClick={onClose}
+              className="flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+              aria-label="关闭设置"
+            >
+              <X size={14} />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-auto p-5 text-sm">
+            <Current />
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-/** 配色方案卡片选择器：3 个方案 + 跟随系统 */
-function SchemePicker() {
-  const colorScheme = useUIStore((s) => s.colorScheme);
-  const setColorScheme = useUIStore((s) => s.setColorScheme);
-
-  const cards: {
-    key: string;
-    value: ColorScheme;
-    name: string;
-    desc: string;
-    mode: string;
-    dots: string[] | null;
-  }[] = [
-    ...COLOR_SCHEMES.map((s) => ({
-      key: s.id,
-      value: s.id as ColorScheme,
-      name: s.name,
-      desc: s.desc,
-      mode: s.mode === "light" ? "浅" : "深",
-      dots: [s.swatch.bg, s.swatch.surface, s.swatch.accent],
-    })),
-    {
-      key: "system",
-      value: "system",
-      name: "跟随系统",
-      desc: "自动跟随系统明暗",
-      mode: "自动",
-      dots: null,
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      {cards.map((c) => {
-        const active = colorScheme === c.value;
-        return (
-          <button
-            key={c.key}
-            onClick={() => setColorScheme(c.value)}
-            className={cn(
-              "flex items-center gap-2.5 rounded-[var(--radius-lg)] border p-2.5 text-left transition-colors",
-              active
-                ? "border-[var(--color-accent)] bg-[var(--color-bg-subtle)]"
-                : "border-[var(--color-border)] hover:bg-[var(--color-bg-muted)]",
-            )}
-          >
-            {/* 色板 / 图标 */}
-            {c.dots ? (
-              <div className="flex gap-0.5">
-                {c.dots.map((d, i) => (
-                  <span
-                    key={i}
-                    className="h-4 w-4 rounded-full border border-[var(--color-border)]"
-                    style={{ backgroundColor: d }}
-                  />
-                ))}
-              </div>
-            ) : (
-              <Monitor size={18} className="shrink-0 text-[var(--color-text-muted)]" />
-            )}
-            {/* 名称 + 描述 */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-medium text-[var(--color-text)]">{c.name}</span>
-                <span className="rounded bg-[var(--color-bg-muted)] px-1 text-[10px] text-[var(--color-text-subtle)]">
-                  {c.mode}
-                </span>
-              </div>
-              <div className="truncate text-[11px] text-[var(--color-text-subtle)]">{c.desc}</div>
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-        {title}
-      </h3>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-[var(--color-text)]">{label}</span>
-      <div className="flex items-center gap-2">{children}</div>
     </div>
   );
 }
