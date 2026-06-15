@@ -9,7 +9,9 @@ import { useCallback, useEffect, useState } from "react";
 import { FileText, FolderOpen } from "lucide-react";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { useEditorStore } from "@/stores/editorStore";
+import { useUIStore } from "@/stores/uiStore";
 import { FileService } from "@/lib/tauri/fs";
+import { cn } from "@/lib/utils/cn";
 import {
   openFileViaDialog,
   openFolderViaDialog,
@@ -19,6 +21,9 @@ export function EditorPane() {
   const currentFile = useEditorStore((s) => s.currentFile);
   const updateContent = useEditorStore((s) => s.updateContent);
   const markSaved = useEditorStore((s) => s.markSaved);
+
+  // 纯编辑模式（editor-only）用卡片包裹，与纯预览（preview-only）的卡片视觉一致
+  const isCardMode = useUIStore((s) => s.layout) === "editor-only";
 
   // 仅在切换文件时更新编辑器初始内容（用 key 强制重建 + 稳定 value）。
   // 打字时不回灌 value 给 @uiw，避免受控 value 同步在快速打字时用滞后值覆盖、吞字符。
@@ -102,14 +107,32 @@ export function EditorPane() {
     );
   }
 
+  // 纯编辑模式用卡片包裹（与纯预览卡片完全一致）：
+  // 外层为滚动容器（overflow-auto），卡片用 min-h——内容少时撑满视口、内容多时变长，
+  // 滚动时卡片整体随滚动移动、顶部圆角可见（而非固定在视口内）。
+  // 上下 my-3 留出与 TopBar / StatusBar 的间距；双栏模式直接平铺（无卡片）。
   return (
-    <div className="h-full w-full overflow-hidden bg-[var(--color-bg-elevated)]">
-      <CodeEditor
-        key={path}
-        value={initValue}
-        onChange={handleChange}
-        onSave={handleSave}
-      />
+    <div
+      className={cn(
+        "h-full w-full",
+        isCardMode ? "overflow-auto bg-[var(--color-bg)]" : "overflow-hidden bg-[var(--color-bg-elevated)]",
+      )}
+    >
+      <div
+        className={cn(
+          "w-full",
+          isCardMode
+            ? "my-3 min-h-[calc(100%-1.5rem)] rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-md)]"
+            : "h-full",
+        )}
+      >
+        <CodeEditor
+          key={path}
+          value={initValue}
+          onChange={handleChange}
+          onSave={handleSave}
+        />
+      </div>
     </div>
   );
 }

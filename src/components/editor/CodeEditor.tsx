@@ -49,6 +49,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { getCmMod } from "@/lib/utils/platform";
 import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { cn } from "@/lib/utils/cn";
 
 interface CodeEditorProps {
   value: string;
@@ -68,6 +69,8 @@ export function CodeEditor({
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const fontSize = useUIStore((s) => s.fontSize);
   const fontFamily = useUIStore((s) => s.fontFamily);
+  // 纯编辑模式：编辑器按内容自然高度撑开（外层卡片整体滚动）+ 不换行（文本填满卡片宽度）
+  const isStandalone = useUIStore((s) => s.layout) === "editor-only";
   const lineNumbersEnabled = useSettingsStore((s) => s.lineNumbers);
   const wordWrapEnabled = useSettingsStore((s) => s.wordWrap);
   const autoSaveEnabled = useSettingsStore((s) => s.autoSave);
@@ -138,7 +141,8 @@ export function CodeEditor({
       createHyperlinkHandler(),
     ];
 
-    if (wordWrapEnabled) {
+    // 纯编辑模式（卡片全宽）不换行，让文本填满卡片宽度；分屏窄栏尊重 wordWrap 设置
+    if (wordWrapEnabled && !isStandalone) {
       exts.push(CMEditorView.lineWrapping);
     }
 
@@ -160,6 +164,7 @@ export function CodeEditor({
     resolvedTheme,
     lineNumbersEnabled,
     wordWrapEnabled,
+    isStandalone,
     autoSaveEnabled,
     autoSaveDelay,
   ]);
@@ -208,15 +213,17 @@ export function CodeEditor({
     "--font-editor": fontFamily,
   } as React.CSSProperties;
 
+  // 纯编辑模式：根容器不固定高度/不裁剪，CodeMirror 也不传 height → 按内容自然撑开，
+  // 由外层卡片+滚动容器整体滚动（卡片随滚动移动）。分屏模式固定高度 + CodeMirror 内部滚动。
   return (
     <div
-      className="h-full w-full overflow-hidden"
+      className={cn("w-full", isStandalone ? "" : "h-full overflow-hidden")}
       style={editorStyle}
     >
       <CodeMirror
-        className="h-full"
+        className={isStandalone ? "cm-grow w-full" : "h-full"}
         value={value}
-        height="100%"
+        height={isStandalone ? undefined : "100%"}
         theme="none"
         extensions={extensions}
         onChange={onChange}

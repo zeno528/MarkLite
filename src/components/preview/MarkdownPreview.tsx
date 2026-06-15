@@ -181,7 +181,10 @@ export function MarkdownPreview() {
     return () => el.removeEventListener("scroll", handler);
   }, [scrollSync, setScrollPercent]);
 
-  // 仅预览模式用卡片包裹，双栏模式直接平铺（无卡片）
+  // 仅预览模式用卡片包裹（占满主区域宽度，圆角/边框/阴影表达卡片视觉）。
+  // 上下 my-3 留出与 TopBar / StatusBar 的间距（与主侧栏卡片的"四周 12px 留白"视觉一致）。
+  // root 容器底色用 var(--color-bg)：跟主侧栏 aside 的 padding 处底色一致（都继承 body）。
+  // 双栏模式直接平铺（无卡片）
   const isCardMode = layout === "preview-only";
 
   return (
@@ -189,14 +192,14 @@ export function MarkdownPreview() {
       ref={containerRef}
       className={cn(
         "h-full w-full overflow-auto",
-        isCardMode ? "bg-[var(--color-bg-muted)]" : "bg-[var(--color-bg-elevated)]",
+        isCardMode ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-elevated)]",
       )}
     >
       <article
         className={cn(
-          "markdown-body mx-auto flex flex-col px-12 py-10",
+          "markdown-body flex flex-col px-12 py-10",
           isCardMode
-            ? "my-3 min-h-[calc(100%-1.5rem)] w-[95%] rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-md)]"
+            ? "my-3 min-h-[calc(100%-1.5rem)] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-md)]"
             : "h-full w-full",
         )}
       >

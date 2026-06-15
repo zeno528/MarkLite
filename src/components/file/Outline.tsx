@@ -82,22 +82,29 @@ export function Outline() {
   });
 
   /** 纯预览模式下：滚动预览区到第 index 个标题
+   *  - index === 0：滚到顶部（卡片"原始位置"= 滚动条到顶）
+   *  - 其他：滚到对应标题位置
    *  预览异步渲染中找不到标题时轮询等待，绝不返回失败（避免误切布局） */
   function jumpInPreview(index: number): boolean {
     const tryJump = () => {
       const preview = document.querySelector(".markdown-body");
       if (!preview) return false;
-      const heads = preview.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6");
-      const el = heads[index];
-      if (!el) return false;
+      // 找滚动容器（向上找第一个 overflow-y: auto 的祖先）
       let scroller: HTMLElement | null = preview.parentElement;
       while (scroller && getComputedStyle(scroller).overflowY !== "auto") {
         scroller = scroller.parentElement;
       }
-      if (!scroller) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!scroller) return false;
+
+      // 第一个标题：滚到顶（卡片原始位置 = 滚动条初始位置）
+      if (index === 0) {
+        scroller.scrollTo({ top: 0, behavior: "smooth" });
         return true;
       }
+
+      const heads = preview.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6");
+      const el = heads[index];
+      if (!el) return false;
       const scrollerRect = scroller.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
       const target = scroller.scrollTop + (elRect.top - scrollerRect.top);
