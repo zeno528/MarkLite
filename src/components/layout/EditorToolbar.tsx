@@ -11,7 +11,7 @@ import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { COLOR_SCHEMES, type ColorScheme, type SchemeId } from "@/lib/theme/colorSchemes";
 import { FileService } from "@/lib/tauri/fs";
 import { useEditorStore } from "@/stores/editorStore";
-import { useFileStore } from "@/stores/fileStore";
+import { openFolderViaDialog } from "@/lib/shortcuts/appShortcuts";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,8 +31,6 @@ export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
   const openFile = useEditorStore((s) => s.openFile);
   const markSaved = useEditorStore((s) => s.markSaved);
   const currentFile = useEditorStore((s) => s.currentFile);
-  const setRootFolder = useFileStore((s) => s.setRootFolder);
-  const setFileTree = useFileStore((s) => s.setFileTree);
 
   useEffect(() => {
     isMac().then(setMac);
@@ -46,16 +44,7 @@ export function EditorToolbar({ onOpenSettings }: EditorToolbarProps = {}) {
   };
 
   const handleOpenFolder = async () => {
-    const { pickFolder } = await import("@/lib/tauri/dialog");
-    const folder = await pickFolder();
-    if (!folder) return;
-    setRootFolder(folder);
-    try {
-      const tree = await FileService.readFolderTree(folder);
-      setFileTree(tree);
-    } catch (e) {
-      console.error("[Toolbar] read folder failed:", e);
-    }
+    await openFolderViaDialog();
   };
 
   const handleSave = async () => {

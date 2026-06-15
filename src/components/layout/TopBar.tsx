@@ -34,7 +34,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   }, []);
 
   const currentFile = useEditorStore((s) => s.currentFile);
-  const rootFolder = useFileStore((s) => s.rootFolder);
+  const rootFolder = useFileStore((s) => s.activeFolderPath);
 
   const layout = useUIStore((s) => s.layout);
   const setLayout = useUIStore((s) => s.setLayout);

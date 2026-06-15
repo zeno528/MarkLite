@@ -12,7 +12,7 @@ import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { useFileStore, ROOTFOLDER_KEY } from "@/stores/fileStore";
+import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { FileService } from "@/lib/tauri/fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
@@ -28,18 +28,45 @@ export default function App() {
     useSettingsStore.getState().init();
   }, []);
 
-  // 启动恢复上次打开的文件夹（持久化），并重建文件树
+  // 启动恢复上次打开的文件夹列表（多文件夹持久化），并读激活文件夹的树
   useEffect(() => {
     const restore = async () => {
       try {
-        const saved = localStorage.getItem(ROOTFOLDER_KEY);
-        if (!saved) return;
-        const { setRootFolder, setFileTree } = useFileStore.getState();
-        setRootFolder(saved);
-        const tree = await FileService.readFolderTree(saved);
-        setFileTree(tree);
+        let folders: { path: string; fileTree: never[]; expanded: string[]; selectedPath: null }[] = [];
+        let active: string | null = null;
+        const metaJson = localStorage.getItem(FOLDERS_KEY);
+        if (metaJson) {
+          const meta = JSON.parse(metaJson);
+          folders = meta.map((m: { path: string; expanded?: string[]; selectedPath?: string | null }) => ({
+            path: m.path,
+            fileTree: [],
+            expanded: m.expanded ?? [],
+            selectedPath: m.selectedPath ?? null,
+          }));
+          active = localStorage.getItem(ACTIVE_FOLDER_KEY) ?? folders[0]?.path ?? null;
+        } else {
+          // 兼容旧 marklite:rootfolder（单文件夹）迁移
+          const old = localStorage.getItem("marklite:rootfolder");
+          if (old) {
+            folders = [{ path: old, fileTree: [], expanded: [], selectedPath: null }];
+            active = old;
+          }
+        }
+        if (folders.length === 0) return;
+        useFileStore.setState({ folders, activeFolderPath: active });
+        // 读激活文件夹的树
+        if (active) {
+          try {
+            const tree = await FileService.readFolderTree(active);
+            useFileStore.setState((state) => ({
+              folders: state.folders.map((f) => (f.path === active ? { ...f, fileTree: tree } : f)),
+            }));
+          } catch (e) {
+            console.error("[App] restore read tree failed:", e);
+          }
+        }
       } catch (e) {
-        console.error("[App] restore rootFolder failed:", e);
+        console.error("[App] restore folders failed:", e);
       }
     };
     restore();

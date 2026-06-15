@@ -1,10 +1,12 @@
 /**
- * 文件夹/文件树状态
+ * 文件夹/文件树状态（多文件夹工作区）
+ *
+ * 每个文件夹是一个 WorkspaceFolder 实体，自带 fileTree / expanded / selectedPath，
+ * 切换 activeFolder 不影响其他文件夹的状态（per-folder 记忆）。
+ * folders 元数据 + activeFolderPath 持久化到 localStorage（fileTree 不持久化，启动重读）。
  */
 import { create } from "zustand";
-
-/** 持久化上次打开的文件夹（localStorage key） */
-export const ROOTFOLDER_KEY = "marklite:rootfolder";
+import { FileService } from "@/lib/tauri/fs";
 
 export interface FileNode {
   name: string;
@@ -13,51 +15,139 @@ export interface FileNode {
   children?: FileNode[];
 }
 
-interface FileState {
-  /** 根目录路径 */
-  rootFolder: string | null;
-  /** 文件树 */
+/** 单个工作区文件夹（自带各自的展开/选中状态） */
+export interface WorkspaceFolder {
+  path: string;
   fileTree: FileNode[];
-  /** 展开的目录 */
-  expanded: Set<string>;
-  /** 选中文件 */
+  expanded: string[];
   selectedPath: string | null;
+}
 
-  // === 操作 ===
-  setRootFolder: (path: string | null) => void;
-  setFileTree: (tree: FileNode[]) => void;
+interface FileState {
+  folders: WorkspaceFolder[];
+  activeFolderPath: string | null;
+
+  /** 添加文件夹：已存在则仅切 active（并懒读树），否则读树后加入并设 active */
+  addFolder: (path: string) => Promise<void>;
+  /** 关闭文件夹：移出列表；若 active 被关则切首个或 null */
+  removeFolder: (path: string) => void;
+  /** 切换当前激活文件夹（不触碰任何 folder 的 expanded/selected） */
+  setActiveFolder: (path: string) => void;
+  /** 切换 activeFolder 内某目录的展开/折叠 */
   toggleExpand: (path: string) => void;
-  expandPath: (path: string) => void;
+  /** 设置 activeFolder 内的选中项 */
   setSelected: (path: string | null) => void;
+  /** 重新读 activeFolder 的文件树（刷新） */
+  refreshActiveTree: () => Promise<void>;
+}
+
+/** localStorage keys */
+export const FOLDERS_KEY = "marklite:folders";
+export const ACTIVE_FOLDER_KEY = "marklite:active-folder";
+
+/** 持久化 folders 元数据（不含 fileTree）+ activeFolderPath */
+function persist(folders: WorkspaceFolder[], activeFolderPath: string | null) {
+  try {
+    const meta = folders.map((f) => ({
+      path: f.path,
+      expanded: f.expanded,
+      selectedPath: f.selectedPath,
+    }));
+    localStorage.setItem(FOLDERS_KEY, JSON.stringify(meta));
+    if (activeFolderPath) localStorage.setItem(ACTIVE_FOLDER_KEY, activeFolderPath);
+    else localStorage.removeItem(ACTIVE_FOLDER_KEY);
+  } catch {}
+}
+
+/** 更新某个 folder（按 path 匹配），返回新 folders 数组 */
+function patchFolder(
+  folders: WorkspaceFolder[],
+  path: string,
+  patch: (f: WorkspaceFolder) => WorkspaceFolder,
+): WorkspaceFolder[] {
+  return folders.map((f) => (f.path === path ? patch(f) : f));
 }
 
 export const useFileStore = create<FileState>((set, get) => ({
-  rootFolder: null,
-  fileTree: [],
-  expanded: new Set(),
-  selectedPath: null,
+  folders: [],
+  activeFolderPath: null,
 
-  setRootFolder: (rootFolder) => {
-    set({ rootFolder, fileTree: [], expanded: new Set(), selectedPath: null });
-    try {
-      if (rootFolder) localStorage.setItem(ROOTFOLDER_KEY, rootFolder);
-      else localStorage.removeItem(ROOTFOLDER_KEY);
-    } catch {}
-  },
-  setFileTree: (fileTree) => set({ fileTree }),
-  toggleExpand: (path) => {
-    const expanded = new Set(get().expanded);
-    if (expanded.has(path)) {
-      expanded.delete(path);
-    } else {
-      expanded.add(path);
+  addFolder: async (path) => {
+    const { folders } = get();
+    const existing = folders.find((f) => f.path === path);
+    if (existing) {
+      // 已存在：仅切 active；若树未缓存则懒读
+      set({ activeFolderPath: path });
+      if (existing.fileTree.length === 0) {
+        try {
+          const tree = await FileService.readFolderTree(path);
+          set({ folders: patchFolder(get().folders, path, (f) => ({ ...f, fileTree: tree })) });
+        } catch (e) {
+          console.error("[fileStore] addFolder read failed:", e);
+        }
+      }
+      persist(get().folders, path);
+      return;
     }
-    set({ expanded });
+    // 新文件夹：读树后加入并设 active
+    let tree: FileNode[] = [];
+    try {
+      tree = await FileService.readFolderTree(path);
+    } catch (e) {
+      console.error("[fileStore] addFolder read failed:", e);
+    }
+    const folder: WorkspaceFolder = { path, fileTree: tree, expanded: [], selectedPath: null };
+    const next = [...get().folders, folder];
+    set({ folders: next, activeFolderPath: path });
+    persist(next, path);
   },
-  expandPath: (path) => {
-    const expanded = new Set(get().expanded);
-    expanded.add(path);
-    set({ expanded });
+
+  removeFolder: (path) => {
+    const folders = get().folders.filter((f) => f.path !== path);
+    let activeFolderPath = get().activeFolderPath;
+    if (activeFolderPath === path) {
+      activeFolderPath = folders[0]?.path ?? null;
+    }
+    set({ folders, activeFolderPath });
+    persist(folders, activeFolderPath);
   },
-  setSelected: (selectedPath) => set({ selectedPath }),
+
+  setActiveFolder: (path) => {
+    set({ activeFolderPath: path });
+    persist(get().folders, path);
+  },
+
+  toggleExpand: (path) => {
+    const active = get().activeFolderPath;
+    if (!active) return;
+    set({
+      folders: patchFolder(get().folders, active, (f) => ({
+        ...f,
+        expanded: f.expanded.includes(path)
+          ? f.expanded.filter((p) => p !== path)
+          : [...f.expanded, path],
+      })),
+    });
+    persist(get().folders, active);
+  },
+
+  setSelected: (selectedPath) => {
+    const active = get().activeFolderPath;
+    if (!active) return;
+    set({
+      folders: patchFolder(get().folders, active, (f) => ({ ...f, selectedPath })),
+    });
+    persist(get().folders, active);
+  },
+
+  refreshActiveTree: async () => {
+    const active = get().activeFolderPath;
+    if (!active) return;
+    try {
+      const tree = await FileService.readFolderTree(active);
+      set({ folders: patchFolder(get().folders, active, (f) => ({ ...f, fileTree: tree })) });
+    } catch (e) {
+      console.error("[fileStore] refresh failed:", e);
+    }
+  },
 }));

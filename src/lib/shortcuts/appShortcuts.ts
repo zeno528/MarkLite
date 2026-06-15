@@ -26,17 +26,10 @@ export async function saveCurrentFile() {
   }
 }
 
-/** 打开文件夹（设为根目录 + 读文件树） */
+/** 打开/添加文件夹（addFolder 内部读树 + 设 active；已存在则仅切 active） */
 export async function openFolderViaDialog() {
   const { pickFolder } = await import("@/lib/tauri/dialog");
   const folder = await pickFolder();
   if (!folder) return;
-  const { setRootFolder, setFileTree } = useFileStore.getState();
-  setRootFolder(folder);
-  try {
-    const tree = await FileService.readFolderTree(folder);
-    setFileTree(tree);
-  } catch (e) {
-    console.error("[openFolder] read folder failed:", e);
-  }
+  await useFileStore.getState().addFolder(folder);
 }

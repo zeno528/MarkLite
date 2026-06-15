@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils/cn";
 import { MdFileIcon } from "@/components/file/MdFileIcon";
 
 export function FileTree() {
-  const fileTree = useFileStore((s) => s.fileTree);
-  const rootFolder = useFileStore((s) => s.rootFolder);
+  const activeFolder = useFileStore((s) =>
+    s.folders.find((f) => f.path === s.activeFolderPath) ?? null,
+  );
 
-  if (!rootFolder) {
+  if (!activeFolder) {
     return (
       <div className="flex h-full items-center justify-center p-4 text-xs text-[var(--color-text-subtle)]">
         未打开文件夹
@@ -26,7 +27,7 @@ export function FileTree() {
 
   return (
     <div className="h-full w-full overflow-auto py-1 text-sm">
-      {fileTree.map((node) => (
+      {activeFolder.fileTree.map((node) => (
         <FileTreeItem key={node.path} node={node} depth={0} />
       ))}
     </div>
@@ -34,13 +35,17 @@ export function FileTree() {
 }
 
 function FileTreeItem({ node, depth }: { node: FileNode; depth: number }) {
-  const expanded = useFileStore((s) => s.expanded);
+  const expanded = useFileStore(
+    (s) => s.folders.find((f) => f.path === s.activeFolderPath)?.expanded ?? [],
+  );
   const toggleExpand = useFileStore((s) => s.toggleExpand);
   const setSelected = useFileStore((s) => s.setSelected);
-  const selected = useFileStore((s) => s.selectedPath);
+  const selected = useFileStore(
+    (s) => s.folders.find((f) => f.path === s.activeFolderPath)?.selectedPath ?? null,
+  );
   const openFile = useEditorStore((s) => s.openFile);
 
-  const isOpen = expanded.has(node.path);
+  const isOpen = expanded.includes(node.path);
   const isSelected = selected === node.path;
   const isMd = /\.(md|markdown|mdx)$/i.test(node.name);
 
