@@ -34,7 +34,7 @@ export function StatusBar() {
     >
       <div className="flex items-center gap-3">
         <span>
-          Ln {cursor.line}, Col {cursor.ch + 1}
+          行 {cursor.line}，列 {cursor.ch + 1}
         </span>
         <span className="text-[var(--color-text-subtle)]">·</span>
         <span>{wc.words} 字</span>
