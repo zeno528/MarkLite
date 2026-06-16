@@ -2,7 +2,7 @@
  * 侧边栏 - 文件树 / 文档大纲
  * 圆角浮起卡片 + 药丸 tabs + 文件夹下拉选择器（多文件夹管理）
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { FileText, List, ChevronDown, Plus, X, Check } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
@@ -26,6 +26,51 @@ export function Sidebar() {
   const [folderMenuOpen, setFolderMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // 滑动指示器：tabs 容器 / 两个 button ref / 当前位置
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const filesBtnRef = useRef<HTMLButtonElement>(null);
+  const outlineBtnRef = useRef<HTMLButtonElement>(null);
+  const [indicator, setIndicator] = useState<{ x: number; w: number } | null>(null);
+  const sidebarTabRef = useRef(sidebarTab);
+  useLayoutEffect(() => {
+    sidebarTabRef.current = sidebarTab;
+  }, [sidebarTab]);
+
+  // 切换 tab 时测量激活按钮位置（useLayoutEffect 同步，避免首帧错位）
+  useLayoutEffect(() => {
+    const activeBtn = sidebarTab === "files" ? filesBtnRef.current : outlineBtnRef.current;
+    const container = tabsRef.current;
+    if (!activeBtn || !container) return;
+    const cRect = container.getBoundingClientRect();
+    const bRect = activeBtn.getBoundingClientRect();
+    const x = bRect.left - cRect.left;
+    const w = bRect.width;
+    setIndicator((prev) =>
+      prev && Math.abs(prev.x - x) < 0.5 && Math.abs(prev.w - w) < 0.5 ? prev : { x, w },
+    );
+  }, [sidebarTab]);
+
+  // 容器尺寸变化时重测（窗口 resize、字体加载等引起 tab 位置/宽度变化）
+  useEffect(() => {
+    const container = tabsRef.current;
+    if (!container) return;
+    const measure = () => {
+      const activeBtn =
+        sidebarTabRef.current === "files" ? filesBtnRef.current : outlineBtnRef.current;
+      if (!activeBtn) return;
+      const cRect = container.getBoundingClientRect();
+      const bRect = activeBtn.getBoundingClientRect();
+      const x = bRect.left - cRect.left;
+      const w = bRect.width;
+      setIndicator((prev) =>
+        prev && Math.abs(prev.x - x) < 0.5 && Math.abs(prev.w - w) < 0.5 ? prev : { x, w },
+      );
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, []);
+
   // 下拉展开时，点击外部自动关闭
   useEffect(() => {
     if (!folderMenuOpen) return;
@@ -46,25 +91,43 @@ export function Sidebar() {
       style={{ minWidth: "var(--sidebar-min-width)", maxWidth: "var(--sidebar-max-width)" }}
     >
       <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-2 shadow-[var(--shadow-sm)]">
-        {/* Tab 切换（药丸 - iOS 风格：背景层 + 高亮浮起卡） */}
-        <div className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--color-bg-muted)] p-1">
+        {/* Tab 切换（药丸 - iOS 风格：高亮指示器在两个 tab 之间滑动） */}
+        <div
+          ref={tabsRef}
+          className="relative flex shrink-0 items-center gap-1 rounded-lg bg-[var(--color-bg-muted)] p-1"
+        >
+          {/* 滑动指示器（指针穿透；按钮在 DOM 顺序中靠后，自然盖在指示器之上） */}
+          {indicator && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-1 bottom-1 rounded-md bg-[var(--color-bg-elevated)] shadow-[var(--shadow-sm)]"
+              style={{
+                transform: `translateX(${indicator.x}px)`,
+                width: indicator.w,
+                transition:
+                  "transform 220ms cubic-bezier(0.32, 0.72, 0, 1), width 220ms cubic-bezier(0.32, 0.72, 0, 1)",
+              }}
+            />
+          )}
           <button
+            ref={filesBtnRef}
             onClick={() => setSidebarTab("files")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+              "relative z-1 flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
               sidebarTab === "files"
-                ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] shadow-[var(--shadow-sm)]"
+                ? "text-[var(--color-text)]"
                 : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
             )}
           >
             <FileText size={13} /> 文件
           </button>
           <button
+            ref={outlineBtnRef}
             onClick={() => setSidebarTab("outline")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+              "relative z-1 flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
               sidebarTab === "outline"
-                ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] shadow-[var(--shadow-sm)]"
+                ? "text-[var(--color-text)]"
                 : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
             )}
           >
