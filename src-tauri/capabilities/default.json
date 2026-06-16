@@ -11,6 +11,9 @@
     "dialog:default",
     "fs:default",
     "fs:allow-write-text-file",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "opener:allow-reveal-item-in-dir",
     "store:default",
     {
       "identifier": "fs:scope",

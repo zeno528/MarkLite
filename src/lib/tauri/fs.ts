@@ -12,6 +12,8 @@ import {
   exists,
   mkdir,
   readDir,
+  remove,
+  rename,
 } from "@tauri-apps/plugin-fs";
 import { join, basename, dirname, sep } from "@tauri-apps/api/path";
 import { getDefaultPath, rememberPath } from "@/lib/tauri/dialog";
@@ -173,5 +175,21 @@ export const FileService = {
   /** 文件名 */
   async fileName(path: string): Promise<string> {
     return await basename(path);
+  },
+
+  /** 删除文件 */
+  async removeFile(path: string): Promise<void> {
+    await remove(path);
+  },
+
+  /** 重命名/移动文件 */
+  async renameFile(oldPath: string, newPath: string): Promise<void> {
+    await rename(oldPath, newPath);
+  },
+
+  /** 在系统文件管理器中显示该文件（选中） */
+  async revealFile(path: string): Promise<void> {
+    const { revealItemInDir } = await import("@tauri-apps/plugin-opener");
+    await revealItemInDir(path);
   },
 };

@@ -2,7 +2,7 @@
  * 侧边栏 - 文件树 / 文档大纲
  * 圆角浮起卡片 + 药丸 tabs + 文件夹下拉选择器（多文件夹管理）
  */
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FileText, List, ChevronDown, Plus, X, Check } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
@@ -24,6 +24,19 @@ export function Sidebar() {
   const setActiveFolder = useFileStore((s) => s.setActiveFolder);
   const removeFolder = useFileStore((s) => s.removeFolder);
   const [folderMenuOpen, setFolderMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 下拉展开时，点击外部自动关闭
+  useEffect(() => {
+    if (!folderMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setFolderMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [folderMenuOpen]);
 
   const activeName = activeFolderPath ? folderName(activeFolderPath) : "未打开文件夹";
 
@@ -61,7 +74,7 @@ export function Sidebar() {
 
         {/* 文件夹下拉选择器：切换 / 关闭 / 添加（仅文件 tab） */}
         {sidebarTab === "files" && (
-          <div className="mt-1.5 shrink-0 px-1">
+          <div ref={menuRef} className="mt-1.5 shrink-0 px-1">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setFolderMenuOpen((v) => !v)}
@@ -122,6 +135,7 @@ export function Sidebar() {
                         onClick={(e) => {
                           e.stopPropagation();
                           removeFolder(f.path);
+                          setFolderMenuOpen(false);
                         }}
                         className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[var(--color-text-subtle)] opacity-0 hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)] group-hover:opacity-100"
                         title="关闭文件夹"
