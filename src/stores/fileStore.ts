@@ -7,6 +7,7 @@
  */
 import { create } from "zustand";
 import { FileService } from "@/lib/tauri/fs";
+import { useEditorStore } from "@/stores/editorStore";
 
 export interface FileNode {
   name: string;
@@ -68,6 +69,14 @@ function patchFolder(
   return folders.map((f) => (f.path === path ? patch(f) : f));
 }
 
+/** 判断文件路径是否位于文件夹之下（含文件夹自身）— 跨平台分隔符 + 大小写不敏感 */
+function isUnderFolder(filePath: string, folderPath: string): boolean {
+  const norm = (p: string) => p.replace(/\\/g, "/").replace(/\/+$/, "").toLowerCase();
+  const f = norm(filePath);
+  const dir = norm(folderPath);
+  return f === dir || f.startsWith(dir + "/");
+}
+
 export const useFileStore = create<FileState>((set, get) => ({
   folders: [],
   activeFolderPath: null,
@@ -110,6 +119,12 @@ export const useFileStore = create<FileState>((set, get) => ({
     }
     set({ folders, activeFolderPath });
     persist(folders, activeFolderPath);
+
+    // 清理编辑器：移除所有位于该文件夹下的已打开文件，否则关闭文件夹后编辑区/预览区仍残留旧文件
+    const editor = useEditorStore.getState();
+    for (const file of editor.openFiles) {
+      if (isUnderFolder(file.path, path)) editor.closeFile(file.path);
+    }
   },
 
   setActiveFolder: (path) => {
