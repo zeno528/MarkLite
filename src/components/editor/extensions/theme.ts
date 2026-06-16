@@ -55,6 +55,15 @@ export const lightTheme = EditorView.theme(
       minWidth: "40px",
       textAlign: "right",
     },
+    ".cm-foldGutter": {
+      width: "16px",
+    },
+    ".cm-foldGutter .cm-gutterElement": {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+    },
     ".cm-foldPlaceholder": {
       backgroundColor: "var(--color-bg-muted)",
       color: "var(--color-text-muted)",
@@ -125,6 +134,15 @@ export const darkTheme = EditorView.theme(
       padding: "0 12px 0 8px",
       minWidth: "40px",
       textAlign: "right",
+    },
+    ".cm-foldGutter": {
+      width: "16px",
+    },
+    ".cm-foldGutter .cm-gutterElement": {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
     },
     ".cm-foldPlaceholder": {
       backgroundColor: "var(--color-bg-muted)",

@@ -24,7 +24,6 @@ import {
 import {
   bracketMatching,
   indentOnInput,
-  foldGutter,
   foldKeymap,
 } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
@@ -149,7 +148,6 @@ export function CodeEditor({
 
     if (lineNumbersEnabled) {
       exts.push(lineNumbers());
-      exts.push(foldGutter());
       exts.push(highlightActiveLine());
     }
 
