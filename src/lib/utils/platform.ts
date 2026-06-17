@@ -34,17 +34,7 @@ export async function isMac(): Promise<boolean> {
   return (await getPlatform()) === "macos";
 }
 
-/** 主修饰键：macOS = Cmd，其他 = Ctrl */
-export async function getModKey(): Promise<"Cmd" | "Ctrl"> {
-  return (await isMac()) ? "Cmd" : "Ctrl";
-}
-
 /** CodeMirror 修饰键前缀：macOS = "Mod-"，其他 = "Ctrl-" */
 export async function getCmMod(): Promise<string> {
   return (await isMac()) ? "Mod-" : "Ctrl-";
-}
-
-/** 滚动同步 throttle 延迟：macOS WKWebView 60fps，Windows WebView2 30fps */
-export async function getScrollThrottle(): Promise<number> {
-  return (await isMac()) ? 16 : 32;
 }

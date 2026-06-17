@@ -197,11 +197,6 @@ aside ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
 }
 
-/* 工具类：填充当前文本色 */
-.text-balance {
-  text-wrap: balance;
-}
-
 /* 禁用 iOS/Mac 弹跳滚动（虽然我们是桌面端，但 WebView 可能继承） */
 html,
 body {

@@ -37,24 +37,6 @@ export async function pickFolder(): Promise<string | null> {
   return selected;
 }
 
-/** 打开文件对话框 */
-export async function pickFile(
-  filters: { name: string; extensions: string[] }[] = [
-    { name: "Markdown", extensions: ["md", "markdown", "mdx"] },
-  ],
-): Promise<string | null> {
-  const defaultPath = await getDefaultPath();
-  const selected = await openDialog({
-    multiple: false,
-    directory: false,
-    defaultPath,
-    filters,
-  });
-  if (!selected || typeof selected !== "string") return null;
-  await rememberPath(selected, false);
-  return selected;
-}
-
 /** 确认对话框 */
 export async function confirmDialog(
   message: string,

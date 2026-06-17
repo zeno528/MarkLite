@@ -66,8 +66,3 @@ export function resolveSystemScheme(isDark: boolean): SchemeId {
 export function resolveScheme(scheme: ColorScheme, systemIsDark: boolean): SchemeId {
   return scheme === "system" ? resolveSystemScheme(systemIsDark) : scheme;
 }
-
-/** 按 id 取方案元数据，找不到时回退到首个（纸白） */
-export function getSchemeMeta(id: SchemeId): SchemeMeta {
-  return COLOR_SCHEMES.find((s) => s.id === id) ?? COLOR_SCHEMES[0];
-}
