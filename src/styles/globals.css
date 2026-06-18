@@ -262,6 +262,11 @@ aside ::-webkit-scrollbar-thumb:hover {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* 设置内容切换淡入动画（200ms） */
+@keyframes content-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 /* 通知条进场动画（右滑入 + 淡入，150ms；class 在 Toast.tsx 引用） */
 @keyframes toast-in {
   from { opacity: 0; transform: translateX(16px); }
@@ -397,6 +402,13 @@ body {
   align-items: center;
   justify-content: center;
   transition: color 0.14s ease, background-color 0.14s ease;
+  outline: none !important;
+}
+.icon-btn:focus,
+.icon-btn:focus-visible,
+.icon-btn:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
 }
 .icon-btn:hover:not(:disabled) {
   color: var(--color-text);

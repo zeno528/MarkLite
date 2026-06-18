@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   FolderPlus,
   Save,
+  Undo2,
   Columns2,
   FileInput,
   PencilLine,
@@ -15,9 +16,10 @@ import {
   PanelLeft,
   ChevronRight,
 } from "lucide-react";
+import { undo } from "@codemirror/commands";
 import logoSvg from "@/assets/logo.svg";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
-import { useEditorStore } from "@/stores/editorStore";
+import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
@@ -40,6 +42,14 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   const setLayout = useUIStore((s) => s.setLayout);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+
+  // 撤销操作
+  const handleUndo = () => {
+    const view = editorViewRef.current;
+    if (view) {
+      undo(view);
+    }
+  };
 
   // rootFolder 末级名（路径最后一段），无目录时显示「未打开」
   const rootFolderName = rootFolder
@@ -115,8 +125,17 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           <span>添加文件夹</span>
         </button>
 
-        {/* 次操作 pill 组：保存 + 布局 */}
+        {/* 次操作 pill 组：撤销 + 保存 + 布局 */}
         <div className="tool-group">
+          <button
+            className={cn("tbtn", currentFile?.isDirty && "active")}
+            onClick={handleUndo}
+            disabled={!currentFile || !currentFile.isDirty}
+            title={currentFile?.isDirty ? "撤销 (Ctrl+Z) — 有未保存的修改" : "撤销 (Ctrl+Z)"}
+          >
+            <Undo2 size={14} />
+            <span>撤销</span>
+          </button>
           <button
             className={cn("tbtn", currentFile?.isDirty && "active")}
             onClick={saveCurrentFile}
@@ -154,7 +173,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
         {onOpenSettings && (
           <button
-            className="icon-btn"
+            className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             onClick={onOpenSettings}
             title="设置 (Ctrl+,)"
             aria-label="设置"
