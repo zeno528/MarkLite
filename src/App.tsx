@@ -10,13 +10,18 @@ import { SplitView } from "@/components/layout/SplitView";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
+import { ToastContainer } from "@/components/ui/Toast";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { FileService } from "@/lib/tauri/fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
-import { openFileViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
+import {
+  openFileViaDialog,
+  reloadCurrentFile,
+  saveCurrentFile,
+} from "@/lib/shortcuts/appShortcuts";
 
 export default function App() {
   const layout = useUIStore((s) => s.layout);
@@ -135,6 +140,11 @@ export default function App() {
           e.preventDefault(); // 阻止浏览器/Tauri 默认保存
           saveCurrentFile();
           break;
+        case "r":
+        case "R":
+          e.preventDefault(); // 阻止浏览器刷新页面
+          reloadCurrentFile();
+          break;
         case "\\":
           e.preventDefault();
           useUIStore.getState().toggleSidebar();
@@ -160,6 +170,7 @@ export default function App() {
       </div>
       <StatusBar />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <ToastContainer />
     </div>
   );
 }

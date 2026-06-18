@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils/cn";
 import { MdFileIcon } from "@/components/file/MdFileIcon";
 import { FileService } from "@/lib/tauri/fs";
 import { confirmDialog } from "@/lib/tauri/dialog";
+import { notify } from "@/stores/notificationStore";
 
 interface MenuState {
   path: string;
@@ -288,8 +289,10 @@ function FileContextMenu({
       // 若该文件正在编辑器中打开，一并移除
       useEditorStore.getState().closeFile(menu.path);
       await refreshActiveTree();
+      notify.success("已删除");
     } catch (e) {
       console.error("[FileTree] delete failed:", e);
+      notify.error("删除失败");
     }
     onClose();
   };
