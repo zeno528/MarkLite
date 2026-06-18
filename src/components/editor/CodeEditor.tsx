@@ -36,6 +36,7 @@ import {
 
 import { lightTheme, darkTheme } from "./extensions/theme";
 import { lightHighlight, darkHighlight } from "./extensions/highlight";
+import { inlineFoldMarkers } from "./extensions/foldMarker";
 import { createShortcuts } from "./extensions/shortcuts";
 import {
   wordCountField,
@@ -170,6 +171,7 @@ export function CodeEditor({
 
     exts.push(resolvedTheme === "dark" ? darkTheme : lightTheme);
     exts.push(syntaxHighlighting(resolvedTheme === "dark" ? darkHighlight : lightHighlight));
+    exts.push(inlineFoldMarkers);
 
     return exts;
   }, [

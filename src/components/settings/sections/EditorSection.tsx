@@ -3,7 +3,7 @@ import { SettingRow } from "@/components/ui/SettingRow";
 import { Toggle } from "@/components/ui/Toggle";
 import { NumberField } from "@/components/ui/NumberField";
 
-/** 编辑器：行号 / 自动换行 / Tab 缩进 / 自动保存(+延迟) / 自动刷新(+间隔) */
+/** 编辑器：行号 / 自动换行 / Tab 缩进 / 自动保存(+延迟) / 自动刷新(+间隔) / 滚动同步 */
 export function EditorSection() {
   const lineNumbers = useSettingsStore((s) => s.lineNumbers);
   const wordWrap = useSettingsStore((s) => s.wordWrap);
@@ -12,6 +12,7 @@ export function EditorSection() {
   const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
   const autoRefresh = useSettingsStore((s) => s.autoRefresh);
   const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
+  const scrollSync = useSettingsStore((s) => s.scrollSync);
   const update = useSettingsStore((s) => s.update);
 
   return (
@@ -65,6 +66,10 @@ export function EditorSection() {
           />
         </SettingRow>
       )}
+      <div className="my-4 h-px bg-[var(--color-border)]" />
+      <SettingRow label="滚动同步" description="编辑器与预览的双向滚动联动">
+        <Toggle checked={scrollSync} onChange={(v) => update("scrollSync", v)} aria-label="滚动同步" />
+      </SettingRow>
     </div>
   );
 }
