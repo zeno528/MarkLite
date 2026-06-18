@@ -31,7 +31,6 @@ import {
   keymap,
   lineNumbers,
   highlightActiveLine,
-  drawSelection,
 } from "@codemirror/view";
 
 import { lightTheme, darkTheme } from "./extensions/theme";
@@ -126,7 +125,6 @@ export function CodeEditor({
       history(),
       bracketMatching(),
       indentOnInput(),
-      drawSelection(),
       highlightSelectionMatches(),
       autocompletion(),
       markdown({ base: markdownLanguage, codeLanguages: languages }),
@@ -241,6 +239,7 @@ export function CodeEditor({
           bracketMatching: false,
           closeBrackets: false,
           indentOnInput: false,
+          drawSelection: false,
           tabSize,
         }}
         onUpdate={onUpdate}

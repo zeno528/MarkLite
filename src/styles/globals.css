@@ -170,15 +170,12 @@ aside ::-webkit-scrollbar-thumb:hover {
 
 /* 选区：用各主题专门的选中色（--color-selection）半透明，保证低饱和主题（如 paper）下也明显可见；
    保留原文字色不反色，选中后字仍清晰 */
+/* 选区：各主题专门的选中色（--color-selection）半透明 + !important，确保 CodeMirror 的 contenteditable
+   和普通 UI 文本都用此色。drawSelection 已在 basicSetup 关闭，原生 ::selection 不再被压透明 */
 ::selection,
 .cm-line::selection,
 .cm-line ::selection,
-.cm-content::selection,
-.cm-content :focus::selection {
-  background: color-mix(in oklch, var(--color-selection) 50%, transparent) !important;
-}
-/* drawSelection 自绘选区层（刷新前兜底；刷新后该元素不再创建，规则空命中无害）*/
-.cm-editor .cm-selectionBackground {
+.cm-content::selection {
   background: color-mix(in oklch, var(--color-selection) 50%, transparent) !important;
 }
 
