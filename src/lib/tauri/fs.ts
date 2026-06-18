@@ -131,10 +131,9 @@ export const FileService = {
       return [];
     }
 
-    // 过滤有效条目
+    // 过滤有效条目（跳过 .git、node_modules、target）
     const validEntries = entries.filter((entry) => {
-      if (entry.name?.startsWith(".")) return false;
-      if (entry.name === "node_modules" || entry.name === "target") return false;
+      if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "target") return false;
       return true;
     });
 

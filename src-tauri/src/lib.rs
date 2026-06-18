@@ -27,8 +27,8 @@ fn read_dir_tree(dir: &Path, depth: u32, max_depth: u32) -> Vec<FileNode> {
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().to_string();
 
-        // 跳过隐藏文件和缓存目录
-        if name.starts_with('.') || name == "node_modules" || name == "target" {
+        // 跳过 .git、node_modules、target 目录
+        if name == ".git" || name == "node_modules" || name == "target" {
             continue;
         }
 
