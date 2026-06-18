@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { undo } from "@codemirror/commands";
 import logoSvg from "@/assets/logo.svg";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
@@ -131,7 +132,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             className={cn("tbtn", currentFile?.isDirty && "active")}
             onClick={handleUndo}
             disabled={!currentFile || !currentFile.isDirty}
-            title={currentFile?.isDirty ? "撤销 (Ctrl+Z) — 有未保存的修改" : "撤销 (Ctrl+Z)"}
+            title="撤销 (Ctrl+Z)"
           >
             <Undo2 size={14} />
             <span>撤销</span>

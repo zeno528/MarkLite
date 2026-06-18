@@ -84,26 +84,38 @@ export function CodeEditor({
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
   // cursorSync 扩展：选区变化时同步光标位置到 store（供目录高亮）
+  // 文档变化时同步内容到 store（确保撤销/重做也能更新 isDirty）
   // 用 ViewPlugin 而非 onUpdate 回调，确保 view.dispatch 触发的选区变化也能被捕获
   const cursorSync = useMemo(
     () =>
       CMEditorView.updateListener.of((vu: ViewUpdate) => {
-        if (!vu.selectionSet) return;
-        const state = vu.state;
-        const pos = state.selection.main.head;
-        const line = state.doc.lineAt(pos);
-        setCursor({ line: line.number, ch: pos - line.from });
+        // 文档变化时同步内容
+        if (vu.docChanged) {
+          const content = vu.state.doc.toString();
+          const path = useEditorStore.getState().currentFile?.path;
+          if (path) {
+            useEditorStore.getState().updateContent(path, content);
+          }
+        }
 
-        // 同步选中文本信息
-        const sel = state.selection.main;
-        if (sel.from !== sel.to) {
-          const text = state.sliceDoc(sel.from, sel.to);
-          const chars = text.length;
-          const cnChars = (text.match(/[一-龥]/g) || []).length;
-          const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
-          setSelection({ text, chars, words: cnChars + enWords });
-        } else {
-          setSelection({ text: "", chars: 0, words: 0 });
+        // 选区变化时同步光标
+        if (vu.selectionSet) {
+          const state = vu.state;
+          const pos = state.selection.main.head;
+          const line = state.doc.lineAt(pos);
+          setCursor({ line: line.number, ch: pos - line.from });
+
+          // 同步选中文本信息
+          const sel = state.selection.main;
+          if (sel.from !== sel.to) {
+            const text = state.sliceDoc(sel.from, sel.to);
+            const chars = text.length;
+            const cnChars = (text.match(/[一-龥]/g) || []).length;
+            const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
+            setSelection({ text, chars, words: cnChars + enWords });
+          } else {
+            setSelection({ text: "", chars: 0, words: 0 });
+          }
         }
       }),
     [setCursor, setSelection],
