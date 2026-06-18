@@ -25,19 +25,19 @@ class FoldToggle extends WidgetType {
     el.className = "cm-fold-toggle" + (this.open ? " cm-fold-toggle-open" : " cm-fold-toggle-closed");
     el.textContent = this.open ? "▾" : "▸";
     el.title = this.open ? "折叠" : "展开";
-    el.addEventListener("mousedown", (e) => {
+    el.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       view.dispatch({
         effects: this.open
-          ? unfoldEffect.of({ from: this.from, to: this.to })
-          : foldEffect.of({ from: this.from, to: this.to }),
+          ? foldEffect.of({ from: this.from, to: this.to })
+          : unfoldEffect.of({ from: this.from, to: this.to }),
       });
     });
     return el;
   }
   ignoreEvent() {
-    return true;
+    return false;
   }
 }
 

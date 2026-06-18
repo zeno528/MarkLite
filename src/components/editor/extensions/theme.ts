@@ -92,6 +92,7 @@ export const lightTheme = EditorView.theme(
       height: "16px",
       margin: "0 6px 0 0",
       borderRadius: "9999px",
+      backgroundColor: "color-mix(in oklch, var(--color-accent) 10%, transparent)",
       color: "var(--color-text-muted)",
       cursor: "pointer",
       fontSize: "11px",
@@ -101,7 +102,7 @@ export const lightTheme = EditorView.theme(
       transition: "color 0.14s ease, background-color 0.14s ease",
     },
     ".cm-fold-toggle:hover": {
-      backgroundColor: "color-mix(in oklch, var(--color-accent) 16%, transparent)",
+      backgroundColor: "color-mix(in oklch, var(--color-accent) 20%, transparent)",
       color: "var(--color-accent)",
     },
     ".cm-fold-toggle-open": {
@@ -208,6 +209,7 @@ export const darkTheme = EditorView.theme(
       height: "16px",
       margin: "0 6px 0 0",
       borderRadius: "9999px",
+      backgroundColor: "color-mix(in oklch, var(--color-accent) 10%, transparent)",
       color: "var(--color-text-muted)",
       cursor: "pointer",
       fontSize: "11px",
@@ -217,7 +219,7 @@ export const darkTheme = EditorView.theme(
       transition: "color 0.14s ease, background-color 0.14s ease",
     },
     ".cm-fold-toggle:hover": {
-      backgroundColor: "color-mix(in oklch, var(--color-accent) 16%, transparent)",
+      backgroundColor: "color-mix(in oklch, var(--color-accent) 20%, transparent)",
       color: "var(--color-accent)",
     },
     ".cm-fold-toggle-open": {
