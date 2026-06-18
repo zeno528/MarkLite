@@ -7,7 +7,7 @@
  */
 
 /** 具体配色方案 id（不含 system） */
-export type SchemeId = "violet" | "paper" | "midnight" | "notion" | "github" | "ink";
+export type SchemeId = "violet" | "paper" | "amber" | "midnight" | "ember" | "notion" | "github" | "ink";
 
 /** 用户可选的配色方案（含跟随系统） */
 export type ColorScheme = SchemeId | "system";
@@ -42,6 +42,13 @@ export const COLOR_SCHEMES: readonly SchemeMeta[] = [
     swatch: { bg: "#eef0f7", surface: "#ffffff", accent: "#7c6ff0" },
   },
   {
+    id: "amber",
+    name: "琥珀",
+    desc: "暖橙活力",
+    mode: "light",
+    swatch: { bg: "#f8f5ef", surface: "#ffffff", accent: "#D97706" },
+  },
+  {
     id: "notion",
     name: "Notion",
     desc: "简洁纯净",
@@ -63,6 +70,13 @@ export const COLOR_SCHEMES: readonly SchemeMeta[] = [
     swatch: { bg: "#1b1f27", surface: "#232833", accent: "#38bdf8" },
   },
   {
+    id: "ember",
+    name: "余烬",
+    desc: "暖橙深邃",
+    mode: "dark",
+    swatch: { bg: "#241e18", surface: "#2e2720", accent: "#FFA344" },
+  },
+  {
     id: "ink",
     name: "墨黑",
     desc: "纯黑护眼",
@@ -75,9 +89,11 @@ export const COLOR_SCHEMES: readonly SchemeMeta[] = [
 export const SCHEME_MODE: Record<SchemeId, SchemeMode> = {
   violet: "light",
   paper: "light",
+  amber: "light",
   notion: "light",
   github: "light",
   midnight: "dark",
+  ember: "dark",
   ink: "dark",
 };
 

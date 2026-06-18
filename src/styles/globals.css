@@ -155,6 +155,56 @@
   --color-danger: oklch(0.6 0.2 25);
 }
 
+/* ---------- 方案：琥珀 (amber) — 暖橙浅色，来自 markspace ---------- */
+:root[data-scheme="amber"] {
+  --color-bg: oklch(0.97 0.006 75);
+  --color-bg-elevated: oklch(1 0 0);
+  --color-bg-muted: oklch(0.95 0.008 75);
+  --color-bg-subtle: oklch(0.935 0.01 75);
+  --color-border: oklch(0.92 0.008 75);
+  --color-border-strong: oklch(0.85 0.012 75);
+
+  --color-text: oklch(0.25 0.012 65);
+  --color-text-muted: oklch(0.52 0.015 70);
+  --color-text-subtle: oklch(0.7 0.01 70);
+
+  --color-accent: oklch(0.68 0.16 65); /* 琥珀橙 #D97706 */
+  --color-accent-hover: oklch(0.6 0.17 65);
+  --color-accent-foreground: oklch(1 0 0);
+  --color-selection: oklch(0.65 0.18 65);
+
+  --color-success: oklch(0.6 0.18 145);
+  --color-warning: oklch(0.75 0.15 65);
+  --color-danger: oklch(0.6 0.18 25);
+}
+
+/* ---------- 方案：余烬 (ember) — 暖橙深色，来自 markspace ---------- */
+:root[data-scheme="ember"] {
+  --color-bg: oklch(0.2 0.01 50);
+  --color-bg-elevated: oklch(0.25 0.012 50);
+  --color-bg-muted: oklch(0.18 0.01 50);
+  --color-bg-subtle: oklch(0.15 0.01 50);
+  --color-border: oklch(0.3 0.012 50);
+  --color-border-strong: oklch(0.4 0.015 50);
+
+  --color-text: oklch(0.85 0.012 60);
+  --color-text-muted: oklch(0.65 0.012 60);
+  --color-text-subtle: oklch(0.48 0.01 60);
+
+  --color-accent: oklch(0.8 0.15 60); /* 暖橙 #FFA344 */
+  --color-accent-hover: oklch(0.85 0.14 60);
+  --color-accent-foreground: oklch(0.2 0.01 50);
+  --color-selection: oklch(0.75 0.17 60);
+
+  --color-success: oklch(0.78 0.17 145);
+  --color-warning: oklch(0.8 0.15 75);
+  --color-danger: oklch(0.65 0.2 20);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
 /* ---------- 方案：墨黑 (ink) ---------- */
 :root[data-scheme="ink"] {
   --color-bg: oklch(0.15 0.01 260);
