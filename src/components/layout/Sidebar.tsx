@@ -3,7 +3,7 @@
  * 左侧窄图标栏切换 面板（文件树/大纲）
  */
 import { useState, useEffect, useRef } from "react";
-import { FileText, List, FolderOpen, Plus, ChevronDown, X, Check } from "lucide-react";
+import { FileText, List, FolderOpen, Plus, ChevronDown, X } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { useUIStore } from "@/stores/uiStore";
@@ -87,17 +87,6 @@ export function Sidebar() {
         >
           <List size={18} />
         </ActivityBarButton>
-
-        {/* 底部操作按钮 */}
-        <div className="mt-auto flex flex-col gap-1">
-          <button
-            onClick={() => openFolderViaDialog()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-            title="打开文件夹"
-          >
-            <Plus size={18} />
-          </button>
-        </div>
       </div>
 
       {/* 面板内容 */}
@@ -126,16 +115,21 @@ export function Sidebar() {
           <div ref={menuRef} className="relative border-b border-[var(--color-border)] px-2 py-1.5">
             <button
               onClick={() => setFolderMenuOpen((v) => !v)}
-              className="flex w-full items-center justify-between gap-1 rounded-md px-2 py-1 text-xs transition-colors hover:bg-[var(--color-bg-muted)]"
+              className={cn(
+                "flex w-full items-center justify-between gap-1 rounded-lg border px-2.5 py-2 text-xs transition-all",
+                folderMenuOpen
+                  ? "border-[var(--color-accent)] bg-[var(--color-bg-muted)] shadow-sm"
+                  : "border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-muted)]",
+              )}
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <FolderOpen size={13} className="shrink-0 text-[var(--color-text-subtle)]" />
-                <span className="truncate text-[var(--color-text)]">{activeName}</span>
+                <FolderOpen size={14} className="shrink-0 text-[var(--color-text-subtle)]" />
+                <span className="truncate font-medium text-[var(--color-text)]">{activeName}</span>
               </div>
               <ChevronDown
-                size={13}
+                size={14}
                 className={cn(
-                  "shrink-0 text-[var(--color-text-subtle)] transition-transform",
+                  "shrink-0 text-[var(--color-text-subtle)] transition-transform duration-200",
                   folderMenuOpen && "rotate-180",
                 )}
               />
@@ -156,30 +150,23 @@ export function Sidebar() {
                       className={cn(
                         "group flex cursor-pointer select-none items-center gap-1.5 rounded-md px-2 py-1.5 text-xs transition-colors",
                         isActive
-                          ? "bg-[var(--color-bg-muted)] text-[var(--color-accent)]"
+                          ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
                           : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
                       )}
                       title={f.path}
                     >
-                      {isActive ? (
-                        <Check size={12} className="shrink-0" />
-                      ) : (
-                        <span className="w-3 shrink-0" />
-                      )}
                       <span className="flex-1 truncate">{folderName(f.path)}</span>
-                      {folders.length > 1 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeFolder(f.path);
-                            setFolderMenuOpen(false);
-                          }}
-                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[var(--color-text-subtle)] opacity-0 hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)] group-hover:opacity-100"
-                          title="关闭文件夹"
-                        >
-                          <X size={11} />
-                        </button>
-                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFolder(f.path);
+                          setFolderMenuOpen(false);
+                        }}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[var(--color-text-subtle)] opacity-0 transition-opacity hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)] group-hover:opacity-100"
+                        title="关闭文件夹"
+                      >
+                        <X size={12} />
+                      </button>
                     </div>
                   );
                 })}
