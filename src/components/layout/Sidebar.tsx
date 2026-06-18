@@ -7,6 +7,7 @@ import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X } from "lucide
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore } from "@/stores/uiStore";
 import { useFileStore } from "@/stores/fileStore";
 import { previewContainerRef } from "@/stores/editorStore";
@@ -45,18 +46,19 @@ function ActivityBarButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
-        active
-          ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
-          : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
-      )}
-    >
-      {children}
-    </button>
+    <Tooltip content={title} placement="right">
+      <button
+        onClick={onClick}
+        className={cn(
+          "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+          active
+            ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+            : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+        )}
+      >
+        {children}
+      </button>
+    </Tooltip>
   );
 }
 
@@ -139,7 +141,6 @@ function FolderSelect() {
                     setOpen(false);
                   }}
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)]"
-                  title="关闭文件夹"
                 >
                   <X size={12} />
                 </button>
@@ -183,7 +184,7 @@ export function Sidebar() {
         <ActivityBarButton
           active={sidebarTab === "search"}
           onClick={() => setSidebarTab("search")}
-          title="搜索"
+          title="搜索 (Ctrl+F)"
         >
           <Search size={20} />
         </ActivityBarButton>
@@ -200,13 +201,14 @@ export function Sidebar() {
             {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
           </span>
           {sidebarTab === "files" && (
-            <button
-              onClick={openFolderViaDialog}
-              className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-              title="打开文件夹"
-            >
-              <Plus size={14} />
-            </button>
+            <Tooltip content="打开文件夹" placement="bottom">
+              <button
+                onClick={openFolderViaDialog}
+                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+              >
+                <Plus size={14} />
+              </button>
+            </Tooltip>
           )}
         </div>
 

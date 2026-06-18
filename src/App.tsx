@@ -23,6 +23,7 @@ import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import {
   openFileViaDialog,
+  openFolderViaDialog,
   reloadCurrentFile,
   saveCurrentFile,
 } from "@/lib/shortcuts/appShortcuts";
@@ -92,35 +93,48 @@ export default function App() {
         }
         if (folders.length === 0) return;
         useFileStore.setState({ folders, activeFolderPath: active });
+
+        // 并行加载：激活文件夹的树 + 恢复上次打开的文件
+        const promises: Promise<void>[] = [];
+
         // 读激活文件夹的树
         if (active) {
-          try {
-            const tree = await FileService.readFolderTree(active);
-            useFileStore.setState((state) => ({
-              folders: state.folders.map((f) => (f.path === active ? { ...f, fileTree: tree } : f)),
-            }));
-          } catch (e) {
-            console.error("[App] restore read tree failed:", e);
-          }
+          promises.push(
+            FileService.readFolderTree(active).then((tree) => {
+              useFileStore.setState((state) => ({
+                folders: state.folders.map((f) => (f.path === active ? { ...f, fileTree: tree } : f)),
+              }));
+            }).catch((e) => {
+              console.error("[App] restore read tree failed:", e);
+            })
+          );
         }
+
         // 恢复上次打开的文件
         const lastFile = localStorage.getItem(ACTIVE_FILE_KEY);
         if (lastFile) {
-          try {
-            const ok = await FileService.fileExists(lastFile);
-            if (!ok) {
-              localStorage.removeItem(ACTIVE_FILE_KEY);
-              notify.info("上次打开的文件已不存在");
-            } else {
-              const content = await readTextFile(lastFile);
-              const title = lastFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
-              useEditorStore.getState().openFile(lastFile, title, content);
-            }
-          } catch (e) {
-            console.error("[App] restore active file failed:", e);
-            localStorage.removeItem(ACTIVE_FILE_KEY);
-          }
+          promises.push(
+            (async () => {
+              try {
+                const ok = await FileService.fileExists(lastFile);
+                if (!ok) {
+                  localStorage.removeItem(ACTIVE_FILE_KEY);
+                  notify.info("上次打开的文件已不存在");
+                } else {
+                  const content = await readTextFile(lastFile);
+                  const title = lastFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
+                  useEditorStore.getState().openFile(lastFile, title, content);
+                }
+              } catch (e) {
+                console.error("[App] restore active file failed:", e);
+                localStorage.removeItem(ACTIVE_FILE_KEY);
+              }
+            })()
+          );
         }
+
+        // 等待所有并行任务完成
+        await Promise.all(promises);
       } catch (e) {
         console.error("[App] restore folders failed:", e);
       }
@@ -199,6 +213,17 @@ export default function App() {
         case "\\":
           e.preventDefault();
           useUIStore.getState().toggleSidebar();
+          break;
+        case "f":
+        case "F":
+          e.preventDefault();
+          useUIStore.getState().setSidebarTab("search");
+          useUIStore.getState().setShowSidebar(true);
+          break;
+        case "n":
+        case "N":
+          e.preventDefault();
+          openFolderViaDialog();
           break;
       }
     };

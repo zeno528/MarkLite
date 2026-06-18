@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 import { previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils/cn";
 
 export function ScrollToTop() {
@@ -44,19 +45,20 @@ export function ScrollToTop() {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={cn(
-        "fixed bottom-16 right-4 z-40 flex h-8 w-8 items-center justify-center rounded-full",
-        "bg-[var(--color-bg-elevated)] border border-[var(--color-border)] shadow-md",
-        "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]",
-        "transition-opacity duration-150",
-        visible ? "opacity-100" : "opacity-0 pointer-events-none",
-      )}
-      title="回到顶部"
-      aria-label="回到顶部"
-    >
-      <ArrowUp size={16} />
-    </button>
+    <Tooltip content="回到顶部" placement="left">
+      <button
+        onClick={handleClick}
+        className={cn(
+          "fixed bottom-16 right-4 z-40 flex h-8 w-8 items-center justify-center rounded-full",
+          "bg-[var(--color-bg-elevated)] border border-[var(--color-border)] shadow-md",
+          "text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]",
+          "transition-opacity duration-150",
+          visible ? "opacity-100" : "opacity-0 pointer-events-none",
+        )}
+        aria-label="回到顶部"
+      >
+        <ArrowUp size={16} />
+      </button>
+    </Tooltip>
   );
 }

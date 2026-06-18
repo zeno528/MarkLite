@@ -8,6 +8,7 @@ import { Search, X, FileText } from "lucide-react";
 import { EditorView } from "@codemirror/view";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
+import { useUIStore } from "@/stores/uiStore";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 
 interface SearchResult {
@@ -54,6 +55,7 @@ export function SearchPanel() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevSidebarTabRef = useRef<string | null>(null);
 
   // 自动聚焦 + 组件卸载时清除选区和高亮
   useEffect(() => {
@@ -62,6 +64,17 @@ export function SearchPanel() {
       window.getSelection()?.removeAllRanges();
       clearHighlights();
     };
+  }, []);
+
+  // 监听 sidebarTab 变化，切换到搜索时聚焦
+  useEffect(() => {
+    const unsubscribe = useUIStore.subscribe((state) => {
+      if (state.sidebarTab === "search" && prevSidebarTabRef.current !== "search") {
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
+      prevSidebarTabRef.current = state.sidebarTab;
+    });
+    return unsubscribe;
   }, []);
 
   // 清除预览区域的搜索高亮

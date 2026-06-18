@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { useRefreshStore } from "@/stores/refreshStore";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils/cn";
 import { reloadCurrentFile } from "@/lib/shortcuts/appShortcuts";
 import { notify } from "@/stores/notificationStore";
@@ -55,15 +56,16 @@ export function StatusBar() {
     >
       <div className="flex items-center gap-3">
         {/* 模块1：刷新按钮 */}
-        <button
-          className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
-          onClick={handleReload}
-          disabled={!currentFile}
-          title="刷新 (Ctrl+R) — 从磁盘重新读取当前文件"
-          aria-label="刷新当前文件"
-        >
-          <RefreshCw size={13} className={cn(reloading && "animate-spin")} />
-        </button>
+        <Tooltip content="刷新 (Ctrl+R) — 从磁盘重新读取当前文件" placement="top">
+          <button
+            className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
+            onClick={handleReload}
+            disabled={!currentFile}
+            aria-label="刷新当前文件"
+          >
+            <RefreshCw size={13} className={cn(reloading && "animate-spin")} />
+          </button>
+        </Tooltip>
 
         {/* 模块2：文档统计 */}
         <div className="flex items-center gap-2">

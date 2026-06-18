@@ -109,78 +109,84 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
         {/* 主操作：打开文件 / 打开文件夹 */}
-        <button
-          className="btn-primary"
-          onClick={openFileViaDialog}
-          title="打开文件 (Ctrl+O)"
-        >
-          <FileInput size={14} />
-          <span>打开</span>
-        </button>
-        <button
-          className="btn-primary"
-          onClick={openFolderViaDialog}
-          title="添加文件夹"
-        >
-          <FolderPlus size={14} />
-          <span>添加文件夹</span>
-        </button>
+        <Tooltip content="打开文件 (Ctrl+O)" placement="bottom">
+          <button
+            className="btn-primary"
+            onClick={openFileViaDialog}
+          >
+            <FileInput size={14} />
+            <span>打开</span>
+          </button>
+        </Tooltip>
+        <Tooltip content="添加文件夹 (Ctrl+N)" placement="bottom">
+          <button
+            className="btn-primary"
+            onClick={openFolderViaDialog}
+          >
+            <FolderPlus size={14} />
+            <span>添加文件夹</span>
+          </button>
+        </Tooltip>
 
         {/* 次操作 pill 组：撤销 + 保存 + 布局 */}
         <div className="tool-group">
-          <button
-            className={cn("tbtn", currentFile?.isDirty && "active")}
-            onClick={handleUndo}
-            disabled={!currentFile || !currentFile.isDirty}
-            title="撤销 (Ctrl+Z)"
-          >
-            <Undo2 size={14} />
-            <span>撤销</span>
-          </button>
-          <button
-            className={cn("tbtn", currentFile?.isDirty && "active")}
-            onClick={saveCurrentFile}
-            disabled={!currentFile || !currentFile.isDirty}
-            title={currentFile?.isDirty ? "保存 (Ctrl+S) — 有未保存的修改" : "保存 (Ctrl+S)"}
-          >
-            <Save size={14} />
-            <span>保存</span>
-          </button>
+          <Tooltip content="撤销 (Ctrl+Z)" placement="bottom">
+            <button
+              className={cn("tbtn", currentFile?.isDirty && "active")}
+              onClick={handleUndo}
+              disabled={!currentFile || !currentFile.isDirty}
+            >
+              <Undo2 size={14} />
+              <span>撤销</span>
+            </button>
+          </Tooltip>
+          <Tooltip content={currentFile?.isDirty ? "保存 (Ctrl+S) — 有未保存的修改" : "保存 (Ctrl+S)"} placement="bottom">
+            <button
+              className={cn("tbtn", currentFile?.isDirty && "active")}
+              onClick={saveCurrentFile}
+              disabled={!currentFile || !currentFile.isDirty}
+            >
+              <Save size={14} />
+              <span>保存</span>
+            </button>
+          </Tooltip>
         </div>
 
         <div className="tool-group">
           {layouts.map((l) => (
-            <button
-              key={l.mode}
-              className={cn("tbtn", layout === l.mode && "active")}
-              onClick={() => setLayout(l.mode)}
-              title={l.label}
-            >
-              {l.icon}
-              <span>{l.label}</span>
-            </button>
+            <Tooltip key={l.mode} content={l.label} placement="bottom">
+              <button
+                className={cn("tbtn", layout === l.mode && "active")}
+                onClick={() => setLayout(l.mode)}
+              >
+                {l.icon}
+                <span>{l.label}</span>
+              </button>
+            </Tooltip>
           ))}
         </div>
 
         {/* 单图标按钮（侧栏 / 设置） */}
-        <button
-          className={cn("icon-btn", showSidebar && "active")}
-          onClick={toggleSidebar}
-          title="主侧栏 (Ctrl+\\)"
-          aria-label="切换侧栏"
-        >
-          <PanelLeft size={15} />
-        </button>
+        <Tooltip content="主侧栏 (Ctrl+\\)" placement="bottom">
+          <button
+            className={cn("icon-btn", showSidebar && "active")}
+            onClick={toggleSidebar}
+            aria-label="切换侧栏"
+          >
+            <PanelLeft size={15} />
+          </button>
+        </Tooltip>
 
         {onOpenSettings && (
-          <button
-            className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-            onClick={onOpenSettings}
-            title="设置 (Ctrl+,)"
-            aria-label="设置"
-          >
-            <Settings size={15} />
-          </button>
+          <Tooltip content="设置 (Ctrl+,)" placement="bottom">
+            <button
+              className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+              onClick={onOpenSettings}
+              aria-label="设置"
+            >
+              <Settings size={15} />
+            </button>
+          </Tooltip>
         )}
       </div>
     </header>
