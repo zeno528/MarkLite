@@ -214,7 +214,7 @@ export function MarkdownPreview() {
         className={cn(
           "markdown-body flex flex-col px-12 py-10",
           isCardMode
-            ? "my-3 min-h-[calc(100%-1.5rem)] w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-[var(--shadow-sm)]"
+            ? "h-full w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
             : "h-full w-full",
         )}
       >
