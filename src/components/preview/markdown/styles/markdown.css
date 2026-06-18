@@ -228,11 +228,12 @@
   margin: 0.5em 0;
 }
 
-/* 行内图片（徽章等）：无边距，保持横向排列 */
+/* 行内图片（徽章等）：无边距，保持横向排列，不强制圆角（让 shields.io 等服务自己控制样式） */
 .markdown-body p img {
   margin: 0;
   display: inline;
   vertical-align: middle;
+  border-radius: 0;
 }
 
 /* 水平线 */
