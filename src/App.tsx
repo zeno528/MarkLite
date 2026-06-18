@@ -2,14 +2,13 @@
  * MarkLite 主应用
  * 布局：标题栏 + 工具栏 + 主体（侧边栏 + 双栏） + 状态栏
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
-import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { ToastContainer } from "@/components/ui/Toast";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { notify } from "@/stores/notificationStore";
@@ -29,6 +28,9 @@ import {
 } from "@/lib/shortcuts/appShortcuts";
 import { useRefreshStore } from "@/stores/refreshStore";
 
+// 延迟加载非首屏组件
+const SettingsDialog = lazy(() => import("@/components/settings/SettingsDialog").then(m => ({ default: m.SettingsDialog })));
+
 export default function App() {
   const layout = useUIStore((s) => s.layout);
   const showSidebar = useUIStore((s) => s.showSidebar);
@@ -37,9 +39,18 @@ export default function App() {
   const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // 初始化设置
+  // 初始化设置（延迟到首帧后，不阻塞渲染）
   useEffect(() => {
-    useSettingsStore.getState().init();
+    const ric =
+      (window as any).requestIdleCallback ??
+      ((cb: () => void) => setTimeout(cb, 1));
+    const id = ric(() => {
+      useSettingsStore.getState().init();
+    });
+    return () => {
+      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
   }, []);
 
   // 自动刷新轮询
@@ -246,7 +257,9 @@ export default function App() {
       </div>
       <StatusBar />
       <ScrollToTop />
-      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <Suspense fallback={null}>
+        <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      </Suspense>
       <ToastContainer />
     </div>
   );
