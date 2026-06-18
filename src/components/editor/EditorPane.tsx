@@ -31,9 +31,21 @@ export function EditorPane() {
   // handleChange/handleSave 引用稳定（不依赖 currentFile），
   // 避免 @uiw 因 onChange 引用变化频繁 reconfigure extensions + value 回灌竞争导致吞字符
   const handleChange = useCallback((value: string) => {
-    const p = useEditorStore.getState().currentFile?.path;
-    if (p) updateContent(p, value);
-  }, [updateContent]);
+    const currentFile = useEditorStore.getState().currentFile;
+    if (!currentFile) return;
+
+    // 只有内容真的变化时才更新（避免文件加载时误触发）
+    // 检查 value 是否和当前文件内容相同
+    if (value === currentFile.content) return;
+
+    // 检查 value 是否和当前文件的 savedContent 相同（文件加载时的初始值）
+    if (value === currentFile.savedContent) return;
+
+    // 检查 value 是否和当前文件的 path 匹配（避免切换文件时误触发）
+    if (currentFile.path !== path) return;
+
+    updateContent(currentFile.path, value);
+  }, [updateContent, path]);
 
   const handleSave = useCallback(async () => {
     const file = useEditorStore.getState().currentFile;
@@ -48,54 +60,46 @@ export function EditorPane() {
 
   if (!currentFile) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg-muted)] p-8">
-        <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-8 text-center shadow-[var(--shadow-sm)]">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-2xl">
+      <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg)]">
+        <div className="flex flex-col items-center gap-6 text-center">
+          {/* Logo */}
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-3xl">
             📝
           </div>
+
+          {/* 标题 */}
           <div>
-            <h3 className="mb-1.5 text-[15px] font-semibold text-[var(--color-text)]">
-              打开 Markdown 开始
-            </h3>
-            <p className="text-[12.5px] leading-relaxed text-[var(--color-text-muted)]">
-              从左侧文件树选择文件，或使用下方按钮快速开始
+            <h2 className="text-lg font-semibold text-[var(--color-text)]">
+              欢迎使用 MarkLite
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+              轻量级 Markdown 编辑器
             </p>
           </div>
-          <div className="flex w-full gap-2">
+
+          {/* 操作按钮 */}
+          <div className="flex gap-3">
             <button
-              className="btn-primary flex-1 justify-center"
+              className="btn-primary"
               onClick={openFileViaDialog}
             >
-              <FileText size={14} />
+              <FileText size={16} />
               <span>打开文件</span>
             </button>
             <button
-              className="btn-ghost flex-1 justify-center"
+              className="btn-ghost"
               onClick={openFolderViaDialog}
             >
-              <FolderOpen size={14} />
+              <FolderOpen size={16} />
               <span>打开文件夹</span>
             </button>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-[var(--color-text-subtle)]">
-            <span className="inline-flex items-center gap-1">
-              <kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-text-muted)]">
-                ⌘ O
-              </kbd>
-              打开
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-text-muted)]">
-                ⌘ S
-              </kbd>
-              保存
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-text-muted)]">
-                ⌘ \
-              </kbd>
-              侧栏
-            </span>
+
+          {/* 快捷键提示 */}
+          <div className="flex gap-4 text-xs text-[var(--color-text-subtle)]">
+            <span>⌘O 打开</span>
+            <span>⌘S 保存</span>
+            <span>⌘\ 侧栏</span>
           </div>
         </div>
       </div>

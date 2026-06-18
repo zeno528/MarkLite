@@ -96,5 +96,16 @@ export async function openFolderViaDialog() {
   const { pickFolder } = await import("@/lib/tauri/dialog");
   const folder = await pickFolder();
   if (!folder) return;
-  await useFileStore.getState().addFolder(folder);
+
+  // 显示加载提示
+  const folderName = folder.split(/[\\/]/).filter(Boolean).pop() ?? folder;
+  notify.info(`正在打开 ${folderName}...`);
+
+  try {
+    await useFileStore.getState().addFolder(folder);
+    notify.success(`${folderName} 已打开`);
+  } catch (e) {
+    console.error("[openFolder] failed:", e);
+    notify.error("打开文件夹失败");
+  }
 }

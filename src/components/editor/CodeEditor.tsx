@@ -92,9 +92,10 @@ export function CodeEditor({
         // 文档变化时同步内容
         if (vu.docChanged) {
           const content = vu.state.doc.toString();
-          const path = useEditorStore.getState().currentFile?.path;
-          if (path) {
-            useEditorStore.getState().updateContent(path, content);
+          const currentFile = useEditorStore.getState().currentFile;
+          // 只有内容真的变化时才更新（避免文件加载时误触发）
+          if (currentFile && content !== currentFile.content) {
+            useEditorStore.getState().updateContent(currentFile.path, content);
           }
         }
 

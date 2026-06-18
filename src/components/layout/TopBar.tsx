@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import {
   FolderPlus,
   Save,
-  Undo2,
   Columns2,
   FileInput,
   PencilLine,
@@ -16,11 +15,10 @@ import {
   PanelLeft,
   ChevronRight,
 } from "lucide-react";
-import { undo } from "@codemirror/commands";
 import logoSvg from "@/assets/logo.svg";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
-import { useEditorStore, editorViewRef } from "@/stores/editorStore";
+import { useEditorStore } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
@@ -43,14 +41,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   const setLayout = useUIStore((s) => s.setLayout);
   const showSidebar = useUIStore((s) => s.showSidebar);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
-
-  // 撤销操作
-  const handleUndo = () => {
-    const view = editorViewRef.current;
-    if (view) {
-      undo(view);
-    }
-  };
 
   // rootFolder 末级名（路径最后一段），无目录时显示「未打开」
   const rootFolderName = rootFolder
@@ -128,18 +118,8 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           </button>
         </Tooltip>
 
-        {/* 次操作 pill 组：撤销 + 保存 + 布局 */}
+        {/* 次操作 pill 组：保存 + 布局 */}
         <div className="tool-group">
-          <Tooltip content="撤销 (Ctrl+Z)" placement="bottom">
-            <button
-              className={cn("tbtn", currentFile?.isDirty && "active")}
-              onClick={handleUndo}
-              disabled={!currentFile || !currentFile.isDirty}
-            >
-              <Undo2 size={14} />
-              <span>撤销</span>
-            </button>
-          </Tooltip>
           <Tooltip content={currentFile?.isDirty ? "保存 (Ctrl+S) — 有未保存的修改" : "保存 (Ctrl+S)"} placement="bottom">
             <button
               className={cn("tbtn", currentFile?.isDirty && "active")}
