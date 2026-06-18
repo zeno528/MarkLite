@@ -1,0 +1,13 @@
+diff --git a/dist/index.js b/dist/index.js
+index 0c0b3ee0a2923f3b3b581e146ed6d3f436497e52..f909041c5d2023f53206a753a657a8f1554399f1 100644
+--- a/dist/index.js
++++ b/dist/index.js	
+@@ -7094,7 +7094,7 @@ class DOMObserver {
+             else
+                 this.flush();
+         });
+-        if (window.EditContext && browser.android && view.constructor.EDIT_CONTEXT !== false &&
++        if (window.EditContext && view.constructor.EDIT_CONTEXT !== false &&
+             // Chrome <126 doesn't support inverted selections in edit context (#1392)
+             !(browser.chrome && browser.chrome_version < 126)) {
+             this.editContext = new EditContextManager(view);

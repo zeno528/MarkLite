@@ -46,7 +46,6 @@ import {
 } from "./extensions/wordcount";
 import { createAutoSave } from "./extensions/autoSave";
 import { createHyperlinkHandler } from "./extensions/hyperlinks";
-import { imeFix } from "./extensions/imeFix";
 import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -171,7 +170,6 @@ export function CodeEditor({
         onToggleSidebar: cbRef.current.onToggleSidebar ?? undefined,
       })),
       createHyperlinkHandler(),
-      imeFix,
     ];
 
     if (wordWrapEnabled) {
