@@ -33,6 +33,7 @@
   --color-accent: oklch(0.62 0.16 278);
   --color-accent-hover: oklch(0.56 0.17 278);
   --color-accent-foreground: oklch(1 0 0);
+  --color-selection: oklch(0.6 0.19 278); /* 选区高亮：紫，比 accent 略饱和确保明显 */
 
   --color-success: oklch(0.7 0.15 155);
   --color-warning: oklch(0.78 0.15 65);
@@ -73,6 +74,7 @@
   --color-accent: oklch(0.62 0.08 60); /* 暖棕 */
   --color-accent-hover: oklch(0.55 0.09 60);
   --color-accent-foreground: oklch(1 0 0);
+  --color-selection: oklch(0.55 0.17 60); /* 选区高亮：加深加饱和暖橙（accent 太淡，选中需更明显）*/
 
   --color-success: oklch(0.62 0.1 130);
   --color-warning: oklch(0.7 0.13 60);
@@ -95,6 +97,7 @@
   --color-accent: oklch(0.75 0.14 220); /* 青蓝 */
   --color-accent-hover: oklch(0.8 0.13 220);
   --color-accent-foreground: oklch(0.18 0.02 250); /* 青色够亮，需深色文字 */
+  --color-selection: oklch(0.7 0.16 220); /* 选区高亮：青（暗底下加深确保可见）*/
 
   --color-success: oklch(0.78 0.17 145);
   --color-warning: oklch(0.8 0.15 75);
@@ -165,10 +168,18 @@ aside ::-webkit-scrollbar-thumb:hover {
   margin: 0 !important;
 }
 
-/* 选区 */
-::selection {
-  background: var(--color-accent);
-  color: var(--color-accent-foreground);
+/* 选区：用各主题专门的选中色（--color-selection）半透明，保证低饱和主题（如 paper）下也明显可见；
+   保留原文字色不反色，选中后字仍清晰 */
+::selection,
+.cm-line::selection,
+.cm-line ::selection,
+.cm-content::selection,
+.cm-content :focus::selection {
+  background: color-mix(in oklch, var(--color-selection) 50%, transparent) !important;
+}
+/* drawSelection 自绘选区层（刷新前兜底；刷新后该元素不再创建，规则空命中无害）*/
+.cm-editor .cm-selectionBackground {
+  background: color-mix(in oklch, var(--color-selection) 50%, transparent) !important;
 }
 
 /* 设置弹窗进场动画（遮罩淡入 + 面板上浮，150ms；class 在 SettingsDialog.tsx 引用） */

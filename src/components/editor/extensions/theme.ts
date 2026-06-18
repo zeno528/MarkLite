@@ -39,7 +39,7 @@ export const lightTheme = EditorView.theme(
       borderLeftColor: "var(--color-accent)",
     },
     "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "color-mix(in oklch, var(--color-accent) 30%, transparent)",
+      backgroundColor: "color-mix(in oklch, var(--color-selection) 38%, transparent)",
     },
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
@@ -119,7 +119,7 @@ export const darkTheme = EditorView.theme(
       borderLeftColor: "var(--color-accent)",
     },
     "&.cm-focused .cm-selectionBackground, ::selection": {
-      backgroundColor: "color-mix(in oklch, var(--color-accent) 30%, transparent)",
+      backgroundColor: "color-mix(in oklch, var(--color-selection) 38%, transparent)",
     },
     ".cm-activeLine": {
       backgroundColor: "var(--color-bg-muted)",
