@@ -94,18 +94,18 @@ export default function App() {
         if (folders.length === 0) return;
         useFileStore.setState({ folders, activeFolderPath: active });
 
-        // 并行加载：激活文件夹的树 + 恢复上次打开的文件
+        // 并行加载：所有文件夹的树 + 恢复上次打开的文件
         const promises: Promise<void>[] = [];
 
-        // 读激活文件夹的树
-        if (active) {
+        // 读所有文件夹的树
+        for (const folder of folders) {
           promises.push(
-            FileService.readFolderTree(active).then((tree) => {
+            FileService.readFolderTree(folder.path).then((tree) => {
               useFileStore.setState((state) => ({
-                folders: state.folders.map((f) => (f.path === active ? { ...f, fileTree: tree } : f)),
+                folders: state.folders.map((f) => (f.path === folder.path ? { ...f, fileTree: tree } : f)),
               }));
             }).catch((e) => {
-              console.error("[App] restore read tree failed:", e);
+              console.error("[App] restore read tree failed:", folder.path, e);
             })
           );
         }
