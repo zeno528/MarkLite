@@ -4,7 +4,7 @@
 import { create } from "zustand";
 import type { EditorView } from "@codemirror/view";
 
-/** 编辑器 view 引用（非响应式，供大纲等组件直接访问） */
+/** 编辑器 view 引用（非响应式，供目录等组件直接访问） */
 export const editorViewRef: { current: EditorView | null } = { current: null };
 
 /** 预览滚动容器引用（非响应式，供编辑器滚动 handler 直接写预览 scrollTop，绕过 React 中转） */
@@ -59,7 +59,7 @@ interface EditorState {
   searchVisible: boolean;
   setSearchVisible: (show: boolean) => void;
 
-  // === 待跳转行（纯预览模式下点击大纲触发：先切 split，再由编辑器消费） ===
+  // === 待跳转行（纯预览模式下点击目录触发：先切 split，再由编辑器消费） ===
   pendingJumpLine: number | null;
   setPendingJumpLine: (line: number | null) => void;
 

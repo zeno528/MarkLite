@@ -1,12 +1,12 @@
 /**
- * 回到顶部悬浮按钮
+ * 回到顶部悬浮按钮（仅阅读模式）
  * - 滚动超过 300px 后显示
  * - 点击后滚动到顶部
  * - 固定在右下角
  */
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
-import { editorViewRef, previewContainerRef } from "@/stores/editorStore";
+import { previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { cn } from "@/lib/utils/cn";
 
@@ -14,48 +14,32 @@ export function ScrollToTop() {
   const layout = useUIStore((s) => s.layout);
   const [visible, setVisible] = useState(false);
 
+  // 仅阅读模式下监听滚动
   useEffect(() => {
+    if (layout !== "preview-only") {
+      setVisible(false);
+      return;
+    }
+
+    const container = previewContainerRef.current;
+    if (!container) return;
+
     const checkScroll = () => {
-      if (layout === "preview-only") {
-        const container = previewContainerRef.current;
-        if (container) {
-          setVisible(container.scrollTop > 300);
-        }
-      } else {
-        const view = editorViewRef.current;
-        if (view) {
-          setVisible(view.scrollDOM.scrollTop > 300);
-        }
-      }
+      setVisible(container.scrollTop > 300);
     };
 
-    // 监听滚动事件
-    const editorView = editorViewRef.current;
-    const previewContainer = previewContainerRef.current;
-
-    if (layout === "preview-only" && previewContainer) {
-      previewContainer.addEventListener("scroll", checkScroll, { passive: true });
-      checkScroll();
-      return () => previewContainer.removeEventListener("scroll", checkScroll);
-    } else if (editorView) {
-      editorView.scrollDOM.addEventListener("scroll", checkScroll, { passive: true });
-      checkScroll();
-      return () => editorView.scrollDOM.removeEventListener("scroll", checkScroll);
-    }
+    container.addEventListener("scroll", checkScroll, { passive: true });
+    checkScroll();
+    return () => container.removeEventListener("scroll", checkScroll);
   }, [layout]);
 
+  // 非阅读模式不渲染
+  if (layout !== "preview-only") return null;
+
   const handleClick = () => {
-    if (layout === "preview-only") {
-      const container = previewContainerRef.current;
-      if (container) {
-        container.scrollTo({ top: 0, behavior: "auto" });
-      }
-    } else {
-      const view = editorViewRef.current;
-      if (view) {
-        view.scrollDOM.scrollTo({ top: 0, behavior: "auto" });
-        view.focus();
-      }
+    const container = previewContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: 0, behavior: "auto" });
     }
   };
 

@@ -5,10 +5,10 @@
  */
 import { useEffect, useState } from "react";
 import {
-  FolderOpen,
+  FolderPlus,
   Save,
   Columns2,
-  File as FileIcon,
+  FileInput,
   PencilLine,
   BookOpen,
   Settings,
@@ -103,16 +103,16 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           onClick={openFileViaDialog}
           title="打开文件 (Ctrl+O)"
         >
-          <FileIcon size={14} />
+          <FileInput size={14} />
           <span>打开</span>
         </button>
         <button
           className="btn-primary"
           onClick={openFolderViaDialog}
-          title="打开文件夹"
+          title="添加文件夹"
         >
-          <FolderOpen size={14} />
-          <span>文件夹</span>
+          <FolderPlus size={14} />
+          <span>添加文件夹</span>
         </button>
 
         {/* 次操作 pill 组：保存 + 布局 */}

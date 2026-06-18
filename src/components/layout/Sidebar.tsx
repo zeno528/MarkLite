@@ -1,6 +1,6 @@
 /**
  * 侧边栏 - Activity Bar + 面板布局
- * 左侧窄图标栏切换 面板（文件树/大纲/搜索）
+ * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  */
 import { useState, useEffect, useRef } from "react";
 import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X } from "lucide-react";
@@ -49,9 +49,9 @@ function ActivityBarButton({
       onClick={onClick}
       title={title}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+        "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
         active
-          ? "bg-[var(--color-bg-muted)] text-[var(--color-accent)]"
+          ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
           : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
       )}
     >
@@ -159,7 +159,7 @@ export function Sidebar() {
   return (
     <aside className="flex h-full shrink-0">
       {/* Activity Bar - 窄图标栏 */}
-      <div className="flex w-11 flex-col items-center gap-1 border-r border-[var(--color-border)] bg-[var(--color-bg)] py-2">
+      <div className="flex w-12 flex-col items-center gap-1.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] py-3">
         <ActivityBarButton
           active={sidebarTab === "files"}
           onClick={() => {
@@ -168,7 +168,7 @@ export function Sidebar() {
           }}
           title="文件资源管理器"
         >
-          <FileText size={18} />
+          <FileText size={20} />
         </ActivityBarButton>
         <ActivityBarButton
           active={sidebarTab === "outline"}
@@ -178,14 +178,14 @@ export function Sidebar() {
           }}
           title="目录"
         >
-          <List size={18} />
+          <List size={20} />
         </ActivityBarButton>
         <ActivityBarButton
           active={sidebarTab === "search"}
           onClick={() => setSidebarTab("search")}
           title="搜索"
         >
-          <Search size={18} />
+          <Search size={20} />
         </ActivityBarButton>
       </div>
 
@@ -196,7 +196,7 @@ export function Sidebar() {
       >
         {/* 面板标题栏 */}
         <div className="flex h-10 items-center justify-between border-b border-[var(--color-border)] px-3">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
+          <span className="text-[13px] font-semibold text-[var(--color-text)]">
             {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
           </span>
           {sidebarTab === "files" && (

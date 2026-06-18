@@ -1,5 +1,5 @@
 /**
- * 文档大纲 - 从 Markdown 源码提取标题
+ * 文档目录 - 从 Markdown 源码提取标题
  * - 点击标题：若有编辑器则直接跳转；否则（纯预览模式）先切到 split 布局并记下待跳转行
  */
 import { useEffect, useMemo, useRef } from "react";
@@ -37,23 +37,24 @@ function extractHeadings(md: string): Heading[] {
   return headings;
 }
 
-/** 根据标题层级返回样式：选中时统一 font-medium + accent 色，与文件树选中态一致 */
+/** 根据标题层级返回样式：层级差异通过字号 + 字重 + 颜色体现，确保每级都清晰可读 */
 function getLevelStyle(level: number, isActive: boolean): string {
   const size =
-    level === 1 ? "text-[13px]"
-      : level === 2 ? "text-[12.5px]"
-      : level === 3 ? "text-[12px]"
-      : "text-[11.5px]";
+    level === 1 ? "text-[13.5px]"
+      : level === 2 ? "text-[13px]"
+      : level === 3 ? "text-[12.5px]"
+      : "text-[12px]";
   if (isActive) {
-    return cn(size, "font-medium text-[var(--color-accent)]");
+    return cn(size, "font-semibold text-[var(--color-accent)]");
   }
   const weight =
-    level <= 2 ? "font-medium"
-    : level === 3 ? "font-normal"
-    : "font-light";
+    level === 1 ? "font-semibold"
+    : level === 2 ? "font-medium"
+    : level === 3 ? "font-medium"
+    : "font-normal";
   const color = level <= 2 ? "text-[var(--color-text)]"
-    : level === 3 ? "text-[var(--color-text-muted)]"
-    : "text-[var(--color-text-subtle)]";
+    : level === 3 ? "text-[var(--color-text)]"
+    : "text-[var(--color-text-muted)]";
   return cn(size, weight, color);
 }
 
@@ -143,7 +144,7 @@ export function Outline() {
       clickedIndexRef.current = null;
     }, 800);
 
-    // 直接更新光标位置，确保大纲立即高亮
+    // 直接更新光标位置，确保目录立即高亮
     useEditorStore.getState().setCursor({ line, ch: 0 });
 
     // 仅当编辑器真实存在于 DOM 时才走编辑器跳转（避免纯预览模式用了孤儿 view）

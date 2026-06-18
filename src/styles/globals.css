@@ -35,7 +35,7 @@
   --color-accent-foreground: oklch(1 0 0);
   --color-selection: oklch(0.6 0.19 278); /* 选区高亮：紫，比 accent 略饱和确保明显 */
 
-  --color-success: oklch(0.7 0.15 155);
+  --color-success: oklch(0.65 0.22 150); /* 更鲜艳的绿 */
   --color-warning: oklch(0.78 0.15 65);
   --color-danger: oklch(0.62 0.2 25);
 
@@ -77,7 +77,7 @@
   --color-accent-foreground: oklch(1 0 0);
   --color-selection: oklch(0.55 0.17 60); /* 选区高亮：加深加饱和暖橙（accent 太淡，选中需更明显）*/
 
-  --color-success: oklch(0.62 0.1 130);
+  --color-success: oklch(0.58 0.18 145); /* 更鲜艳的绿 */
   --color-warning: oklch(0.7 0.13 60);
   --color-danger: oklch(0.58 0.16 30);
 }
@@ -107,6 +107,79 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
+/* ---------- 方案：Notion 风格 (notion) ---------- */
+:root[data-scheme="notion"] {
+  --color-bg: oklch(1 0 0);
+  --color-bg-elevated: oklch(1 0 0);
+  --color-bg-muted: oklch(0.98 0.002 80);
+  --color-bg-subtle: oklch(0.965 0.003 80);
+  --color-border: oklch(0.92 0.003 80);
+  --color-border-strong: oklch(0.85 0.005 80);
+
+  --color-text: oklch(0.3 0.015 60); /* Notion 深棕 #37352f */
+  --color-text-muted: oklch(0.55 0.012 60);
+  --color-text-subtle: oklch(0.72 0.008 60);
+
+  --color-accent: oklch(0.65 0.15 220); /* Notion 蓝 #2eaadc */
+  --color-accent-hover: oklch(0.58 0.16 220);
+  --color-accent-foreground: oklch(1 0 0);
+  --color-selection: oklch(0.65 0.17 220);
+
+  --color-success: oklch(0.7 0.15 155);
+  --color-warning: oklch(0.78 0.15 65);
+  --color-danger: oklch(0.62 0.2 25);
+}
+
+/* ---------- 方案：GitHub 风格 (github) ---------- */
+:root[data-scheme="github"] {
+  --color-bg: oklch(0.98 0.002 240);
+  --color-bg-elevated: oklch(1 0 0);
+  --color-bg-muted: oklch(0.965 0.003 240);
+  --color-bg-subtle: oklch(0.955 0.004 240);
+  --color-border: oklch(0.91 0.004 240);
+  --color-border-strong: oklch(0.84 0.006 240);
+
+  --color-text: oklch(0.2 0.01 250);
+  --color-text-muted: oklch(0.45 0.01 250);
+  --color-text-subtle: oklch(0.65 0.008 250);
+
+  --color-accent: oklch(0.55 0.18 250); /* GitHub 蓝 */
+  --color-accent-hover: oklch(0.48 0.19 250);
+  --color-accent-foreground: oklch(1 0 0);
+  --color-selection: oklch(0.55 0.2 250);
+
+  --color-success: oklch(0.62 0.17 145);
+  --color-warning: oklch(0.75 0.15 65);
+  --color-danger: oklch(0.6 0.2 25);
+}
+
+/* ---------- 方案：墨黑 (ink) ---------- */
+:root[data-scheme="ink"] {
+  --color-bg: oklch(0.15 0.01 260);
+  --color-bg-elevated: oklch(0.2 0.01 260);
+  --color-bg-muted: oklch(0.18 0.01 260);
+  --color-bg-subtle: oklch(0.13 0.01 260);
+  --color-border: oklch(0.28 0.01 260);
+  --color-border-strong: oklch(0.38 0.015 260);
+
+  --color-text: oklch(0.88 0.01 260);
+  --color-text-muted: oklch(0.65 0.01 260);
+  --color-text-subtle: oklch(0.48 0.01 260);
+
+  --color-accent: oklch(0.7 0.15 240); /* 亮蓝 */
+  --color-accent-hover: oklch(0.75 0.14 240);
+  --color-accent-foreground: oklch(0.15 0.01 260);
+  --color-selection: oklch(0.65 0.17 240);
+
+  --color-success: oklch(0.75 0.18 145);
+  --color-warning: oklch(0.78 0.15 75);
+  --color-danger: oklch(0.62 0.22 20);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.7), 0 4px 6px -4px rgb(0 0 0 / 0.5);
 }
 
 /* ===== 基础重置 ===== */
@@ -200,7 +273,7 @@ aside ::-webkit-scrollbar-thumb:hover {
   to   { opacity: 0; transform: translateX(16px); }
 }
 
-/* 列表项选中态（文件树 / 大纲共用）：淡 accent 背景 + 左侧高亮条。行需 position: relative */
+/* 列表项选中态（文件树 / 目录共用）：淡 accent 背景 + 左侧高亮条。行需 position: relative */
 .item-active {
   background: color-mix(in oklch, var(--color-accent) 10%, transparent);
 }

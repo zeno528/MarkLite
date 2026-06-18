@@ -83,7 +83,7 @@ export function CodeEditor({
   const setSelection = useEditorStore((s) => s.setSelection);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
-  // cursorSync 扩展：选区变化时同步光标位置到 store（供大纲高亮）
+  // cursorSync 扩展：选区变化时同步光标位置到 store（供目录高亮）
   // 用 ViewPlugin 而非 onUpdate 回调，确保 view.dispatch 触发的选区变化也能被捕获
   const cursorSync = useMemo(
     () =>
@@ -122,7 +122,7 @@ export function CodeEditor({
     getCmMod().then(setMod);
   }, []);
 
-  // 卸载时清空共享 view 引用，避免纯预览模式下大纲误用已销毁的 view
+  // 卸载时清空共享 view 引用，避免纯预览模式下目录误用已销毁的 view
   useEffect(() => {
     return () => {
       editorViewRef.current = null;
@@ -249,7 +249,7 @@ export function CodeEditor({
           editorViewRef.current = view;
           setEditorReady(true);
           // 切换文件会按 key=path 重建编辑器：重置光标到开头，避免上一文件的 cursor 残留，
-          // 否则大纲用过期的 currentLine 算 active，永远高亮到最后一个标题
+          // 否则目录用过期的 currentLine 算 active，永远高亮到最后一个标题
           setCursor({ line: 1, ch: 0 });
         }}
         basicSetup={{
