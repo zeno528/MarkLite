@@ -51,6 +51,8 @@ interface FileState {
   refreshActiveTree: () => Promise<void>;
   /** 重新读所有已添加文件夹的文件树 */
   refreshAllTrees: () => Promise<void>;
+  /** 清除所有文件夹（恢复到全新状态） */
+  clearAllFolders: () => void;
 }
 
 /** localStorage keys */
@@ -212,6 +214,19 @@ export const useFileStore = create<FileState>((set, get) => ({
       set({ folders: updatedFolders });
     } catch (e) {
       console.error("[fileStore] refreshAllTrees failed:", e);
+    }
+  },
+
+  clearAllFolders: () => {
+    // 清除缓存
+    treeCache.clear();
+    // 清空状态
+    set({ folders: [], activeFolderPath: null });
+    persist([], null);
+    // 清理编辑器：关闭所有已打开的文件
+    const editor = useEditorStore.getState();
+    for (const file of editor.openFiles) {
+      editor.closeFile(file.path);
     }
   },
 }));

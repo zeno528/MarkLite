@@ -1,9 +1,11 @@
 /**
  * Tauri 对话框封装
- * - 记住上次打开/保存的目录（localStorage），下次对话框默认指向那里
+ * - 文件/文件夹选择：仍用系统对话框（Tauri 原生，体验好）
+ * - 确认对话框：用自定义 UI（替代 Windows 原生丑对话框）
  */
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { homeDir, dirname } from "@tauri-apps/api/path";
+import { customConfirm } from "@/stores/confirmStore";
 
 const LAST_DIR_KEY = "marklite:lastdir";
 
@@ -37,13 +39,13 @@ export async function pickFolder(): Promise<string | null> {
   return selected;
 }
 
-/** 确认对话框 */
+/** 确认对话框（自定义 UI，非系统原生） */
 export async function confirmDialog(
   message: string,
   title = "MarkLite",
   okLabel = "确定",
   cancelLabel = "取消",
+  danger = false,
 ): Promise<boolean> {
-  const { ask } = await import("@tauri-apps/plugin-dialog");
-  return await ask(message, { title, okLabel, cancelLabel });
+  return customConfirm(message, title, okLabel, cancelLabel, danger);
 }

@@ -279,7 +279,7 @@ function FileContextMenu({
   };
 
   const handleDelete = async () => {
-    const ok = await confirmDialog(`确定删除「${menu.name}」？此操作不可撤销。`, "删除文件");
+    const ok = await confirmDialog(`确定删除「${menu.name}」？此操作不可撤销。`, "删除文件", "删除", "取消", true);
     if (!ok) {
       onClose();
       return;

@@ -303,6 +303,17 @@ aside ::-webkit-scrollbar-thumb:hover {
   background: color-mix(in oklch, var(--color-selection) 50%, transparent) !important;
 }
 
+/* 通用淡入 */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* 弹窗弹入（缩放 + 淡入） */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 /* 设置弹窗进场动画（遮罩淡入 + 面板上浮，150ms；class 在 SettingsDialog.tsx 引用） */
 @keyframes settings-fade {
   from { opacity: 0; }

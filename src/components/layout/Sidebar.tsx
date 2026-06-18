@@ -3,7 +3,7 @@
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  */
 import { useState, useEffect, useRef } from "react";
-import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X } from "lucide-react";
+import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X, Trash2 } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
@@ -68,6 +68,7 @@ function FolderSelect() {
   const activeFolderPath = useFileStore((s) => s.activeFolderPath);
   const setActiveFolder = useFileStore((s) => s.setActiveFolder);
   const removeFolder = useFileStore((s) => s.removeFolder);
+  const clearAllFolders = useFileStore((s) => s.clearAllFolders);
 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -147,6 +148,31 @@ function FolderSelect() {
               </div>
             );
           })}
+          {folders.length > 1 && (
+            <>
+              <div className="mx-2 my-1 h-px bg-[var(--color-border)]" />
+              <button
+                onClick={async () => {
+                  const { confirmDialog } = await import("@/lib/tauri/dialog");
+                  const ok = await confirmDialog(
+                    `确定清除所有 ${folders.length} 个文件夹？\n编辑器中已打开的文件也将被关闭。`,
+                    "清除所有文件夹",
+                    "清除",
+                    "取消",
+                    true,
+                  );
+                  if (ok) {
+                    clearAllFolders();
+                    setOpen(false);
+                  }
+                }}
+                className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger)]/10"
+              >
+                <Trash2 size={12} />
+                <span>清除所有文件夹</span>
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ import { SplitView } from "@/components/layout/SplitView";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { ToastContainer } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { notify } from "@/stores/notificationStore";
 import { useUIStore } from "@/stores/uiStore";
@@ -261,6 +262,7 @@ export default function App() {
         <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       </Suspense>
       <ToastContainer />
+      <ConfirmDialog />
     </div>
   );
 }
