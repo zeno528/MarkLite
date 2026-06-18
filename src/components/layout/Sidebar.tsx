@@ -39,16 +39,19 @@ function ActivityBarButton({
   onClick,
   title,
   children,
+  onMouseDown,
 }: {
   active: boolean;
   onClick: () => void;
   title: string;
   children: React.ReactNode;
+  onMouseDown?: (e: React.MouseEvent) => void;
 }) {
   return (
     <Tooltip content={title} placement="right">
       <button
         onClick={onClick}
+        onMouseDown={onMouseDown}
         className={cn(
           "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
           active
@@ -182,6 +185,7 @@ function FolderSelect() {
 export function Sidebar() {
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
+  const triggerSearchFocus = useUIStore((s) => s.triggerSearchFocus);
 
   return (
     <aside className="flex h-full shrink-0">
@@ -209,13 +213,10 @@ export function Sidebar() {
         </ActivityBarButton>
         <ActivityBarButton
           active={sidebarTab === "search"}
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
             setSidebarTab("search");
-            // 延迟聚焦搜索框
-            setTimeout(() => {
-              const input = document.querySelector('[data-search-input]') as HTMLInputElement;
-              input?.focus();
-            }, 100);
+            triggerSearchFocus();
           }}
           title="搜索 (Ctrl+F)"
         >

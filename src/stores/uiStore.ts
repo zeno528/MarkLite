@@ -43,6 +43,8 @@ interface UIState {
   setShowSidebar: (show: boolean) => void;
   sidebarTab: "files" | "outline" | "search";
   setSidebarTab: (tab: "files" | "outline" | "search") => void;
+  focusSearchTrigger: number;
+  triggerSearchFocus: () => void;
 
   // 状态栏
   showStatusBar: boolean;
@@ -110,6 +112,8 @@ export const useUIStore = create<UIState>((set, get) => ({
   setShowSidebar: (showSidebar) => set({ showSidebar }),
   sidebarTab: "files",
   setSidebarTab: (sidebarTab) => set({ sidebarTab }),
+  focusSearchTrigger: 0,
+  triggerSearchFocus: () => set((s) => ({ focusSearchTrigger: s.focusSearchTrigger + 1 })),
 
   // 状态栏
   showStatusBar: true,

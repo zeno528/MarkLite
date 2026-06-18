@@ -8,6 +8,7 @@ import { Search, X, FileText } from "lucide-react";
 import { EditorView } from "@codemirror/view";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
+import { useUIStore } from "@/stores/uiStore";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 
 interface SearchResult {
@@ -55,9 +56,15 @@ export function SearchPanel() {
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 组件挂载时聚焦 + 卸载时清理
+  const focusSearchTrigger = useUIStore((s) => s.focusSearchTrigger);
+
+  // 切换到搜索 tab 或重复点击搜索按钮时自动聚焦输入框
   useEffect(() => {
     inputRef.current?.focus();
+  }, [focusSearchTrigger]);
+
+  // 仅在卸载时清理选区和高亮（与聚焦逻辑分离，防止 cleanup 抢占焦点）
+  useEffect(() => {
     return () => {
       window.getSelection()?.removeAllRanges();
       clearHighlights();
@@ -237,8 +244,12 @@ export function SearchPanel() {
     <div className="flex h-full flex-col">
       {/* 搜索输入框 */}
       <div className="px-2 py-1.5">
-        <div className="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-2.5 py-2">
-          <Search size={14} className="shrink-0 text-[var(--color-text-subtle)]" />
+        <div className="group flex items-center gap-1.5 rounded-lg border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] px-2.5 py-2 transition-colors focus-within:border-[var(--color-accent)] focus-within:shadow-[0_0_0_2px_color-mix(in_oklch,var(--color-accent)_15%,transparent)]">
+          <Search
+            size={14}
+            className="shrink-0 cursor-text text-[var(--color-text-subtle)] transition-colors group-focus-within:text-[var(--color-accent)]"
+            onClick={() => inputRef.current?.focus()}
+          />
           <input
             ref={inputRef}
             type="text"
@@ -246,7 +257,6 @@ export function SearchPanel() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="搜索文件内容..."
-            data-search-input
             className="min-w-0 flex-1 bg-transparent text-xs text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-subtle)]"
           />
           {query && (

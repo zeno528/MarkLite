@@ -231,6 +231,7 @@ export default function App() {
           e.preventDefault();
           useUIStore.getState().setSidebarTab("search");
           useUIStore.getState().setShowSidebar(true);
+          useUIStore.getState().triggerSearchFocus();
           break;
         case "n":
         case "N":
