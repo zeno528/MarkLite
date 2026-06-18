@@ -13,6 +13,12 @@ interface SettingsState {
   autoSave: boolean;
   autoSaveDelay: number; // ms
 
+  // === 自动刷新 ===
+  /** 自动刷新开关 */
+  autoRefresh: boolean;
+  /** 自动刷新间隔（秒） */
+  autoRefreshInterval: number;
+
   // === Markdown ===
   /** 同步滚动 */
   scrollSync: boolean;
@@ -36,6 +42,8 @@ const DEFAULTS = {
   lineNumbers: false,
   autoSave: true,
   autoSaveDelay: 2000,
+  autoRefresh: false,
+  autoRefreshInterval: 30,
   scrollSync: true,
 };
 

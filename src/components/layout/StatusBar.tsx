@@ -8,21 +8,28 @@
 import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
+import { useRefreshStore } from "@/stores/refreshStore";
 import { cn } from "@/lib/utils/cn";
 import { reloadCurrentFile } from "@/lib/shortcuts/appShortcuts";
+import { notify } from "@/stores/notificationStore";
 
 export function StatusBar() {
   const cursor = useEditorStore((s) => s.cursor);
+  const selection = useEditorStore((s) => s.selection);
   const currentFile = useEditorStore((s) => s.currentFile);
   const [wc, setWc] = useState({ chars: 0, words: 0, lines: 0 });
-  // 刷新动效：点击后图标旋转，读盘期间持续转，至少 400ms（本地读盘极快，补足一圈保证可见）
-  const [reloading, setReloading] = useState(false);
+  const reloading = useRefreshStore((s) => s.reloading);
+  const setReloading = useRefreshStore((s) => s.setReloading);
+
   const handleReload = async () => {
     if (reloading) return; // 旋转中防重复点击
     setReloading(true);
     const minSpin = new Promise<void>((r) => setTimeout(r, 400));
     try {
-      await Promise.all([reloadCurrentFile(), minSpin]);
+      const hasChanges = await Promise.all([reloadCurrentFile(false), minSpin]);
+      if (hasChanges[0]) {
+        notify.info("已刷新");
+      }
     } finally {
       setReloading(false);
     }
@@ -47,6 +54,7 @@ export function StatusBar() {
       className="flex h-[var(--statusbar-height)] w-full shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 text-xs text-[var(--color-text-muted)]"
     >
       <div className="flex items-center gap-3">
+        {/* 模块1：刷新按钮 */}
         <button
           className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
           onClick={handleReload}
@@ -56,14 +64,28 @@ export function StatusBar() {
         >
           <RefreshCw size={13} className={cn(reloading && "animate-spin")} />
         </button>
-        <span className="text-[var(--color-text-subtle)]">·</span>
-        <span>
-          行 {cursor.line}，列 {cursor.ch + 1}
-        </span>
-        <span className="text-[var(--color-text-subtle)]">·</span>
-        <span>{wc.words} 字</span>
-        <span className="text-[var(--color-text-subtle)]">·</span>
-        <span>{wc.lines} 行</span>
+
+        {/* 模块2：文档统计 */}
+        <div className="flex items-center gap-2">
+          <span className="text-[var(--color-text-subtle)]">|</span>
+          <span>{wc.words} 字</span>
+          <span className="text-[var(--color-text-subtle)]">·</span>
+          <span>{wc.lines} 行</span>
+        </div>
+
+        {/* 模块3：光标位置 + 选中信息 */}
+        <div className="flex items-center gap-2">
+          <span className="text-[var(--color-text-subtle)]">|</span>
+          <span>
+            行 {cursor.line}，列 {cursor.ch + 1}
+          </span>
+          {selection.chars > 0 && (
+            <>
+              <span className="text-[var(--color-text-subtle)]">·</span>
+              <span>选中 {selection.chars} 字符 / {selection.words} 词</span>
+            </>
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-2">
         {currentFile && (
@@ -72,24 +94,22 @@ export function StatusBar() {
             <span className="rounded-md bg-[color-mix(in_oklch,var(--color-accent)_14%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--color-accent)]">
               {currentFile.ext.toUpperCase()}
             </span>
-            {/* 保存状态：圆点 + 文字；未保存 warning 醒目，已保存 subtle 低调（常态不抢眼） */}
+            {/* 保存状态：胶囊样式 */}
             <span
               className={cn(
-                "flex items-center gap-1.5",
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold",
                 currentFile.isDirty
-                  ? "text-[var(--color-warning)]"
-                  : "text-[var(--color-text-subtle)]",
+                  ? "bg-[color-mix(in_oklch,var(--color-warning)_15%,transparent)] text-[var(--color-warning)]"
+                  : "bg-[color-mix(in_oklch,var(--color-success)_15%,transparent)] text-[var(--color-success)]",
               )}
             >
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full",
-                  currentFile.isDirty
-                    ? "bg-[var(--color-warning)] shadow-[0_0_0_2px_color-mix(in_oklch,var(--color-warning)_25%,transparent)]"
-                    : "bg-[var(--color-success)]",
+                  currentFile.isDirty ? "bg-[var(--color-warning)]" : "bg-[var(--color-success)]",
                 )}
               />
-              <span className="font-medium">{currentFile.isDirty ? "未保存" : "已保存"}</span>
+              {currentFile.isDirty ? "未保存" : "已保存"}
             </span>
           </>
         )}

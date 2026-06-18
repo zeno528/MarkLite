@@ -40,7 +40,8 @@
   --color-danger: oklch(0.62 0.2 25);
 
   /* 排版 */
-  --font-editor: "JetBrains Mono", "SF Mono", "Cascadia Code", "Menlo", "Consolas", monospace;
+  --font-editor: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-editor-mono: "JetBrains Mono", "SF Mono", "Cascadia Code", "Menlo", "Consolas", monospace;
   --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-serif: "Source Serif 4", "Source Han Serif SC", "Noto Serif CJK SC", Georgia, serif;
   --font-preview: var(--font-ui);

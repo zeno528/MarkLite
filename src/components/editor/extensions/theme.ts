@@ -37,23 +37,29 @@ export const lightTheme = EditorView.theme(
     },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: "var(--color-accent)",
+      borderLeftWidth: "2px",
     },
     "&.cm-focused .cm-selectionBackground, ::selection": {
       backgroundColor: "color-mix(in oklch, var(--color-selection) 38%, transparent)",
     },
     ".cm-activeLine": {
-      backgroundColor: "var(--color-bg-muted)",
+      backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+      color: "var(--color-text)",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg-subtle)",
       color: "var(--color-text-subtle)",
       border: "none",
-      borderRight: "1px solid var(--color-border)",
+      borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
     },
     ".cm-lineNumbers .cm-gutterElement": {
       padding: "0 12px 0 8px",
       minWidth: "40px",
       textAlign: "right",
+      color: "var(--color-text-subtle)",
     },
     ".cm-foldGutter": {
       width: "16px",
@@ -117,23 +123,29 @@ export const darkTheme = EditorView.theme(
     },
     ".cm-cursor, .cm-dropCursor": {
       borderLeftColor: "var(--color-accent)",
+      borderLeftWidth: "2px",
     },
     "&.cm-focused .cm-selectionBackground, ::selection": {
       backgroundColor: "color-mix(in oklch, var(--color-selection) 38%, transparent)",
     },
     ".cm-activeLine": {
-      backgroundColor: "var(--color-bg-muted)",
+      backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+      color: "var(--color-text)",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg-subtle)",
       color: "var(--color-text-subtle)",
       border: "none",
-      borderRight: "1px solid var(--color-border)",
+      borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
     },
     ".cm-lineNumbers .cm-gutterElement": {
       padding: "0 12px 0 8px",
       minWidth: "40px",
       textAlign: "right",
+      color: "var(--color-text-subtle)",
     },
     ".cm-foldGutter": {
       width: "16px",

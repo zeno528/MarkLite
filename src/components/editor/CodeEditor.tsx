@@ -25,6 +25,7 @@ import {
   bracketMatching,
   indentOnInput,
   foldKeymap,
+  syntaxHighlighting,
 } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
 import {
@@ -34,6 +35,7 @@ import {
 } from "@codemirror/view";
 
 import { lightTheme, darkTheme } from "./extensions/theme";
+import { lightHighlight, darkHighlight } from "./extensions/highlight";
 import { createShortcuts } from "./extensions/shortcuts";
 import {
   wordCountField,
@@ -76,6 +78,7 @@ export function CodeEditor({
   const autoSaveEnabled = useSettingsStore((s) => s.autoSave);
   const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay);
   const setCursor = useEditorStore((s) => s.setCursor);
+  const setSelection = useEditorStore((s) => s.setSelection);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
   // onUpdate 稳定引用（避免 @uiw 因 onUpdate 变化 reconfigure 全部 extensions，导致打字吞字符）
@@ -87,8 +90,20 @@ export function CodeEditor({
       const pos = state.selection.main.head;
       const line = state.doc.lineAt(pos);
       setCursor({ line: line.number, ch: pos - line.from });
+
+      // 同步选中文本信息
+      const sel = state.selection.main;
+      if (sel.from !== sel.to) {
+        const text = state.sliceDoc(sel.from, sel.to);
+        const chars = text.length;
+        const cnChars = (text.match(/[一-龥]/g) || []).length;
+        const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
+        setSelection({ text, chars, words: cnChars + enWords });
+      } else {
+        setSelection({ text: "", chars: 0, words: 0 });
+      }
     },
-    [setCursor],
+    [setCursor, setSelection],
   );
 
   const viewRef = useRef<EditorView | null>(null);
@@ -154,6 +169,7 @@ export function CodeEditor({
     }
 
     exts.push(resolvedTheme === "dark" ? darkTheme : lightTheme);
+    exts.push(syntaxHighlighting(resolvedTheme === "dark" ? darkHighlight : lightHighlight));
 
     return exts;
   }, [

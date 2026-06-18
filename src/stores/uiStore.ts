@@ -121,7 +121,8 @@ export const useUIStore = create<UIState>((set, get) => ({
     set({ fontSize });
     try { localStorage.setItem(FONT_SIZE_KEY, String(fontSize)); } catch {}
   },
-  fontFamily: "JetBrains Mono",
+  fontFamily:
+    '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "PingFang SC", "Microsoft YaHei", sans-serif',
   setFontFamily: (fontFamily) => {
     set({ fontFamily });
     try { localStorage.setItem(FONT_FAMILY_KEY, fontFamily); } catch {}
@@ -152,7 +153,10 @@ if (typeof window !== "undefined") {
       useUIStore.setState({ fontSize: +savedFontSize });
     }
     const savedFontFamily = localStorage.getItem(FONT_FAMILY_KEY);
-    if (savedFontFamily) useUIStore.setState({ fontFamily: savedFontFamily });
+    // 旧默认 "JetBrains Mono"（等宽）迁移为无衬线正文；其他保留用户自选
+    if (savedFontFamily && savedFontFamily !== "JetBrains Mono") {
+      useUIStore.setState({ fontFamily: savedFontFamily });
+    }
 
     // 恢复布局（layout）
     const savedLayout = localStorage.getItem(LAYOUT_KEY) as LayoutMode | null;

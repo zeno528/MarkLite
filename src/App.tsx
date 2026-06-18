@@ -25,16 +25,45 @@ import {
   reloadCurrentFile,
   saveCurrentFile,
 } from "@/lib/shortcuts/appShortcuts";
+import { useRefreshStore } from "@/stores/refreshStore";
 
 export default function App() {
   const layout = useUIStore((s) => s.layout);
   const showSidebar = useUIStore((s) => s.showSidebar);
+  const autoRefresh = useSettingsStore((s) => s.autoRefresh);
+  const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
+  const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // 初始化设置
   useEffect(() => {
     useSettingsStore.getState().init();
   }, []);
+
+  // 自动刷新轮询
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const intervalId = setInterval(() => {
+      // 没有打开文件夹则跳过
+      const { folders } = useFileStore.getState();
+      if (folders.length === 0) return;
+
+      // 静默模式刷新
+      reloadCurrentFile(true).then((hasChanges) => {
+        // 只有文件有变化时才显示动画和通知
+        if (hasChanges) {
+          setReloading(true);
+          setTimeout(() => {
+            setReloading(false);
+            notify.info("已刷新");
+          }, 500);
+        }
+      });
+    }, autoRefreshInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [autoRefresh, autoRefreshInterval, setReloading]);
 
   // 启动恢复上次打开的文件夹列表（多文件夹持久化），并读激活文件夹的树
   useEffect(() => {

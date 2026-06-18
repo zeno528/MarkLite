@@ -33,7 +33,7 @@ export function Toggle({
     >
       <span
         className={cn(
-          "absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150",
+          "absolute top-1/2 -translate-y-1/2 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-150",
           checked && "translate-x-4",
         )}
       />

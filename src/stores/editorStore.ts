@@ -45,6 +45,10 @@ interface EditorState {
   cursor: { line: number; ch: number };
   setCursor: (cursor: { line: number; ch: number }) => void;
 
+  // === 选中文本 ===
+  selection: { text: string; chars: number; words: number };
+  setSelection: (selection: { text: string; chars: number; words: number }) => void;
+
   // === 滚动位置 ===
   scrollPercent: number;
   /** 滚动来源，用于双向同步防循环 */
@@ -73,12 +77,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   activeFilePath: null,
   currentFile: null,
   cursor: { line: 1, ch: 0 },
+  selection: { text: "", chars: 0, words: 0 },
   scrollPercent: 0,
   scrollSource: null,
   searchVisible: false,
   pendingJumpLine: null,
 
   setCursor: (cursor) => set({ cursor }),
+  setSelection: (selection) => set({ selection }),
   setScrollPercent: (scrollPercent, source) => set({ scrollPercent, scrollSource: source }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
   setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),

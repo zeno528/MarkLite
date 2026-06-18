@@ -32,12 +32,12 @@ export async function saveCurrentFile() {
 
 /**
  * 刷新所有已打开的文件 + 文件树
- * - 所有文件都从磁盘重新读取最新内容
- * - 有未保存改动的文件弹确认，避免误覆盖本地编辑
+ * @param silent 静默模式：不弹确认框、不显示通知（自动刷新用）
+ * @returns 是否有文件内容变化
  */
-export async function reloadCurrentFile() {
+export async function reloadCurrentFile(silent = false): Promise<boolean> {
   const editor = useEditorStore.getState();
-  const { openFiles, activeFilePath, updateContent, markSaved, switchFile } = editor;
+  const { openFiles, activeFilePath, updateContent, markSaved } = editor;
   try {
     // 1. 刷新所有文件夹的文件树
     await useFileStore.getState().refreshAllTrees();
@@ -45,8 +45,8 @@ export async function reloadCurrentFile() {
     // 2. 收集需要刷新的文件（排除无改动的文件以减少 IO）
     const filesToRefresh = openFiles.filter((f) => f.isDirty || f.content !== f.savedContent);
 
-    // 3. 如果有未保存改动的文件，弹确认
-    if (filesToRefresh.some((f) => f.isDirty)) {
+    // 3. 如果有未保存改动的文件，弹确认（非静默模式）
+    if (!silent && filesToRefresh.some((f) => f.isDirty)) {
       const names = filesToRefresh
         .filter((f) => f.isDirty)
         .map((f) => f.title)
@@ -55,7 +55,7 @@ export async function reloadCurrentFile() {
         `以下文件有未保存的改动：${names}\n刷新将用磁盘内容覆盖本地改动，是否继续？`,
         "刷新确认",
       );
-      if (!ok) return;
+      if (!ok) return false;
     }
 
     // 4. 刷新所有已打开的文件
@@ -83,12 +83,11 @@ export async function reloadCurrentFile() {
       }
     }
 
-    if (hasChanges) {
-      notify.info("已刷新");
-    }
+    return hasChanges;
   } catch (e) {
     console.error("[reload] failed:", e);
-    notify.error("刷新失败");
+    if (!silent) notify.error("刷新失败");
+    return false;
   }
 }
 
