@@ -1,8 +1,9 @@
 /**
  * 关于页面：项目信息、版本号、技术栈
  */
-import { ExternalLink, Globe } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import logoSvg from "@/assets/logo.svg";
+import { version } from "../../../../package.json";
 
 export function AboutSection() {
   return (
@@ -12,7 +13,7 @@ export function AboutSection() {
         <img src={logoSvg} alt="MarkLite" className="h-12 w-12" />
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">MarkLite</h2>
-          <p className="text-xs text-[var(--color-text-subtle)]">v0.1.0</p>
+          <p className="text-xs text-[var(--color-text-subtle)]">v{version}</p>
         </div>
       </div>
 
