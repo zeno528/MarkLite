@@ -97,8 +97,8 @@ function FolderSelect() {
         className={cn(
           "flex w-full items-center justify-between gap-1 rounded-lg border px-2.5 py-2 text-xs transition-colors",
           open
-            ? "rounded-b-none border-[var(--color-accent)] bg-[var(--color-bg-muted)]"
-            : "border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-bg-muted)]",
+            ? "rounded-b-none border-[var(--color-accent)] bg-[var(--color-bg-elevated)]"
+            : "border-[var(--color-border)] bg-[var(--color-bg-elevated)] hover:border-[var(--color-border-strong)]",
         )}
       >
         <div className="flex items-center gap-1.5 min-w-0">
@@ -116,7 +116,7 @@ function FolderSelect() {
 
       {/* 下拉面板 - 绝对定位，不影响下方布局 */}
       {open && (
-        <div className="absolute left-2 right-2 z-50 mt-0 overflow-auto rounded-b-lg border border-t-0 border-[var(--color-accent)] bg-[var(--color-bg-muted)] p-1 max-h-[40vh] shadow-md">
+        <div className="absolute left-2 right-2 z-50 mt-0 overflow-auto rounded-b-lg border border-t-0 border-[var(--color-accent)] bg-[var(--color-bg-elevated)] p-1 max-h-[40vh] shadow-[var(--shadow-lg)]">
           {folders.map((f) => {
             const isActive = f.path === activeFolderPath;
             return (

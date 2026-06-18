@@ -137,15 +137,14 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
         <div className="tool-group">
           {layouts.map((l) => (
-            <Tooltip key={l.mode} content={l.label} placement="bottom">
-              <button
-                className={cn("tbtn", layout === l.mode && "active")}
-                onClick={() => setLayout(l.mode)}
-              >
-                {l.icon}
-                <span>{l.label}</span>
-              </button>
-            </Tooltip>
+            <button
+              key={l.mode}
+              className={cn("tbtn", layout === l.mode && "active")}
+              onClick={() => setLayout(l.mode)}
+            >
+              {l.icon}
+              <span>{l.label}</span>
+            </button>
           ))}
         </div>
 

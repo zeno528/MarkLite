@@ -391,7 +391,7 @@ body {
 }
 .tool-group .tbtn:hover:not(:disabled) {
   color: var(--color-text);
-  background: var(--color-bg-subtle);
+  background: color-mix(in oklch, var(--color-text) 8%, transparent);
 }
 .tool-group .tbtn.icon {
   width: 30px;
@@ -407,6 +407,11 @@ body {
   background: var(--color-accent);
   box-shadow: 0 2px 6px color-mix(in oklch, var(--color-accent) 35%, transparent);
 }
+.tool-group .tbtn.active:hover:not(:disabled) {
+  color: var(--color-accent-foreground);
+  background: var(--color-accent-hover);
+  box-shadow: 0 2px 8px color-mix(in oklch, var(--color-accent) 45%, transparent);
+}
 
 /* ===== 主操作按钮（顶栏"打开"等关键 CTA，黑色填充与 pill 工具组视觉分层） ===== */
 .btn-primary {
@@ -418,9 +423,9 @@ body {
   font-weight: 600;
   color: oklch(1 0 0);
   background: oklch(0.32 0.012 275);
-  height: 30px;
+  height: 34px;
   padding: 0 13px;
-  border-radius: 9px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -456,8 +461,8 @@ body {
   font-family: inherit;
   color: var(--color-text-muted);
   background: transparent;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
