@@ -37,7 +37,7 @@ class FoldToggle extends WidgetType {
     return el;
   }
   ignoreEvent() {
-    return false;
+    return true;
   }
 }
 

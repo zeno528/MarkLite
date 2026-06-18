@@ -25,6 +25,7 @@ import {
   bracketMatching,
   indentOnInput,
   foldKeymap,
+  foldState,
   syntaxHighlighting,
 } from "@codemirror/language";
 import { autocompletion, completionKeymap } from "@codemirror/autocomplete";
@@ -172,6 +173,8 @@ export function CodeEditor({
     exts.push(resolvedTheme === "dark" ? darkTheme : lightTheme);
     exts.push(syntaxHighlighting(resolvedTheme === "dark" ? darkHighlight : lightHighlight));
     exts.push(inlineFoldMarkers);
+    // foldGutter 关闭后 foldState 不会自动激活，需手动加，否则 foldEffect/unfoldEffect 无处理者（点击折叠无效）
+    exts.push(foldState);
 
     return exts;
   }, [
