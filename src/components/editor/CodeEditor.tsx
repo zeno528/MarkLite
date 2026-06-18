@@ -8,7 +8,7 @@
  * - 滚动同步（编辑器 → 预览）
  * - 查找替换（内置 searchKeymap）
  */
-import { useMemo, useEffect, useState, useRef, useCallback } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import type { EditorView, ViewUpdate } from "@codemirror/view";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
@@ -83,28 +83,29 @@ export function CodeEditor({
   const setSelection = useEditorStore((s) => s.setSelection);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
-  // onUpdate 稳定引用（避免 @uiw 因 onUpdate 变化 reconfigure 全部 extensions，导致打字吞字符）
-  // 只在选区（光标）变化时同步，docChanged 不重复触发
-  const onUpdate = useCallback(
-    (vu: ViewUpdate) => {
-      if (!vu.selectionSet) return;
-      const state = vu.state;
-      const pos = state.selection.main.head;
-      const line = state.doc.lineAt(pos);
-      setCursor({ line: line.number, ch: pos - line.from });
+  // cursorSync 扩展：选区变化时同步光标位置到 store（供大纲高亮）
+  // 用 ViewPlugin 而非 onUpdate 回调，确保 view.dispatch 触发的选区变化也能被捕获
+  const cursorSync = useMemo(
+    () =>
+      CMEditorView.updateListener.of((vu: ViewUpdate) => {
+        if (!vu.selectionSet) return;
+        const state = vu.state;
+        const pos = state.selection.main.head;
+        const line = state.doc.lineAt(pos);
+        setCursor({ line: line.number, ch: pos - line.from });
 
-      // 同步选中文本信息
-      const sel = state.selection.main;
-      if (sel.from !== sel.to) {
-        const text = state.sliceDoc(sel.from, sel.to);
-        const chars = text.length;
-        const cnChars = (text.match(/[一-龥]/g) || []).length;
-        const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
-        setSelection({ text, chars, words: cnChars + enWords });
-      } else {
-        setSelection({ text: "", chars: 0, words: 0 });
-      }
-    },
+        // 同步选中文本信息
+        const sel = state.selection.main;
+        if (sel.from !== sel.to) {
+          const text = state.sliceDoc(sel.from, sel.to);
+          const chars = text.length;
+          const cnChars = (text.match(/[一-龥]/g) || []).length;
+          const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
+          setSelection({ text, chars, words: cnChars + enWords });
+        } else {
+          setSelection({ text: "", chars: 0, words: 0 });
+        }
+      }),
     [setCursor, setSelection],
   );
 
@@ -145,6 +146,7 @@ export function CodeEditor({
       highlightSelectionMatches(),
       autocompletion(),
       markdown({ base: markdownLanguage, codeLanguages: languages }),
+      cursorSync,
       wordCountField,
       wordCountUpdate,
       wordCountInit,
@@ -263,7 +265,6 @@ export function CodeEditor({
           drawSelection: false,
           tabSize,
         }}
-        onUpdate={onUpdate}
       />
     </div>
   );

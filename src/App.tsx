@@ -11,6 +11,7 @@ import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { ToastContainer } from "@/components/ui/Toast";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { notify } from "@/stores/notificationStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -219,6 +220,7 @@ export default function App() {
         </main>
       </div>
       <StatusBar />
+      <ScrollToTop />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <ToastContainer />
     </div>

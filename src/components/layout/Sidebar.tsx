@@ -176,7 +176,7 @@ export function Sidebar() {
             setSidebarTab("outline");
             clearSearchHighlights();
           }}
-          title="文档大纲"
+          title="目录"
         >
           <List size={18} />
         </ActivityBarButton>
@@ -197,7 +197,7 @@ export function Sidebar() {
         {/* 面板标题栏 */}
         <div className="flex h-10 items-center justify-between border-b border-[var(--color-border)] px-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-            {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "大纲"}
+            {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
           </span>
           {sidebarTab === "files" && (
             <button

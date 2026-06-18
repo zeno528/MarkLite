@@ -2,7 +2,7 @@
  * 文档大纲 - 从 Markdown 源码提取标题
  * - 点击标题：若有编辑器则直接跳转；否则（纯预览模式）先切到 split 布局并记下待跳转行
  */
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { EditorView } from "@codemirror/view";
 import { cn } from "@/lib/utils/cn";
@@ -37,19 +37,24 @@ function extractHeadings(md: string): Heading[] {
   return headings;
 }
 
-/** 根据标题层级返回样式：字号/字重按层级（选中与非选中一致，避免切换时行高跳动），只颜色不同 */
+/** 根据标题层级返回样式：选中时统一 font-medium + accent 色，与文件树选中态一致 */
 function getLevelStyle(level: number, isActive: boolean): string {
-  const sizeWeight =
-    level === 1 ? "text-[13px] font-semibold"
-      : level === 2 ? "text-[12.5px] font-medium"
-      : level === 3 ? "text-[12px] font-normal"
-      : "text-[11.5px] font-light";
-  const color = isActive
-    ? "text-[var(--color-accent)]"
-    : level <= 2 ? "text-[var(--color-text)]"
+  const size =
+    level === 1 ? "text-[13px]"
+      : level === 2 ? "text-[12.5px]"
+      : level === 3 ? "text-[12px]"
+      : "text-[11.5px]";
+  if (isActive) {
+    return cn(size, "font-medium text-[var(--color-accent)]");
+  }
+  const weight =
+    level <= 2 ? "font-medium"
+    : level === 3 ? "font-normal"
+    : "font-light";
+  const color = level <= 2 ? "text-[var(--color-text)]"
     : level === 3 ? "text-[var(--color-text-muted)]"
     : "text-[var(--color-text-subtle)]";
-  return cn(sizeWeight, color);
+  return cn(size, weight, color);
 }
 
 /** 让编辑器跳到指定行（需 view 已就绪） */
@@ -60,6 +65,11 @@ function jumpToLine(view: EditorView, line: number) {
     selection: { anchor: lineObj.from },
     effects: EditorView.scrollIntoView(lineObj.from, { y: "start", yMargin: 60 }),
   });
+  // 手动快速滚动到目标位置（scrollIntoView 动画太慢）
+  const dom = view.dom;
+  const lineTop = view.lineBlockAt(lineObj.from).top;
+  const scrollTop = Math.max(0, lineTop - 60);
+  dom.scrollTo({ top: scrollTop, behavior: "auto" });
   view.focus();
 }
 
@@ -70,6 +80,9 @@ export function Outline() {
   const setPendingJumpLine = useEditorStore((s) => s.setPendingJumpLine);
 
   const headings = useMemo(() => extractHeadings(content), [content]);
+  // 点击锁定：点击标题后直接高亮，不跟随滚动过渡
+  const clickedIndexRef = useRef<number | null>(null);
+  const clickTimerRef = useRef(0);
 
   // 消费 pendingJumpLine：编辑器就绪后跳转并清空
   useEffect(() => {
@@ -97,7 +110,7 @@ export function Outline() {
 
       // 第一个标题：滚到顶（卡片原始位置 = 滚动条初始位置）
       if (index === 0) {
-        scroller.scrollTo({ top: 0, behavior: "smooth" });
+        scroller.scrollTo({ top: 0, behavior: "auto" });
         return true;
       }
 
@@ -107,7 +120,7 @@ export function Outline() {
       const scrollerRect = scroller.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
       const target = scroller.scrollTop + (elRect.top - scrollerRect.top);
-      scroller.scrollTo({ top: target, behavior: "smooth" });
+      scroller.scrollTo({ top: target, behavior: "auto" });
       return true;
     };
     if (tryJump()) return true;
@@ -122,6 +135,17 @@ export function Outline() {
   const handleClick = (index: number) => {
     const line = headings[index]?.line;
     if (line == null) return;
+
+    // 点击锁定：直接高亮目标标题，不跟随滚动过渡
+    clickedIndexRef.current = index;
+    clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = window.setTimeout(() => {
+      clickedIndexRef.current = null;
+    }, 800);
+
+    // 直接更新光标位置，确保大纲立即高亮
+    useEditorStore.getState().setCursor({ line, ch: 0 });
+
     // 仅当编辑器真实存在于 DOM 时才走编辑器跳转（避免纯预览模式用了孤儿 view）
     const view = editorViewRef.current;
     if (view && document.body.contains(view.dom)) {
@@ -140,14 +164,18 @@ export function Outline() {
     );
   }
 
-  // 计算当前光标所在的"最具体"标题索引（唯一高亮，不高亮祖先）
+  // 点击锁定时直接用点击的标题，否则根据光标位置计算
   let activeIndex = -1;
-  for (let i = 0; i < headings.length; i++) {
-    const h = headings[i];
-    const nextSameOrHigher = headings.slice(i + 1).find((n) => n.level <= h.level);
-    const sectionEnd = nextSameOrHigher ? nextSameOrHigher.line - 1 : Infinity;
-    if (currentLine >= h.line && currentLine <= sectionEnd) {
-      activeIndex = i; // 取最后一个满足的（最深层级）
+  if (clickedIndexRef.current !== null) {
+    activeIndex = clickedIndexRef.current;
+  } else {
+    for (let i = 0; i < headings.length; i++) {
+      const h = headings[i];
+      const nextSameOrHigher = headings.slice(i + 1).find((n) => n.level <= h.level);
+      const sectionEnd = nextSameOrHigher ? nextSameOrHigher.line - 1 : Infinity;
+      if (currentLine >= h.line && currentLine <= sectionEnd) {
+        activeIndex = i;
+      }
     }
   }
 
@@ -160,7 +188,7 @@ export function Outline() {
             key={`${h.line}-${h.text}`}
             onClick={() => handleClick(i)}
             className={cn(
-              "group relative flex my-0.5 cursor-pointer select-none items-center rounded-md py-[5px] pr-2 transition-colors",
+              "group relative flex my-0.5 cursor-pointer select-none items-center rounded-md py-[5px] pr-2",
               "hover:bg-[var(--color-bg-muted)]",
               getLevelStyle(h.level, isActive),
               isActive && "item-active",
