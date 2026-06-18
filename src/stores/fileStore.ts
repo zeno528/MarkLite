@@ -4,6 +4,11 @@
  * 每个文件夹是一个 WorkspaceFolder 实体，自带 fileTree / expanded / selectedPath，
  * 切换 activeFolder 不影响其他文件夹的状态（per-folder 记忆）。
  * folders 元数据 + activeFolderPath 持久化到 localStorage（fileTree 不持久化，启动重读）。
+ *
+ * 性能优化：
+ * - 文件树缓存：避免重复读取未变化的文件夹
+ * - 并行读取：使用 Promise.all 并行处理多个文件夹
+ * - 延迟加载：非激活文件夹延迟加载
  */
 import { create } from "zustand";
 import { FileService } from "@/lib/tauri/fs";
@@ -15,6 +20,10 @@ export interface FileNode {
   isDir: boolean;
   children?: FileNode[];
 }
+
+/** 文件树缓存：path → { tree, timestamp } */
+const treeCache = new Map<string, { tree: FileNode[]; timestamp: number }>();
+const CACHE_TTL = 30_000; // 30秒缓存过期
 
 /** 单个工作区文件夹（自带各自的展开/选中状态） */
 export interface WorkspaceFolder {
@@ -79,6 +88,17 @@ function isUnderFolder(filePath: string, folderPath: string): boolean {
   return f === dir || f.startsWith(dir + "/");
 }
 
+/** 读取文件树（带缓存） */
+async function readTreeWithCache(path: string): Promise<FileNode[]> {
+  const cached = treeCache.get(path);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.tree;
+  }
+  const tree = await FileService.readFolderTree(path);
+  treeCache.set(path, { tree, timestamp: Date.now() });
+  return tree;
+}
+
 export const useFileStore = create<FileState>((set, get) => ({
   folders: [],
   activeFolderPath: null,
@@ -91,7 +111,7 @@ export const useFileStore = create<FileState>((set, get) => ({
       set({ activeFolderPath: path });
       if (existing.fileTree.length === 0) {
         try {
-          const tree = await FileService.readFolderTree(path);
+          const tree = await readTreeWithCache(path);
           set({ folders: patchFolder(get().folders, path, (f) => ({ ...f, fileTree: tree })) });
         } catch (e) {
           console.error("[fileStore] addFolder read failed:", e);
@@ -103,7 +123,7 @@ export const useFileStore = create<FileState>((set, get) => ({
     // 新文件夹：读树后加入并设 active
     let tree: FileNode[] = [];
     try {
-      tree = await FileService.readFolderTree(path);
+      tree = await readTreeWithCache(path);
     } catch (e) {
       console.error("[fileStore] addFolder read failed:", e);
     }
@@ -161,7 +181,9 @@ export const useFileStore = create<FileState>((set, get) => ({
     const active = get().activeFolderPath;
     if (!active) return;
     try {
-      const tree = await FileService.readFolderTree(active);
+      // 清除缓存，强制刷新
+      treeCache.delete(active);
+      const tree = await readTreeWithCache(active);
       set({ folders: patchFolder(get().folders, active, (f) => ({ ...f, fileTree: tree })) });
     } catch (e) {
       console.error("[fileStore] refresh failed:", e);
@@ -173,10 +195,13 @@ export const useFileStore = create<FileState>((set, get) => ({
     if (folders.length === 0) return;
 
     try {
+      // 清除所有缓存，强制刷新
+      folders.forEach((f) => treeCache.delete(f.path));
+
       const updatedFolders = await Promise.all(
         folders.map(async (folder) => {
           try {
-            const tree = await FileService.readFolderTree(folder.path);
+            const tree = await readTreeWithCache(folder.path);
             return { ...folder, fileTree: tree };
           } catch (e) {
             console.error("[fileStore] refreshAllTrees failed for:", folder.path, e);

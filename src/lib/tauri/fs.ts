@@ -108,7 +108,7 @@ export const FileService = {
   },
 
   /**
-   * 读取文件夹并构建文件树（深度优先）
+   * 读取文件夹并构建文件树（深度优先，优化版）
    * @param rootPath 根目录路径
    * @param maxDepth 最大深度（默认 5）
    */
@@ -131,26 +131,34 @@ export const FileService = {
       return [];
     }
 
-    const nodes: FileNode[] = [];
-    for (const entry of entries) {
-      // 跳过隐藏文件 & node_modules
-      if (entry.name?.startsWith(".")) continue;
-      if (entry.name === "node_modules" || entry.name === "target") continue;
+    // 过滤有效条目
+    const validEntries = entries.filter((entry) => {
+      if (entry.name?.startsWith(".")) return false;
+      if (entry.name === "node_modules" || entry.name === "target") return false;
+      return true;
+    });
 
+    // 并行处理所有条目
+    const nodePromises = validEntries.map(async (entry) => {
       const fullPath = await join(dir, entry.name);
       const isDir = entry.isDirectory;
       // markdown 编辑器：只收录 .md/.markdown/.mdx 文件 + 目录，其他文件不进树
-      if (!isDir && !/\.(md|markdown|mdx)$/i.test(entry.name ?? "")) continue;
+      if (!isDir && !/\.(md|markdown|mdx)$/i.test(entry.name ?? "")) return null;
+
       const node: FileNode = {
         name: entry.name ?? "",
         path: fullPath,
         isDir,
       };
+
       if (isDir) {
         node.children = await this.buildTree(root, fullPath, depth + 1, maxDepth);
       }
-      nodes.push(node);
-    }
+      return node;
+    });
+
+    const results = await Promise.all(nodePromises);
+    const nodes = results.filter((n): n is FileNode => n !== null);
 
     // 排序：目录在前，按名称
     nodes.sort((a, b) => {
