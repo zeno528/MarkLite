@@ -41,8 +41,8 @@ interface UIState {
   showSidebar: boolean;
   toggleSidebar: () => void;
   setShowSidebar: (show: boolean) => void;
-  sidebarTab: "files" | "outline";
-  setSidebarTab: (tab: "files" | "outline") => void;
+  sidebarTab: "files" | "outline" | "search";
+  setSidebarTab: (tab: "files" | "outline" | "search") => void;
 
   // 状态栏
   showStatusBar: boolean;

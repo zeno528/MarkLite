@@ -1,15 +1,31 @@
 /**
  * 侧边栏 - Activity Bar + 面板布局
- * 左侧窄图标栏切换 面板（文件树/大纲）
+ * 左侧窄图标栏切换 面板（文件树/大纲/搜索）
  */
 import { useState, useEffect, useRef } from "react";
-import { FileText, List, FolderOpen, Plus, ChevronDown, X } from "lucide-react";
+import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
+import { SearchPanel } from "@/components/file/SearchPanel";
 import { useUIStore } from "@/stores/uiStore";
 import { useFileStore } from "@/stores/fileStore";
+import { previewContainerRef } from "@/stores/editorStore";
 import { openFolderViaDialog } from "@/lib/shortcuts/appShortcuts";
 import { cn } from "@/lib/utils/cn";
+
+/** 清除预览区域的搜索高亮和选区 */
+function clearSearchHighlights() {
+  window.getSelection()?.removeAllRanges();
+  const container = previewContainerRef.current;
+  if (!container) return;
+  container.querySelectorAll(".search-highlight").forEach((el) => {
+    const parent = el.parentNode;
+    if (parent) {
+      parent.replaceChild(document.createTextNode(el.textContent || ""), el);
+      parent.normalize();
+    }
+  });
+}
 
 /** 取路径末级目录名（显示用） */
 function folderName(path: string): string {
@@ -116,19 +132,17 @@ function FolderSelect() {
                 title={f.path}
               >
                 <span className="flex-1 truncate">{folderName(f.path)}</span>
-                {folders.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFolder(f.path);
-                      setOpen(false);
-                    }}
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)]"
-                    title="关闭文件夹"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFolder(f.path);
+                    setOpen(false);
+                  }}
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[var(--color-text-muted)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)]"
+                  title="关闭文件夹"
+                >
+                  <X size={12} />
+                </button>
               </div>
             );
           })}
@@ -148,17 +162,30 @@ export function Sidebar() {
       <div className="flex w-11 flex-col items-center gap-1 border-r border-[var(--color-border)] bg-[var(--color-bg)] py-2">
         <ActivityBarButton
           active={sidebarTab === "files"}
-          onClick={() => setSidebarTab("files")}
+          onClick={() => {
+            setSidebarTab("files");
+            clearSearchHighlights();
+          }}
           title="文件资源管理器"
         >
           <FileText size={18} />
         </ActivityBarButton>
         <ActivityBarButton
           active={sidebarTab === "outline"}
-          onClick={() => setSidebarTab("outline")}
+          onClick={() => {
+            setSidebarTab("outline");
+            clearSearchHighlights();
+          }}
           title="文档大纲"
         >
           <List size={18} />
+        </ActivityBarButton>
+        <ActivityBarButton
+          active={sidebarTab === "search"}
+          onClick={() => setSidebarTab("search")}
+          title="搜索"
+        >
+          <Search size={18} />
         </ActivityBarButton>
       </div>
 
@@ -170,7 +197,7 @@ export function Sidebar() {
         {/* 面板标题栏 */}
         <div className="flex h-10 items-center justify-between border-b border-[var(--color-border)] px-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-            {sidebarTab === "files" ? "资源管理器" : "大纲"}
+            {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "大纲"}
           </span>
           {sidebarTab === "files" && (
             <button
@@ -187,8 +214,10 @@ export function Sidebar() {
         {sidebarTab === "files" && <FolderSelect />}
 
         {/* 内容区 */}
-        <div className="min-h-0 flex-1 overflow-auto">
-          {sidebarTab === "files" ? <FileTree /> : <Outline />}
+        <div className="min-h-0 flex-1 overflow-hidden">
+          {sidebarTab === "files" && <FileTree />}
+          {sidebarTab === "search" && <SearchPanel />}
+          {sidebarTab === "outline" && <Outline />}
         </div>
       </div>
     </aside>
