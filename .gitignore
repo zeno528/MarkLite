@@ -31,3 +31,9 @@ ui-redesign-demo.html
 *.njsproj
 *.sln
 *.sw?
+
+# AI 配置（私人指令，不公开）
+CLAUDE.md
+AGENTS.md
+.claude/
+.agents/
