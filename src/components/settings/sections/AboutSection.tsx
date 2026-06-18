@@ -4,8 +4,13 @@
 import { ExternalLink } from "lucide-react";
 import logoSvg from "@/assets/logo.svg";
 import { version } from "../../../../package.json";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 export function AboutSection() {
+  const handleGitHub = async () => {
+    await openUrl("https://github.com/zeno528/MarkLite");
+  };
+
   return (
     <div className="space-y-6">
       {/* Logo + 名称 */}
@@ -89,10 +94,8 @@ export function AboutSection() {
 
       {/* 链接 */}
       <div className="flex gap-3">
-        <a
-          href="https://github.com/zeno528/MarkLite"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={handleGitHub}
           className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs text-[var(--color-text)] transition-colors hover:bg-[var(--color-bg-subtle)]"
         >
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
@@ -100,7 +103,7 @@ export function AboutSection() {
           </svg>
           GitHub
           <ExternalLink size={10} className="text-[var(--color-text-subtle)]" />
-        </a>
+        </button>
       </div>
     </div>
   );
