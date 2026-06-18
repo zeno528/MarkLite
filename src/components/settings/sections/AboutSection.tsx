@@ -36,27 +36,27 @@ export function AboutSection() {
           技术栈
         </h3>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">前端：</span>
             <span className="text-[var(--color-text)]">React 19 + TypeScript</span>
           </div>
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">编辑器：</span>
             <span className="text-[var(--color-text)]">CodeMirror 6</span>
           </div>
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">框架：</span>
             <span className="text-[var(--color-text)]">Tauri 2</span>
           </div>
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">样式：</span>
             <span className="text-[var(--color-text)]">Tailwind CSS v4</span>
           </div>
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">状态：</span>
             <span className="text-[var(--color-text)]">Zustand 5</span>
           </div>
-          <div className="rounded bg-[var(--color-bg-muted)] px-2 py-1.5">
+          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
             <span className="text-[var(--color-text-muted)]">构建：</span>
             <span className="text-[var(--color-text)]">Vite 7</span>
           </div>

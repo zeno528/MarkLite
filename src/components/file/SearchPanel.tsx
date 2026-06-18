@@ -8,7 +8,6 @@ import { Search, X, FileText } from "lucide-react";
 import { EditorView } from "@codemirror/view";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
-import { useUIStore } from "@/stores/uiStore";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 
 interface SearchResult {
@@ -55,26 +54,14 @@ export function SearchPanel() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const prevSidebarTabRef = useRef<string | null>(null);
 
-  // 自动聚焦 + 组件卸载时清除选区和高亮
+  // 组件挂载时聚焦 + 卸载时清理
   useEffect(() => {
     inputRef.current?.focus();
     return () => {
       window.getSelection()?.removeAllRanges();
       clearHighlights();
     };
-  }, []);
-
-  // 监听 sidebarTab 变化，切换到搜索时聚焦
-  useEffect(() => {
-    const unsubscribe = useUIStore.subscribe((state) => {
-      if (state.sidebarTab === "search" && prevSidebarTabRef.current !== "search") {
-        setTimeout(() => inputRef.current?.focus(), 50);
-      }
-      prevSidebarTabRef.current = state.sidebarTab;
-    });
-    return unsubscribe;
   }, []);
 
   // 清除预览区域的搜索高亮
@@ -259,6 +246,7 @@ export function SearchPanel() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="搜索文件内容..."
+            data-search-input
             className="min-w-0 flex-1 bg-transparent text-xs text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-subtle)]"
           />
           {query && (

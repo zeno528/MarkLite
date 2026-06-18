@@ -183,7 +183,14 @@ export function Sidebar() {
         </ActivityBarButton>
         <ActivityBarButton
           active={sidebarTab === "search"}
-          onClick={() => setSidebarTab("search")}
+          onClick={() => {
+            setSidebarTab("search");
+            // 延迟聚焦搜索框
+            setTimeout(() => {
+              const input = document.querySelector('[data-search-input]') as HTMLInputElement;
+              input?.focus();
+            }, 100);
+          }}
           title="搜索 (Ctrl+F)"
         >
           <Search size={20} />

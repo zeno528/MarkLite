@@ -60,7 +60,10 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
       style={{ paddingLeft: mac ? "78px" : "16px", WebkitAppRegion: "drag" } as React.CSSProperties}
     >
       {/* 品牌 + 面包屑 */}
-      <div className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]">
+      <div
+        className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]"
+        style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+      >
         <img src={logoSvg} alt="MarkLite" className="h-[22px] w-[22px] shrink-0" />
         <span className="shrink-0 text-[14.5px] font-bold tracking-tight">MarkLite</span>
 
@@ -68,7 +71,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           <>
             <ChevronRight size={12} className="mx-0.5 shrink-0 text-[var(--color-text-subtle)]" />
             <span
-              className="truncate text-[var(--color-text-muted)]"
+              className="truncate text-[var(--color-text-muted)] cursor-text select-text"
               style={{ maxWidth: "180px" }}
               title={rootFolder ?? ""}
             >
@@ -81,7 +84,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           <>
             <ChevronRight size={12} className="mx-0.5 shrink-0 text-[var(--color-text-subtle)]" />
             <span
-              className="flex min-w-0 flex-1 items-center gap-1.5 truncate font-medium text-[var(--color-text)]"
+              className="flex min-w-0 flex-1 items-center gap-1.5 truncate font-medium text-[var(--color-text)] cursor-text select-text"
               title={currentFile.path}
             >
               <span className="truncate">{currentFile.path}</span>
