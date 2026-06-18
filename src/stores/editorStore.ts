@@ -10,6 +10,17 @@ export const editorViewRef: { current: EditorView | null } = { current: null };
 /** 预览滚动容器引用（非响应式，供编辑器滚动 handler 直接写预览 scrollTop，绕过 React 中转） */
 export const previewContainerRef: { current: HTMLElement | null } = { current: null };
 
+/** localStorage key：上次打开的文件路径（重开自动恢复） */
+export const ACTIVE_FILE_KEY = "marklite:active-file";
+
+/** 增量持久化当前激活文件路径（仿 fileStore.persist；无关闭事件，故每次切换即写盘） */
+function persistActiveFile(path: string | null) {
+  try {
+    if (path) localStorage.setItem(ACTIVE_FILE_KEY, path);
+    else localStorage.removeItem(ACTIVE_FILE_KEY);
+  } catch {}
+}
+
 interface OpenFile {
   path: string;
   title: string;
@@ -78,6 +89,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const existing = openFiles.find((f) => f.path === path);
     if (existing) {
       set({ activeFilePath: path, currentFile: existing });
+      persistActiveFile(path);
       return;
     }
     const newFile: OpenFile = {
@@ -93,6 +105,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeFilePath: path,
       currentFile: newFile,
     });
+    persistActiveFile(path);
   },
 
   closeFile: (path) => {
@@ -111,11 +124,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeFilePath: nextActive,
       currentFile: nextCurrent,
     });
+    persistActiveFile(nextActive);
   },
 
   switchFile: (path) => {
     const file = get().openFiles.find((f) => f.path === path) ?? null;
     set({ activeFilePath: path, currentFile: file });
+    persistActiveFile(path);
   },
 
   updateContent: (path, content) => {
@@ -138,5 +153,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ openFiles: next, currentFile: cur });
   },
 
-  closeAllFiles: () => set({ openFiles: [], activeFilePath: null, currentFile: null }),
+  closeAllFiles: () => {
+    set({ openFiles: [], activeFilePath: null, currentFile: null });
+    persistActiveFile(null);
+  },
 }));

@@ -137,7 +137,7 @@ export function Sidebar() {
 
         {/* 文件夹下拉选择器：切换 / 关闭 / 添加（仅文件 tab） */}
         {sidebarTab === "files" && (
-          <div ref={menuRef} className="mt-1.5 shrink-0 px-1">
+          <div ref={menuRef} className="relative mt-1.5 shrink-0 px-1">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setFolderMenuOpen((v) => !v)}
@@ -170,7 +170,7 @@ export function Sidebar() {
 
             {/* 下拉列表（inline，展开时显示） */}
             {folderMenuOpen && folders.length > 0 && (
-              <div className="mt-1 max-h-[40vh] overflow-auto rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-1 shadow-[var(--shadow-md)]">
+              <div className="absolute left-1 right-1 top-full z-50 mt-1 max-h-[40vh] overflow-auto rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-1 shadow-[var(--shadow-md)]">
                 {folders.map((f) => {
                   const isActive = f.path === activeFolderPath;
                   return (

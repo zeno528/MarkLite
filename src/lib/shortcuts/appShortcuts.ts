@@ -31,41 +31,61 @@ export async function saveCurrentFile() {
 }
 
 /**
- * 刷新当前文件：从磁盘重新读取最新内容并同步到编辑器/预览/文件树
- * - 内容无变化：仅刷新文件树（静默，不打扰）
- * - 内容有变化且本地有未保存改动：弹确认，避免误覆盖本地编辑
+ * 刷新所有已打开的文件 + 文件树
+ * - 所有文件都从磁盘重新读取最新内容
+ * - 有未保存改动的文件弹确认，避免误覆盖本地编辑
  */
 export async function reloadCurrentFile() {
-  const { currentFile, updateContent, markSaved } = useEditorStore.getState();
-  if (!currentFile) return;
+  const editor = useEditorStore.getState();
+  const { openFiles, activeFilePath, updateContent, markSaved, switchFile } = editor;
   try {
-    const content = await readTextFile(currentFile.path);
-    // 内容无变化：静默刷新文件树后返回（外部可能新建/删除了别的文件）
-    if (content === currentFile.content) {
-      await useFileStore.getState().refreshActiveTree();
-      return;
-    }
-    // 内容有变化且本地有未保存改动 → 弹确认，避免误覆盖本地编辑
-    if (currentFile.isDirty) {
+    // 1. 刷新所有文件夹的文件树
+    await useFileStore.getState().refreshAllTrees();
+
+    // 2. 收集需要刷新的文件（排除无改动的文件以减少 IO）
+    const filesToRefresh = openFiles.filter((f) => f.isDirty || f.content !== f.savedContent);
+
+    // 3. 如果有未保存改动的文件，弹确认
+    if (filesToRefresh.some((f) => f.isDirty)) {
+      const names = filesToRefresh
+        .filter((f) => f.isDirty)
+        .map((f) => f.title)
+        .join("、");
       const ok = await confirmDialog(
-        "该文件已被外部修改，且本地有未保存的改动。\n刷新将用磁盘内容覆盖本地改动，是否继续？",
+        `以下文件有未保存的改动：${names}\n刷新将用磁盘内容覆盖本地改动，是否继续？`,
         "刷新确认",
       );
       if (!ok) return;
     }
-    // 同步 store（预览/字数随之更新）+ 对齐 savedContent、清 dirty（刷新 = 与磁盘对齐）
-    updateContent(currentFile.path, content);
-    markSaved(currentFile.path);
-    // 非受控编辑器：直接 dispatch 替换文档，绕过 key={path} 回灌限制（不动重建机制，无吞字符回归）
-    const view = editorViewRef.current;
-    if (view) {
-      view.dispatch({
-        changes: { from: 0, to: view.state.doc.length, insert: content },
-      });
+
+    // 4. 刷新所有已打开的文件
+    let hasChanges = false;
+    for (const file of openFiles) {
+      try {
+        const content = await readTextFile(file.path);
+        if (content !== file.content) {
+          updateContent(file.path, content);
+          markSaved(file.path);
+          hasChanges = true;
+
+          // 如果是当前激活的文件，需要更新编辑器
+          if (file.path === activeFilePath) {
+            const view = editorViewRef.current;
+            if (view) {
+              view.dispatch({
+                changes: { from: 0, to: view.state.doc.length, insert: content },
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.error("[reload] failed to read file:", file.path, e);
+      }
     }
-    // 同步文件树（外部新建/删除/重命名）
-    await useFileStore.getState().refreshActiveTree();
-    notify.info("已刷新");
+
+    if (hasChanges) {
+      notify.info("已刷新");
+    }
   } catch (e) {
     console.error("[reload] failed:", e);
     notify.error("刷新失败");

@@ -11,10 +11,13 @@ import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { ToastContainer } from "@/components/ui/Toast";
+import { notify } from "@/stores/notificationStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
+import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
+import { readTextFile } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import {
@@ -68,6 +71,24 @@ export default function App() {
             }));
           } catch (e) {
             console.error("[App] restore read tree failed:", e);
+          }
+        }
+        // 恢复上次打开的文件
+        const lastFile = localStorage.getItem(ACTIVE_FILE_KEY);
+        if (lastFile) {
+          try {
+            const ok = await FileService.fileExists(lastFile);
+            if (!ok) {
+              localStorage.removeItem(ACTIVE_FILE_KEY);
+              notify.info("上次打开的文件已不存在");
+            } else {
+              const content = await readTextFile(lastFile);
+              const title = lastFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
+              useEditorStore.getState().openFile(lastFile, title, content);
+            }
+          } catch (e) {
+            console.error("[App] restore active file failed:", e);
+            localStorage.removeItem(ACTIVE_FILE_KEY);
           }
         }
       } catch (e) {

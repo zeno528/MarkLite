@@ -23,6 +23,7 @@ const CHECK_ICON =
 
 export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
+  const filePath = useEditorStore((s) => s.currentFile?.path);
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const layout = useUIStore((s) => s.layout);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
@@ -41,6 +42,20 @@ export function MarkdownPreview() {
       }
     };
   }, []);
+
+  // 切换文档时预览滚动归零（预览只挂载一次、容器复用，scrollTop 会残留）。
+  // rAF 推迟一帧等 HTML 解析；lockScrollSync 防止归零被同步 handler 当用户滚动联动编辑器。
+  const lastPathRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (lastPathRef.current === filePath) return;
+    lastPathRef.current = filePath;
+    requestAnimationFrame(() => {
+      const el = containerRef.current;
+      if (!el) return;
+      lockScrollSync();
+      el.scrollTop = 0;
+    });
+  }, [filePath]);
 
   // 解析 Markdown → HTML
   useEffect(() => {

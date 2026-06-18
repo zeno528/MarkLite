@@ -40,6 +40,8 @@ interface FileState {
   setSelected: (path: string | null) => void;
   /** 重新读 activeFolder 的文件树（刷新） */
   refreshActiveTree: () => Promise<void>;
+  /** 重新读所有已添加文件夹的文件树 */
+  refreshAllTrees: () => Promise<void>;
 }
 
 /** localStorage keys */
@@ -163,6 +165,28 @@ export const useFileStore = create<FileState>((set, get) => ({
       set({ folders: patchFolder(get().folders, active, (f) => ({ ...f, fileTree: tree })) });
     } catch (e) {
       console.error("[fileStore] refresh failed:", e);
+    }
+  },
+
+  refreshAllTrees: async () => {
+    const { folders } = get();
+    if (folders.length === 0) return;
+
+    try {
+      const updatedFolders = await Promise.all(
+        folders.map(async (folder) => {
+          try {
+            const tree = await FileService.readFolderTree(folder.path);
+            return { ...folder, fileTree: tree };
+          } catch (e) {
+            console.error("[fileStore] refreshAllTrees failed for:", folder.path, e);
+            return folder;
+          }
+        }),
+      );
+      set({ folders: updatedFolders });
+    } catch (e) {
+      console.error("[fileStore] refreshAllTrees failed:", e);
     }
   },
 }));
