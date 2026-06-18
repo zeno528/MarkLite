@@ -2,7 +2,8 @@
  * 侧边栏 - Activity Bar + 面板布局
  * 左侧窄图标栏切换 面板（文件树/大纲）
  */
-import { FileText, List, FolderOpen, Plus } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { FileText, List, FolderOpen, Plus, ChevronDown, X, Check } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { useUIStore } from "@/stores/uiStore";
@@ -51,6 +52,23 @@ export function Sidebar() {
   const setActiveFolder = useFileStore((s) => s.setActiveFolder);
   const removeFolder = useFileStore((s) => s.removeFolder);
 
+  const [folderMenuOpen, setFolderMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 点击外部关闭下拉菜单
+  useEffect(() => {
+    if (!folderMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setFolderMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [folderMenuOpen]);
+
+  const activeName = activeFolderPath ? folderName(activeFolderPath) : "未打开文件夹";
+
   return (
     <aside className="flex h-full shrink-0">
       {/* Activity Bar - 窄图标栏 */}
@@ -92,33 +110,80 @@ export function Sidebar() {
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
             {sidebarTab === "files" ? "资源管理器" : "大纲"}
           </span>
+          {sidebarTab === "files" && (
+            <button
+              onClick={openFolderViaDialog}
+              className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+              title="打开文件夹"
+            >
+              <Plus size={14} />
+            </button>
+          )}
         </div>
 
         {/* 文件夹选择器（仅文件 tab） */}
         {sidebarTab === "files" && folders.length > 0 && (
-          <div className="flex items-center gap-1 border-b border-[var(--color-border)] px-2 py-1.5">
-            <FolderOpen size={13} className="shrink-0 text-[var(--color-text-subtle)]" />
-            <select
-              value={activeFolderPath ?? ""}
-              onChange={(e) => setActiveFolder(e.target.value)}
-              className="min-w-0 flex-1 truncate bg-transparent text-xs text-[var(--color-text)] outline-none"
+          <div ref={menuRef} className="relative border-b border-[var(--color-border)] px-2 py-1.5">
+            <button
+              onClick={() => setFolderMenuOpen((v) => !v)}
+              className="flex w-full items-center justify-between gap-1 rounded-md px-2 py-1 text-xs transition-colors hover:bg-[var(--color-bg-muted)]"
             >
-              {folders.map((f) => (
-                <option key={f.path} value={f.path}>
-                  {folderName(f.path)}
-                </option>
-              ))}
-            </select>
-            {folders.length > 1 && (
-              <button
-                onClick={() => {
-                  if (activeFolderPath) removeFolder(activeFolderPath);
-                }}
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-[var(--color-text-subtle)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-                title="关闭当前文件夹"
-              >
-                ×
-              </button>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <FolderOpen size={13} className="shrink-0 text-[var(--color-text-subtle)]" />
+                <span className="truncate text-[var(--color-text)]">{activeName}</span>
+              </div>
+              <ChevronDown
+                size={13}
+                className={cn(
+                  "shrink-0 text-[var(--color-text-subtle)] transition-transform",
+                  folderMenuOpen && "rotate-180",
+                )}
+              />
+            </button>
+
+            {/* 下拉列表 */}
+            {folderMenuOpen && folders.length > 0 && (
+              <div className="absolute left-2 right-2 top-full z-50 mt-1 max-h-[40vh] overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-1 shadow-[var(--shadow-md)]">
+                {folders.map((f) => {
+                  const isActive = f.path === activeFolderPath;
+                  return (
+                    <div
+                      key={f.path}
+                      onClick={() => {
+                        setActiveFolder(f.path);
+                        setFolderMenuOpen(false);
+                      }}
+                      className={cn(
+                        "group flex cursor-pointer select-none items-center gap-1.5 rounded-md px-2 py-1.5 text-xs transition-colors",
+                        isActive
+                          ? "bg-[var(--color-bg-muted)] text-[var(--color-accent)]"
+                          : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+                      )}
+                      title={f.path}
+                    >
+                      {isActive ? (
+                        <Check size={12} className="shrink-0" />
+                      ) : (
+                        <span className="w-3 shrink-0" />
+                      )}
+                      <span className="flex-1 truncate">{folderName(f.path)}</span>
+                      {folders.length > 1 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFolder(f.path);
+                            setFolderMenuOpen(false);
+                          }}
+                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-[var(--color-text-subtle)] opacity-0 hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-danger)] group-hover:opacity-100"
+                          title="关闭文件夹"
+                        >
+                          <X size={11} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
