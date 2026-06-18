@@ -247,7 +247,7 @@ export function CodeEditor({
         }}
         basicSetup={{
           lineNumbers: lineNumbersEnabled,
-          foldGutter: lineNumbersEnabled,
+          foldGutter: false,
           highlightActiveLine: lineNumbersEnabled,
           highlightActiveLineGutter: lineNumbersEnabled,
           highlightSelectionMatches: false,
