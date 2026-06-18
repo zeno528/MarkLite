@@ -79,6 +79,10 @@
 .markdown-body a:hover {
   border-bottom-color: var(--color-accent);
 }
+/* 包含图片的链接：无底部边框（徽章等） */
+.markdown-body a:has(img) {
+  border-bottom: none;
+}
 
 .markdown-body strong { font-weight: 700; color: var(--color-text); }
 .markdown-body em { font-style: italic; }
@@ -222,6 +226,13 @@
   max-width: 100%;
   border-radius: var(--radius-lg);
   margin: 0.5em 0;
+}
+
+/* 行内图片（徽章等）：无边距，保持横向排列 */
+.markdown-body p img {
+  margin: 0;
+  display: inline;
+  vertical-align: middle;
 }
 
 /* 水平线 */

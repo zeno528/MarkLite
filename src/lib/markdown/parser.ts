@@ -68,6 +68,8 @@ export async function parseMarkdown(
       "checked", "disabled", "type",
       "data-shiki-id", "data-lang",
       "style",
+      "align",
+      "width", "height",
     ],
     ALLOW_DATA_ATTR: true,
   });
