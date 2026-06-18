@@ -6,7 +6,7 @@
  */
 import { create } from "zustand";
 
-export type NotificationType = "success" | "error" | "warning" | "info";
+export type NotificationType = "success" | "error" | "warning" | "info" | "loading";
 
 export interface NotificationItem {
   id: string;
@@ -18,7 +18,8 @@ export interface NotificationItem {
 
 interface NotificationState {
   notifications: NotificationItem[];
-  notify: (message: string, type?: NotificationType, duration?: number) => void;
+  notify: (message: string, type?: NotificationType, duration?: number) => string;
+  update: (id: string, message: string, type: NotificationType, duration?: number) => void;
   dismiss: (id: string) => void;
   clear: () => void;
 }
@@ -28,12 +29,13 @@ let seq = 0;
 /** 自动消失 timer（非响应式外部存储，不进 state） */
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-/** 默认停留时长：error 更久（5s）便于看清 + 可手动关，其余 3s */
+/** 默认停留时长：error 更久（5s）便于看清 + 可手动关，loading 不自动消失，其余 3s */
 const DEFAULT_DURATION: Record<NotificationType, number> = {
   success: 3000,
   error: 5000,
   warning: 3000,
   info: 3000,
+  loading: Infinity,
 };
 
 /** 同时显示上限：超出移除最旧的（含清其 timer），避免堆积 */
@@ -59,9 +61,36 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       return { notifications: next };
     });
 
-    // 排程自动消失
-    const timer = setTimeout(() => get().dismiss(id), wait);
-    timers.set(id, timer);
+    // 排程自动消失（loading 不自动消失）
+    if (wait !== Infinity) {
+      const timer = setTimeout(() => get().dismiss(id), wait);
+      timers.set(id, timer);
+    }
+
+    return id;
+  },
+
+  update: (id, message, type, duration) => {
+    const wait = duration ?? DEFAULT_DURATION[type];
+
+    // 清除旧 timer
+    const oldTimer = timers.get(id);
+    if (oldTimer) {
+      clearTimeout(oldTimer);
+      timers.delete(id);
+    }
+
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === id ? { ...n, message, type } : n,
+      ),
+    }));
+
+    // 排程自动消失（loading 不自动消失）
+    if (wait !== Infinity) {
+      const timer = setTimeout(() => get().dismiss(id), wait);
+      timers.set(id, timer);
+    }
   },
 
   dismiss: (id) => {
@@ -98,4 +127,10 @@ export const notify = {
   error: (m: string) => useNotificationStore.getState().notify(m, "error"),
   warning: (m: string) => useNotificationStore.getState().notify(m, "warning"),
   info: (m: string) => useNotificationStore.getState().notify(m, "info"),
+  /** 显示 loading 通知，返回 id；用 notify.done(id, msg) 更新为成功 */
+  loading: (m: string) => useNotificationStore.getState().notify(m, "loading"),
+  /** 将 loading 通知更新为成功 */
+  done: (id: string, m: string) => useNotificationStore.getState().update(id, m, "success"),
+  /** 将 loading 通知更新为失败 */
+  fail: (id: string, m: string) => useNotificationStore.getState().update(id, m, "error"),
 };

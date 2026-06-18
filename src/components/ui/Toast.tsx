@@ -8,6 +8,7 @@ import {
   XCircle,
   AlertTriangle,
   Info,
+  Loader2,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -17,11 +18,12 @@ import {
 } from "@/stores/notificationStore";
 import { cn } from "@/lib/utils/cn";
 
-const TYPE_CONFIG: Record<NotificationType, { icon: LucideIcon; color: string }> = {
+const TYPE_CONFIG: Record<NotificationType, { icon: LucideIcon; color: string; spin?: boolean }> = {
   success: { icon: CheckCircle2, color: "var(--color-success)" },
   error: { icon: XCircle, color: "var(--color-danger)" },
   warning: { icon: AlertTriangle, color: "var(--color-warning)" },
   info: { icon: Info, color: "var(--color-accent)" },
+  loading: { icon: Loader2, color: "var(--color-accent)", spin: true },
 };
 
 export function ToastContainer() {
@@ -37,7 +39,7 @@ export function ToastContainer() {
       aria-label="通知"
     >
       {notifications.map((n) => {
-        const { icon: Icon, color } = TYPE_CONFIG[n.type];
+        const { icon: Icon, color, spin } = TYPE_CONFIG[n.type];
         return (
           <div
             key={n.id}
@@ -47,10 +49,14 @@ export function ToastContainer() {
               "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-2.5 shadow-[var(--shadow-lg)]",
               n.leaving
                 ? "animate-[toast-out_180ms_ease_forwards]"
-                : "animate-[toast-in_150ms_ease_forwards]",
+                : "animate-[toast-in_150ms_ease-forwards]",
             )}
           >
-            <Icon size={16} style={{ color }} className="shrink-0" />
+            <Icon
+              size={16}
+              style={{ color }}
+              className={cn("shrink-0", spin && "animate-spin")}
+            />
             <span className="flex-1 text-[12.5px] leading-snug text-[var(--color-text)]">
               {n.message}
             </span>

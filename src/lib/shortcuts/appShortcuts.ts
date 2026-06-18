@@ -97,15 +97,15 @@ export async function openFolderViaDialog() {
   const folder = await pickFolder();
   if (!folder) return;
 
-  // 显示加载提示
+  // 显示 loading 通知（带旋转图标），完成后更新为成功
   const folderName = folder.split(/[\\/]/).filter(Boolean).pop() ?? folder;
-  notify.info(`正在打开 ${folderName}...`);
+  const id = notify.loading(`正在打开 ${folderName}...`);
 
   try {
     await useFileStore.getState().addFolder(folder);
-    notify.success(`${folderName} 已打开`);
+    notify.done(id, `${folderName} 已打开`);
   } catch (e) {
     console.error("[openFolder] failed:", e);
-    notify.error("打开文件夹失败");
+    notify.fail(id, "打开文件夹失败");
   }
 }
