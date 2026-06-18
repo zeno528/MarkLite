@@ -4,11 +4,13 @@
  * - 字数（中英混合）
  * - 文件状态（已保存/未保存，圆点 + 文字）
  * - 文件类型
+ * - 自动保存/自动刷新状态标识
  */
 import { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Save, RotateCw } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { useRefreshStore } from "@/stores/refreshStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils/cn";
 import { reloadCurrentFile } from "@/lib/shortcuts/appShortcuts";
@@ -21,6 +23,8 @@ export function StatusBar() {
   const [wc, setWc] = useState({ chars: 0, words: 0, lines: 0 });
   const reloading = useRefreshStore((s) => s.reloading);
   const setReloading = useRefreshStore((s) => s.setReloading);
+  const autoSave = useSettingsStore((s) => s.autoSave);
+  const autoRefresh = useSettingsStore((s) => s.autoRefresh);
 
   const handleReload = async () => {
     if (reloading) return; // 旋转中防重复点击
@@ -90,6 +94,26 @@ export function StatusBar() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {/* 自动保存标识 */}
+        {autoSave && (
+          <Tooltip content="自动保存已开启" placement="top">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)]">
+              <Save size={10} />
+              <span>自动</span>
+            </span>
+          </Tooltip>
+        )}
+
+        {/* 自动刷新标识 */}
+        {autoRefresh && (
+          <Tooltip content="自动刷新已开启" placement="top">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)]">
+              <RotateCw size={10} />
+              <span>同步</span>
+            </span>
+          </Tooltip>
+        )}
+
         {currentFile && (
           <>
             {/* 文件类型徽章：accent 淡底胶囊 */}
