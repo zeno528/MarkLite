@@ -1,5 +1,14 @@
 # MarkLite
 
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
+![React](https://img.shields.io/badge/React-19-61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6)
+![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38BDF8)
+![Zustand](https://img.shields.io/badge/Zustand-5-443E0)
+
 > 轻量、秒开、跨平台（macOS + Windows）的现代化 Markdown 编辑器
 
 ## ✨ 特性
