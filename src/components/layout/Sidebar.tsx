@@ -186,7 +186,7 @@ export function Sidebar() {
   return (
     <aside className="flex h-full shrink-0">
       {/* Activity Bar - 窄图标栏 */}
-      <div className="flex w-12 flex-col items-center gap-1.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] py-3">
+      <div className="flex w-12 flex-col items-center gap-1.5 border-r border-[var(--color-border)] bg-[var(--color-bg-subtle)] py-3">
         <ActivityBarButton
           active={sidebarTab === "files"}
           onClick={() => {
@@ -225,7 +225,7 @@ export function Sidebar() {
 
       {/* 面板内容 */}
       <div
-        className="flex w-[var(--sidebar-width)] flex-col border-r border-[var(--color-border)] bg-[var(--color-bg)]"
+        className="flex w-[var(--sidebar-width)] flex-col border-r border-[var(--color-border)] bg-[var(--color-bg-muted)]"
         style={{ minWidth: "var(--sidebar-min-width)", maxWidth: "var(--sidebar-max-width)" }}
       >
         {/* 面板标题栏 */}

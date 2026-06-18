@@ -1,7 +1,7 @@
 /**
- * 通知条容器（toast）：右下角浮现、非阻塞、自动消失
+ * 通知条容器（toast）：顶部居中浮现、非阻塞、自动消失
  * 订阅 notificationStore，垂直堆叠渲染。单条 = 类型图标 + 消息 + 关闭按钮。
- * 配色跟随 data-scheme（CSS 变量），进场动画 toast-in（150ms，与 settings-pop 同节奏）。
+ * 配色跟随 data-scheme（CSS 变量），进场动画 toast-in（150ms）。
  */
 import {
   CheckCircle2,
@@ -34,7 +34,7 @@ export function ToastContainer() {
 
   return (
     <div
-      className="pointer-events-none fixed bottom-[calc(var(--statusbar-height)+16px)] right-4 z-[60] flex flex-col items-end gap-2"
+      className="pointer-events-none fixed top-[calc(var(--titlebar-height)+35px)] left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2"
       role="region"
       aria-label="通知"
     >
@@ -46,7 +46,8 @@ export function ToastContainer() {
             role="status"
             aria-live="polite"
             className={cn(
-              "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-2.5 shadow-[var(--shadow-lg)]",
+              "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2",
+              "shadow-[0_6px_20px_rgba(0,0,0,0.12),0_0_10px_color-mix(in_oklch,var(--color-accent)_12%,transparent)]",
               n.leaving
                 ? "animate-[toast-out_180ms_ease_forwards]"
                 : "animate-[toast-in_150ms_ease-forwards]",
