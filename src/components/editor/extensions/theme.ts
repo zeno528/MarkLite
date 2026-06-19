@@ -53,7 +53,7 @@ export const lightTheme = EditorView.theme(
       fontWeight: "600",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-subtle)",
+      backgroundColor: "var(--color-bg-elevated)",
       color: "var(--color-text-subtle)",
       border: "none",
       borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
@@ -172,7 +172,7 @@ export const darkTheme = EditorView.theme(
       fontWeight: "600",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-subtle)",
+      backgroundColor: "var(--color-bg-elevated)",
       color: "var(--color-text-subtle)",
       border: "none",
       borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
