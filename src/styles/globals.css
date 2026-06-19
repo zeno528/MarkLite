@@ -423,7 +423,7 @@ body {
   font-weight: 600;
   color: oklch(1 0 0);
   background: oklch(0.32 0.012 275);
-  height: 30px;
+  height: 34px;
   padding: 0 13px;
   border-radius: 8px;
   display: inline-flex;

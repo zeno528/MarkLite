@@ -3,14 +3,14 @@
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  */
 import { useState, useEffect, useRef, useMemo } from "react";
-import { FileText, List, Search, FolderOpen, Plus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2 } from "lucide-react";
+import { FileText, List, Search, FolderOpen, Plus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore } from "@/stores/uiStore";
 import { useFileStore, collectDirPaths } from "@/stores/fileStore";
-import { previewContainerRef } from "@/stores/editorStore";
+import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { openFolderViaDialog } from "@/lib/shortcuts/appShortcuts";
 import { cn } from "@/lib/utils/cn";
 
@@ -186,6 +186,8 @@ export function Sidebar() {
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
   const triggerSearchFocus = useUIStore((s) => s.triggerSearchFocus);
+  const openFiles = useEditorStore((s) => s.openFiles);
+  const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
   const toggleExpandAll = useFileStore((s) => s.toggleExpandAll);
   const activeFolder = useFileStore(
     (s) => s.folders.find((f) => f.path === s.activeFolderPath) ?? null,
@@ -246,6 +248,16 @@ export function Sidebar() {
           </span>
           {sidebarTab === "files" && (
             <div className="flex items-center gap-1">
+              {openFiles.length > 1 && (
+                <Tooltip content="关闭所有标签" placement="bottom">
+                  <button
+                    onClick={closeAllFiles}
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+                  >
+                    <XCircle size={14} />
+                  </button>
+                </Tooltip>
+              )}
               <Tooltip content={isAllExpanded ? "收起全部" : "展开全部"} placement="bottom">
                 <button
                   onClick={toggleExpandAll}

@@ -170,6 +170,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             </button>
           </Tooltip>
         )}
+
       </div>
     </header>
   );

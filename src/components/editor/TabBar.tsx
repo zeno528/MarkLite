@@ -3,7 +3,7 @@
  * - 标签过多时自动收缩宽度（最小 80px）
  * - 激活标签与编辑区同色，形成延伸效果
  */
-import { X, FileText, XCircle } from "lucide-react";
+import { X, FileText } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
 
@@ -12,7 +12,6 @@ export function TabBar() {
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
   const switchFile = useEditorStore((s) => s.switchFile);
   const closeFile = useEditorStore((s) => s.closeFile);
-  const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
 
   if (openFiles.length === 0) return null;
 
@@ -25,10 +24,11 @@ export function TabBar() {
             key={file.path}
             onClick={() => switchFile(file.path)}
             className={cn(
-              "group relative flex h-[30px] min-w-[80px] shrink-[2] cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+              "group relative flex h-[30px] min-w-[80px] shrink-0 basis-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+              openFiles.length > 1 && "shrink grow",
               isActive
                 ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
             )}
           >
             {isActive && (
@@ -49,7 +49,7 @@ export function TabBar() {
                 "ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded transition-all",
                 isActive
                   ? "hover:bg-[var(--color-bg-muted)] opacity-60 hover:opacity-100"
-                  : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]"
+                  : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]",
               )}
             >
               <X size={11} />
@@ -58,15 +58,6 @@ export function TabBar() {
         );
       })}
       <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
-      {openFiles.length > 1 && (
-        <button
-          onClick={closeAllFiles}
-          title="关闭所有标签"
-          className="flex h-[30px] shrink-0 items-center px-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
-        >
-          <XCircle size={14} />
-        </button>
-      )}
     </div>
   );
 }

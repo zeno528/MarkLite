@@ -4,7 +4,7 @@
  * - 激活标签与预览区同色，形成延伸效果
  * - 使用预览相关图标（Eye）
  */
-import { X, Eye, XCircle } from "lucide-react";
+import { X, Eye } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
 
@@ -13,13 +13,12 @@ export function PreviewTabBar() {
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
   const switchFile = useEditorStore((s) => s.switchFile);
   const closeFile = useEditorStore((s) => s.closeFile);
-  const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
 
   // 无文件时不显示
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 select-none items-end bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
       {openFiles.map((file) => {
         const isActive = file.path === activeFilePath;
         return (
@@ -27,18 +26,18 @@ export function PreviewTabBar() {
             key={file.path}
             onClick={() => switchFile(file.path)}
             className={cn(
-              "group relative flex h-[30px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+              "group relative flex h-[30px] min-w-[80px] shrink-0 basis-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+              openFiles.length > 1 && "shrink grow",
               isActive
                 ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
             )}
           >
-            {/* 激活标签底部遮盖边框 */}
             {isActive && (
               <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg-elevated)]" />
             )}
             <Eye size={13} className="shrink-0 opacity-70" />
-            <span className="max-w-[120px] truncate">{file.title}</span>
+            <span className="min-w-0 flex-1 truncate">{file.title}</span>
             {file.isDirty && (
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-warning)]" />
             )}
@@ -52,7 +51,7 @@ export function PreviewTabBar() {
                 "ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded transition-all",
                 isActive
                   ? "hover:bg-[var(--color-bg-muted)] opacity-60 hover:opacity-100"
-                  : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]"
+                  : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]",
               )}
             >
               <X size={11} />
@@ -60,18 +59,7 @@ export function PreviewTabBar() {
           </div>
         );
       })}
-      {/* 底部分隔线（非激活区域） */}
-      <div className="flex-1 self-stretch border-b border-[var(--color-border)]" />
-      {/* 关闭所有按钮 */}
-      {openFiles.length > 1 && (
-        <button
-          onClick={closeAllFiles}
-          title="关闭所有标签"
-          className="flex h-[30px] shrink-0 items-center px-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
-        >
-          <XCircle size={14} />
-        </button>
-      )}
+      <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
     </div>
   );
 }
