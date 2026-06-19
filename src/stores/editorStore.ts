@@ -71,6 +71,10 @@ interface EditorState {
   searchVisible: boolean;
   setSearchVisible: (show: boolean) => void;
 
+  // === 单标签模式 ===
+  singleTabMode: boolean;
+  toggleSingleTabMode: () => void;
+
   // === 待跳转行（纯预览模式下点击目录触发：先切 split，再由编辑器消费） ===
   pendingJumpLine: number | null;
   setPendingJumpLine: (line: number | null) => void;
@@ -93,16 +97,18 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   scrollPercent: 0,
   scrollSource: null,
   searchVisible: false,
+  singleTabMode: false,
   pendingJumpLine: null,
 
   setCursor: (cursor) => set({ cursor }),
   setSelection: (selection) => set({ selection }),
   setScrollPercent: (scrollPercent, source) => set({ scrollPercent, scrollSource: source }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
+  toggleSingleTabMode: () => set((s) => ({ singleTabMode: !s.singleTabMode })),
   setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),
 
   openFile: (path, title, content) => {
-    const { openFiles } = get();
+    const { openFiles, singleTabMode } = get();
     const ext = path.split(".").pop()?.toLowerCase() ?? "md";
     const existing = openFiles.find((f) => f.path === path);
     if (existing) {
@@ -120,11 +126,21 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isDirty: false,
       ext,
     };
-    set({
-      openFiles: [...openFiles, newFile],
-      activeFilePath: path,
-      currentFile: newFile,
-    });
+    if (singleTabMode && openFiles.length > 0) {
+      // 单标签模式：替换当前标签
+      const activeIdx = openFiles.findIndex((f) => f.path === get().activeFilePath);
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      const next = [...openFiles];
+      next[idx] = newFile;
+      set({ openFiles: next, activeFilePath: path, currentFile: newFile });
+    } else {
+      // 正常模式：追加新标签
+      set({
+        openFiles: [...openFiles, newFile],
+        activeFilePath: path,
+        currentFile: newFile,
+      });
+    }
     persistActiveFile(path);
   },
 

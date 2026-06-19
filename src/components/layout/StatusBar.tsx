@@ -7,7 +7,7 @@
  * - 自动保存/自动刷新状态标识
  */
 import { useEffect, useState } from "react";
-import { RefreshCw, Save, RotateCw } from "lucide-react";
+import { RefreshCw, Save, RotateCw, Pin } from "lucide-react";
 import { MdFileIcon } from "@/components/file/MdFileIcon";
 import { useEditorStore } from "@/stores/editorStore";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
@@ -35,6 +35,8 @@ export function StatusBar() {
   const cursor = useEditorStore((s) => s.cursor);
   const selection = useEditorStore((s) => s.selection);
   const currentFile = useEditorStore((s) => s.currentFile);
+  const singleTabMode = useEditorStore((s) => s.singleTabMode);
+  const toggleSingleTabMode = useEditorStore((s) => s.toggleSingleTabMode);
   const [wc, setWc] = useState({ chars: 0, words: 0, lines: 0 });
   const reloading = useRefreshStore((s) => s.reloading);
   const setReloading = useRefreshStore((s) => s.setReloading);
@@ -121,6 +123,22 @@ export function StatusBar() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {/* 单标签模式 */}
+        <Tooltip content={singleTabMode ? "单标签模式：已开启（新文件替换当前标签）" : "单标签模式：已关闭"} placement="top">
+          <button
+            onClick={toggleSingleTabMode}
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] transition-colors",
+              singleTabMode
+                ? "bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] text-[var(--color-accent)]"
+                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
+            )}
+          >
+            <Pin size={10} />
+            <span>单标签</span>
+          </button>
+        </Tooltip>
+
         {/* 自动保存标识 */}
         {autoSave && (
           <Tooltip content="自动保存已开启" placement="top">
