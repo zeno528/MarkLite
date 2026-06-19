@@ -45,10 +45,8 @@ interface FileState {
   setActiveFolder: (path: string) => void;
   /** 切换 activeFolder 内某目录的展开/折叠 */
   toggleExpand: (path: string) => void;
-  /** 展开 activeFolder 的全部目录（受文件树最大读取深度限制） */
-  expandAll: () => void;
-  /** 收起 activeFolder 的全部目录 */
-  collapseAll: () => void;
+  /** 智能切换 activeFolder 全部目录的展开/收起：已全展开则收起，否则展开全部 */
+  toggleExpandAll: () => void;
   /** 设置 activeFolder 内的选中项 */
   setSelected: (path: string | null) => void;
   /** 重新读 activeFolder 的文件树（刷新） */
@@ -87,7 +85,7 @@ function patchFolder(
 }
 
 /** 递归收集文件树中所有目录节点的 path（用于"展开全部"；用内部 walk 避免每层 concat 开销） */
-function collectDirPaths(nodes: FileNode[]): string[] {
+export function collectDirPaths(nodes: FileNode[]): string[] {
   const result: string[] = [];
   const walk = (list: FileNode[]) => {
     for (const n of list) {
@@ -189,23 +187,17 @@ export const useFileStore = create<FileState>((set, get) => ({
     persist(get().folders, active);
   },
 
-  expandAll: () => {
+  toggleExpandAll: () => {
     const active = get().activeFolderPath;
     if (!active) return;
     set({
-      folders: patchFolder(get().folders, active, (f) => ({
-        ...f,
-        expanded: collectDirPaths(f.fileTree),
-      })),
-    });
-    persist(get().folders, active);
-  },
-
-  collapseAll: () => {
-    const active = get().activeFolderPath;
-    if (!active) return;
-    set({
-      folders: patchFolder(get().folders, active, (f) => ({ ...f, expanded: [] })),
+      folders: patchFolder(get().folders, active, (f) => {
+        // 已全部展开 → 收起；否则（空或部分展开）→ 展开全部
+        const allDirs = collectDirPaths(f.fileTree);
+        const isAllExpanded =
+          allDirs.length > 0 && allDirs.every((p) => f.expanded.includes(p));
+        return { ...f, expanded: isAllExpanded ? [] : allDirs };
+      }),
     });
     persist(get().folders, active);
   },

@@ -276,21 +276,21 @@ export function SearchPanel() {
       </div>
 
       {/* 搜索结果 */}
-      <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
+      <div className="min-h-0 flex-1 overflow-auto px-2 pb-2 text-sm">
         {searching && (
-          <div className="flex items-center justify-center py-4 text-xs text-[var(--color-text-subtle)]">
+          <div className="flex items-center justify-center py-4 text-sm text-[var(--color-text-subtle)]">
             搜索中...
           </div>
         )}
 
         {!searching && query && results.length === 0 && (
-          <div className="flex items-center justify-center py-4 text-xs text-[var(--color-text-subtle)]">
+          <div className="flex items-center justify-center py-4 text-sm text-[var(--color-text-subtle)]">
             未找到匹配结果
           </div>
         )}
 
         {!searching && results.length > 0 && (
-          <div className="text-xs text-[var(--color-text-subtle)]">
+          <div className="text-sm text-[var(--color-text-subtle)]">
             找到 {results.length} 个结果
           </div>
         )}

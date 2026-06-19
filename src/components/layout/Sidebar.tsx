@@ -2,14 +2,14 @@
  * 侧边栏 - Activity Bar + 面板布局
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  */
-import { useState, useEffect, useRef } from "react";
-import { FileText, List, Search, FolderOpen, Plus, ChevronDown, ChevronsDown, ChevronsUp, X, Trash2 } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { FileText, List, Search, FolderOpen, Plus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2 } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore } from "@/stores/uiStore";
-import { useFileStore } from "@/stores/fileStore";
+import { useFileStore, collectDirPaths } from "@/stores/fileStore";
 import { previewContainerRef } from "@/stores/editorStore";
 import { openFolderViaDialog } from "@/lib/shortcuts/appShortcuts";
 import { cn } from "@/lib/utils/cn";
@@ -186,8 +186,16 @@ export function Sidebar() {
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
   const triggerSearchFocus = useUIStore((s) => s.triggerSearchFocus);
-  const expandAll = useFileStore((s) => s.expandAll);
-  const collapseAll = useFileStore((s) => s.collapseAll);
+  const toggleExpandAll = useFileStore((s) => s.toggleExpandAll);
+  const activeFolder = useFileStore(
+    (s) => s.folders.find((f) => f.path === s.activeFolderPath) ?? null,
+  );
+  // 当前激活文件夹是否已全部展开 → 决定按钮显示「展开」还是「收起」图标
+  const isAllExpanded = useMemo(() => {
+    if (!activeFolder) return false;
+    const allDirs = collectDirPaths(activeFolder.fileTree);
+    return allDirs.length > 0 && allDirs.every((p) => activeFolder.expanded.includes(p));
+  }, [activeFolder]);
 
   return (
     <aside className="flex h-full shrink-0">
@@ -238,20 +246,12 @@ export function Sidebar() {
           </span>
           {sidebarTab === "files" && (
             <div className="flex items-center gap-1">
-              <Tooltip content="展开全部" placement="bottom">
+              <Tooltip content={isAllExpanded ? "收起全部" : "展开全部"} placement="bottom">
                 <button
-                  onClick={expandAll}
+                  onClick={toggleExpandAll}
                   className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
                 >
-                  <ChevronsDown size={14} />
-                </button>
-              </Tooltip>
-              <Tooltip content="收起全部" placement="bottom">
-                <button
-                  onClick={collapseAll}
-                  className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-                >
-                  <ChevronsUp size={14} />
+                  {isAllExpanded ? <FoldVertical size={14} /> : <UnfoldVertical size={14} />}
                 </button>
               </Tooltip>
               <Tooltip content="打开文件夹" placement="bottom">
