@@ -210,8 +210,7 @@ export function MarkdownPreview() {
       >
         <article
           className={cn(
-            "markdown-body flex flex-col px-12",
-            isCardMode ? "min-h-full w-full" : "w-full",
+            "markdown-body flex flex-col px-12 min-h-full w-full",
           )}
           style={{ paddingTop: "10px", paddingBottom: "40px" }}
         >

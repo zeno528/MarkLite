@@ -61,7 +61,9 @@ export function EditorPane() {
 
   if (!currentFile) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-[var(--color-bg)]">
+      <div className="flex h-full w-full flex-col bg-[var(--color-bg)]">
+        <TabBar />
+        <div className="flex min-h-0 flex-1 items-center justify-center">
         <div className="flex flex-col items-center gap-6 text-center">
           {/* Logo */}
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-3xl">
@@ -98,11 +100,12 @@ export function EditorPane() {
 
           {/* 快捷键提示 */}
           <div className="flex gap-4 text-xs text-[var(--color-text-subtle)]">
-            <span>⌘O 打开</span>
-            <span>⌘S 保存</span>
-            <span>⌘\ 侧栏</span>
+            <span>Ctrl+O 打开</span>
+            <span>Ctrl+S 保存</span>
+            <span>Ctrl+\ 侧栏</span>
           </div>
         </div>
+      </div>
       </div>
     );
   }
