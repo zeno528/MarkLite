@@ -204,24 +204,26 @@ export function MarkdownPreview() {
   const isCardMode = layout === "preview-only";
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--color-bg)]">
+    <div
+      className={cn(
+        "flex h-full w-full flex-col",
+        isCardMode
+          ? "border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+          : "bg-[var(--color-bg-elevated)]",
+      )}
+    >
       <PreviewTabBar />
       <div
         ref={containerRef}
-        className={cn(
-          "min-h-0 flex-1 overflow-auto",
-          isCardMode ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-elevated)]",
-        )}
+        className="min-h-0 flex-1 overflow-auto"
       >
-        <article
-          className={cn(
-            "markdown-body flex flex-col px-12",
-            isCardMode
-              ? "min-h-full w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
-              : "h-full w-full",
-          )}
-          style={{ paddingTop: "10px", paddingBottom: "40px" }}
-        >
+      <article
+        className={cn(
+          "markdown-body flex flex-col px-12",
+          isCardMode ? "min-h-full w-full" : "w-full",
+        )}
+        style={{ paddingTop: "10px", paddingBottom: "40px" }}
+      >
           {loading && !html ? (
             <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
               渲染中...
