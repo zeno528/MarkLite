@@ -3,8 +3,8 @@ name = "marklite"
 version = "0.1.5"
 description = "MarkLite - 轻量级 Markdown 编辑器"
 authors = ["zwf"]
-edition = "2021"
-rust-version = "1.77"
+edition = "2024"
+rust-version = "1.85"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -1,2 +1,4 @@
+minimumReleaseAgeExclude:
+  - '@types/node@26.0.0'
 patchedDependencies:
   '@codemirror/view@6.43.1': patches/@codemirror__view@6.43.1.patch

@@ -17,7 +17,6 @@
  *
  * 防回环：写对端前 lockScrollSync()，对端 scroll handler 入口 isScrollSyncing() 跳过。
  */
-import { EditorView } from "@codemirror/view";
 import { editorViewRef, previewContainerRef, previewBlocksRef } from "@/stores/editorStore";
 import { lockScrollSync } from "./scrollSyncLock";
 

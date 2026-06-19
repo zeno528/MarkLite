@@ -1,8 +1,7 @@
 /**
- * 文件标签栏 - VSCode 风格延伸式标签
- * - 始终显示（即使只有 1 个文件）
+ * 文件标签栏 - Edge 浏览器风格自适应标签
+ * - 标签过多时自动收缩宽度（最小 80px）
  * - 激活标签与编辑区同色，形成延伸效果
- * - 未激活标签轻微区分，无边框割裂
  */
 import { X, FileText, XCircle } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
@@ -15,11 +14,10 @@ export function TabBar() {
   const closeFile = useEditorStore((s) => s.closeFile);
   const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
 
-  // 无文件时不显示
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 select-none items-end bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
       {openFiles.map((file) => {
         const isActive = file.path === activeFilePath;
         return (
@@ -27,18 +25,17 @@ export function TabBar() {
             key={file.path}
             onClick={() => switchFile(file.path)}
             className={cn(
-              "group relative flex h-[30px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+              "group relative flex h-[30px] min-w-[80px] shrink-[2] cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
               isActive
                 ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
                 : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
             )}
           >
-            {/* 激活标签底部遮盖边框 */}
             {isActive && (
               <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg-elevated)]" />
             )}
             <FileText size={13} className="shrink-0 opacity-70" />
-            <span className="max-w-[120px] truncate">{file.title}</span>
+            <span className="min-w-0 flex-1 truncate">{file.title}</span>
             {file.isDirty && (
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-warning)]" />
             )}
@@ -60,9 +57,7 @@ export function TabBar() {
           </div>
         );
       })}
-      {/* 底部分隔线（非激活区域） */}
-      <div className="flex-1 self-stretch border-b border-[var(--color-border)]" />
-      {/* 关闭所有按钮 */}
+      <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
       {openFiles.length > 1 && (
         <button
           onClick={closeAllFiles}

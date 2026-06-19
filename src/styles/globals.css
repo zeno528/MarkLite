@@ -423,7 +423,7 @@ body {
   font-weight: 600;
   color: oklch(1 0 0);
   background: oklch(0.32 0.012 275);
-  height: 34px;
+  height: 30px;
   padding: 0 13px;
   border-radius: 8px;
   display: inline-flex;
@@ -496,12 +496,12 @@ body {
   cursor: pointer;
   font-family: inherit;
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text);
   background: var(--color-bg-elevated);
-  height: 32px;
+  height: 30px;
   padding: 0 13px;
-  border-radius: 9px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 6px;

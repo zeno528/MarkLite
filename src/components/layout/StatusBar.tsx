@@ -8,13 +8,28 @@
  */
 import { useEffect, useState } from "react";
 import { RefreshCw, Save, RotateCw } from "lucide-react";
+import { MdFileIcon } from "@/components/file/MdFileIcon";
 import { useEditorStore } from "@/stores/editorStore";
+import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useRefreshStore } from "@/stores/refreshStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils/cn";
 import { reloadCurrentFile } from "@/lib/shortcuts/appShortcuts";
 import { notify } from "@/stores/notificationStore";
+
+/** 递归统计文件夹下的 md 文件数量 */
+function countMdFiles(nodes: FileNode[]): number {
+  let count = 0;
+  for (const node of nodes) {
+    if (node.isDir) {
+      if (node.children) count += countMdFiles(node.children);
+    } else {
+      count++;
+    }
+  }
+  return count;
+}
 
 export function StatusBar() {
   const cursor = useEditorStore((s) => s.cursor);
@@ -25,6 +40,10 @@ export function StatusBar() {
   const setReloading = useRefreshStore((s) => s.setReloading);
   const autoSave = useSettingsStore((s) => s.autoSave);
   const autoRefresh = useSettingsStore((s) => s.autoRefresh);
+  const folders = useFileStore((s) => s.folders);
+
+  // 统计所有打开文件夹下的 md 文件总数
+  const fileCount = folders.reduce((sum, f) => sum + countMdFiles(f.fileTree), 0);
 
   const handleReload = async () => {
     if (reloading) return; // 旋转中防重复点击
@@ -74,6 +93,15 @@ export function StatusBar() {
         {/* 模块2：文档统计 */}
         <div className="flex items-center gap-2">
           <span className="text-[var(--color-text-subtle)]">|</span>
+          {fileCount > 0 && (
+            <>
+              <span className="inline-flex items-center gap-1">
+                <MdFileIcon size={11} />
+                <span>{fileCount} 个文件</span>
+              </span>
+              <span className="text-[var(--color-text-subtle)]">·</span>
+            </>
+          )}
           <span>{wc.words} 字</span>
           <span className="text-[var(--color-text-subtle)]">·</span>
           <span>{wc.lines} 行</span>
