@@ -75,13 +75,13 @@ export function StatusBar() {
 
   return (
     <div
-      className="flex h-[var(--statusbar-height)] w-full shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 text-xs text-[var(--color-text-muted)]"
+      className="flex h-[var(--statusbar-height)] w-full shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] pr-3 text-xs text-[var(--color-text-muted)]"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex h-full items-stretch gap-3">
         {/* 模块1：刷新按钮 */}
-        <Tooltip content="刷新 (Ctrl+R) — 从磁盘重新读取当前文件" placement="top">
+        <Tooltip content="刷新 (Ctrl+R) — 从磁盘重新读取当前文件" placement="top" align="left" className="!flex h-full">
           <button
-            className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
+            className="flex h-full w-12 items-center justify-center border-0 bg-transparent text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
             onClick={handleReload}
             disabled={!currentFile}
             aria-label="刷新当前文件"
@@ -92,7 +92,6 @@ export function StatusBar() {
 
         {/* 模块2：文档统计 */}
         <div className="flex items-center gap-2">
-          <span className="text-[var(--color-text-subtle)]">|</span>
           {fileCount > 0 && (
             <>
               <span className="inline-flex items-center gap-1">

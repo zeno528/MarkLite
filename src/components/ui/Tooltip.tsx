@@ -17,9 +17,11 @@ interface TooltipProps {
   delay?: number;
   /** 显示方向，默认 top */
   placement?: TooltipPlacement;
+  /** 水平对齐，默认 center */
+  align?: "center" | "left";
 }
 
-export function Tooltip({ content, children, className, delay = 300, placement = "top" }: TooltipProps) {
+export function Tooltip({ content, children, className, delay = 300, placement = "top", align = "center" }: TooltipProps) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const timerRef = useRef(0);
@@ -34,11 +36,11 @@ export function Tooltip({ content, children, className, delay = 300, placement =
 
     switch (placement) {
       case "top":
-        x = rect.left + rect.width / 2;
+        x = align === "left" ? rect.left : rect.left + rect.width / 2;
         y = rect.top - offset;
         break;
       case "bottom":
-        x = rect.left + rect.width / 2;
+        x = align === "left" ? rect.left : rect.left + rect.width / 2;
         y = rect.bottom + offset;
         break;
       case "left":
@@ -67,9 +69,9 @@ export function Tooltip({ content, children, className, delay = 300, placement =
   const getTransform = () => {
     switch (placement) {
       case "top":
-        return "translate(-50%, -100%)";
+        return align === "left" ? "translate(0, -100%)" : "translate(-50%, -100%)";
       case "bottom":
-        return "translate(-50%, 0)";
+        return align === "left" ? "translate(0, 0)" : "translate(-50%, 0)";
       case "left":
         return "translate(-100%, -50%)";
       case "right":
@@ -95,6 +97,11 @@ export function Tooltip({ content, children, className, delay = 300, placement =
           }}
         >
           {content}
+          {align === "left" && placement === "top" && (
+            <div
+              className="absolute -bottom-[3px] left-2 h-[6px] w-[6px] rotate-45 border-b border-r border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+            />
+          )}
         </div>
       )}
     </div>
