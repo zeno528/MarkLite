@@ -7,6 +7,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { FileText, FolderOpen } from "lucide-react";
+import logoSvg from "@/assets/logo.svg";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { useEditorStore } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
@@ -64,48 +65,48 @@ export function EditorPane() {
       <div className="flex h-full w-full flex-col bg-[var(--color-bg)]">
         <TabBar />
         <div className="flex min-h-0 flex-1 items-center justify-center">
-        <div className="flex flex-col items-center gap-6 text-center">
-          {/* Logo */}
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-3xl">
-            📝
-          </div>
-
-          {/* 标题 */}
-          <div>
-            <h2 className="text-lg font-semibold text-[var(--color-text)]">
-              欢迎使用 MarkLite
-            </h2>
-            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-              轻量级 Markdown 编辑器
-            </p>
-          </div>
-
-          {/* 操作按钮 */}
-          <div className="flex gap-3">
-            <button
-              className="btn-primary"
-              onClick={openFileViaDialog}
+          <div className="flex flex-col items-center gap-5 text-center">
+            {/* Logo */}
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-[22px] border border-[var(--color-border)] transition-transform duration-300 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, color-mix(in oklch, var(--color-accent) 10%, transparent), color-mix(in oklch, var(--color-accent) 4%, transparent))`,
+                boxShadow: `0 4px 16px color-mix(in oklch, var(--color-accent) 12%, transparent)`,
+              }}
             >
-              <FileText size={16} />
-              <span>打开文件</span>
-            </button>
-            <button
-              className="btn-ghost"
-              onClick={openFolderViaDialog}
-            >
-              <FolderOpen size={16} />
-              <span>打开文件夹</span>
-            </button>
-          </div>
+              <img src={logoSvg} alt="MarkLite" className="h-10 w-10" />
+            </div>
 
-          {/* 快捷键提示 */}
-          <div className="flex gap-4 text-xs text-[var(--color-text-subtle)]">
-            <span>Ctrl+O 打开</span>
-            <span>Ctrl+S 保存</span>
-            <span>Ctrl+\ 侧栏</span>
+            {/* 标题 */}
+            <div>
+              <h2 className="text-base font-semibold text-[var(--color-text)]">
+                欢迎使用 MarkLite
+              </h2>
+              <p className="mt-0.5 text-[13px] text-[var(--color-text-muted)]">
+                轻量级 Markdown 编辑器
+              </p>
+            </div>
+
+            {/* 操作按钮 — 与顶栏一致的 btn-primary 样式 */}
+            <div className="flex gap-2">
+              <button className="btn-primary" onClick={openFileViaDialog}>
+                <FileText size={15} />
+                <span>打开文件</span>
+              </button>
+              <button className="btn-primary" onClick={openFolderViaDialog}>
+                <FolderOpen size={15} />
+                <span>打开文件夹</span>
+              </button>
+            </div>
+
+            {/* 快捷键提示 */}
+            <div className="flex gap-3 text-[11px] text-[var(--color-text-subtle)]">
+              <span><kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1 py-0.5 text-[10px]">Ctrl+O</kbd> 打开</span>
+              <span><kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1 py-0.5 text-[10px]">Ctrl+S</kbd> 保存</span>
+              <span><kbd className="rounded border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-1 py-0.5 text-[10px]">Ctrl+\</kbd> 侧栏</span>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     );
   }

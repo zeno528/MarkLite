@@ -299,7 +299,23 @@ export default function App() {
     <div className="flex h-screen w-screen flex-col overflow-hidden">
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
-        {showSidebar && <Sidebar />}
+        <div
+          className="flex shrink-0 overflow-hidden"
+          style={{
+            maxWidth: showSidebar ? "calc(48px + var(--sidebar-width) + 2px)" : "0px",
+            transition: "max-width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          <div
+            className="flex shrink-0"
+            style={{
+              transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
+              transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            <Sidebar />
+          </div>
+        </div>
         <main className="flex min-h-0 flex-1 overflow-hidden">
           {layout === "split" && (
             <SplitView left={<EditorPane />} right={<MarkdownPreview />} />

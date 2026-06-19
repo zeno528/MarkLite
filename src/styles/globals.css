@@ -499,7 +499,7 @@ body {
   font-weight: 600;
   color: var(--color-text);
   background: var(--color-bg-elevated);
-  height: 30px;
+  height: 34px;
   padding: 0 13px;
   border-radius: 8px;
   display: inline-flex;

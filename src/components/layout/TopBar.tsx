@@ -149,7 +149,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         </div>
 
         {/* 单图标按钮（侧栏 / 设置） */}
-        <Tooltip content="主侧栏 (Ctrl+\\)" placement="bottom">
+        <Tooltip content="切换侧栏 (Ctrl+\\)" placement="bottom">
           <button
             className={cn("icon-btn", showSidebar && "active")}
             onClick={toggleSidebar}
