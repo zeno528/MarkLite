@@ -302,13 +302,14 @@ export default function App() {
         <div
           className="flex shrink-0 overflow-hidden"
           style={{
-            maxWidth: showSidebar ? "calc(48px + var(--sidebar-width) + 2px)" : "0px",
-            transition: "max-width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+            width: showSidebar ? "calc(48px + var(--sidebar-width) + 2px)" : "0px",
+            transition: "width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           <div
             className="flex shrink-0"
             style={{
+              width: "calc(48px + var(--sidebar-width) + 2px)",
               transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
               transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
