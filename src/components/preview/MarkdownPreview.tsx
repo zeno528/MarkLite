@@ -13,6 +13,7 @@ import { parseMarkdown } from "@/lib/markdown/parser";
 import { cn } from "@/lib/utils/cn";
 import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
 import { openExternalUrl } from "@/lib/utils/openUrl";
+import { PreviewTabBar } from "./PreviewTabBar";
 import "./markdown/styles/markdown.css";
 
 // 复制按钮图标（模块级常量，避免每次 render 重建）
@@ -203,33 +204,36 @@ export function MarkdownPreview() {
   const isCardMode = layout === "preview-only";
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "h-full w-full overflow-auto",
-        isCardMode ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-elevated)]",
-      )}
-    >
-      <article
+    <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--color-bg)]">
+      <PreviewTabBar />
+      <div
+        ref={containerRef}
         className={cn(
-          "markdown-body flex flex-col px-12 py-10",
-          isCardMode
-            ? "min-h-full w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
-            : "h-full w-full",
+          "min-h-0 flex-1 overflow-auto",
+          isCardMode ? "bg-[var(--color-bg)]" : "bg-[var(--color-bg-elevated)]",
         )}
       >
-        {loading && !html ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
-            渲染中...
-          </div>
-        ) : html ? (
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        ) : (
-          <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
-            预览将在这里显示
-          </div>
-        )}
-      </article>
+        <article
+          className={cn(
+            "markdown-body flex flex-col px-12 py-10",
+            isCardMode
+              ? "min-h-full w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+              : "h-full w-full",
+          )}
+        >
+          {loading && !html ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
+              渲染中...
+            </div>
+          ) : html ? (
+            <div dangerouslySetInnerHTML={{ __html: html }} />
+          ) : (
+            <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
+              预览将在这里显示
+            </div>
+          )}
+        </article>
+      </div>
     </div>
   );
 }

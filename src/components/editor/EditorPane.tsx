@@ -14,6 +14,7 @@ import {
   openFileViaDialog,
   openFolderViaDialog,
 } from "@/lib/shortcuts/appShortcuts";
+import { TabBar } from "./TabBar";
 
 export function EditorPane() {
   const currentFile = useEditorStore((s) => s.currentFile);
@@ -107,13 +108,16 @@ export function EditorPane() {
   }
 
   return (
-    <div className="h-full w-full overflow-hidden bg-[var(--color-bg-elevated)]">
-      <CodeEditor
-        key={path}
-        value={initValue}
-        onChange={handleChange}
-        onSave={handleSave}
-      />
+    <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--color-bg)]">
+      <TabBar />
+      <div className="min-h-0 flex-1 bg-[var(--color-bg-elevated)]">
+        <CodeEditor
+          key={path}
+          value={initValue}
+          onChange={handleChange}
+          onSave={handleSave}
+        />
+      </div>
     </div>
   );
 }
