@@ -18,7 +18,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
-import { readTextFile } from "@tauri-apps/plugin-fs";
+import { readTextFile, stat } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import {
@@ -189,8 +189,8 @@ export default function App() {
         return getCurrentWebview().onDragDropEvent(async (event) => {
           switch (event.payload.type) {
             case "enter":
-              // enter 带 paths：仅当悬停内容含 Markdown 文件时才亮起覆盖层，避免拖入图片等误导
-              setDragging(event.payload.paths.some(isMd));
+              // enter 带 paths：任何内容都显示覆盖层，放下时再过滤
+              setDragging(event.payload.paths.length > 0);
               break;
             case "over":
               // over 只带 position（无 paths），沿用 enter 的判断结果，无需改动
@@ -200,21 +200,34 @@ export default function App() {
               break;
             case "drop": {
               setDragging(false);
-              const mdPaths = event.payload.paths.filter(isMd);
-              if (mdPaths.length === 0) {
-                notify.warning("仅支持 .md / .markdown / .mdx 文件");
-                return;
-              }
-              // 串行打开：保证激活文件顺序确定（最后一个被拖入的），避免并发读取竞态
-              for (const path of mdPaths) {
-                try {
-                  const content = await readTextFile(path);
-                  const title = path.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
-                  useEditorStore.getState().openFile(path, title, content);
-                } catch (e) {
-                  console.error("[drag-drop] open file failed:", e);
-                  notify.error(`打开失败：${path.split(/[/\\]/).pop() ?? path}`);
+              const paths = event.payload.paths;
+              let handled = false;
+
+              for (const p of paths) {
+                if (isMd(p)) {
+                  // Markdown 文件：打开
+                  try {
+                    const content = await readTextFile(p);
+                    const title = p.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
+                    useEditorStore.getState().openFile(p, title, content);
+                    handled = true;
+                  } catch (e) {
+                    console.error("[drag-drop] open file failed:", e);
+                    notify.error(`打开失败：${p.split(/[/\\]/).pop() ?? p}`);
+                  }
+                } else {
+                  // 非 .md 文件：尝试作为文件夹添加
+                  try {
+                    await useFileStore.getState().addFolder(p);
+                    handled = true;
+                  } catch (e) {
+                    console.error("[drag-drop] addFolder failed:", e);
+                  }
                 }
+              }
+
+              if (!handled) {
+                notify.warning("仅支持 .md 文件或文件夹");
               }
               break;
             }
