@@ -46,11 +46,12 @@ import {
 } from "./extensions/wordcount";
 import { createAutoSave } from "./extensions/autoSave";
 import { createHyperlinkHandler } from "./extensions/hyperlinks";
-import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/editorStore";
+import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { getCmMod } from "@/lib/utils/platform";
-import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { syncPreviewFromEditor } from "@/lib/utils/scrollSync";
 import { cn } from "@/lib/utils/cn";
 
 interface CodeEditorProps {
@@ -201,8 +202,8 @@ export function CodeEditor({
     autoSaveDelay,
   ]);
 
-  // 滚动同步：编辑器 → 预览（直接写预览 scrollTop，绕过 React 中转，1 帧延迟）
-  // 不走 store → useEffect 中转（那会多 2~3 帧），而是同 rAF 内直接 DOM-to-DOM
+  // 滚动同步：编辑器 → 预览（按编辑器可视首行映射到预览对应块；找不到标注块回退百分比）
+  // 同步逻辑下沉到 syncPreviewFromEditor，供 MarkdownPreview 编辑后对齐复用
   useEffect(() => {
     if (!scrollSync) return; // 关闭滚动同步时不挂监听
     const view = viewRef.current;
@@ -216,20 +217,10 @@ export function CodeEditor({
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
+        syncPreviewFromEditor();
         const top = dom.scrollTop;
         const height = dom.scrollHeight - dom.clientHeight;
         const percent = height > 0 ? top / height : 0;
-
-        // 直接写预览 scrollTop
-        const preview = previewContainerRef.current;
-        if (preview) {
-          const previewHeight = preview.scrollHeight - preview.clientHeight;
-          if (previewHeight > 0) {
-            lockScrollSync();
-            preview.scrollTop = previewHeight * percent;
-          }
-        }
-
         setScrollPercent(percent, "editor");
       });
     };

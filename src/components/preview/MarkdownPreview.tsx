@@ -6,12 +6,13 @@
  * - 跟随配色方案（resolvedTheme）
  */
 import { useEffect, useRef, useState } from "react";
-import { useEditorStore, previewContainerRef, editorViewRef } from "@/stores/editorStore";
+import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { parseMarkdown } from "@/lib/markdown/parser";
 import { cn } from "@/lib/utils/cn";
 import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { rebuildPreviewBlocks, syncEditorFromPreview, syncPreviewFromEditor } from "@/lib/utils/scrollSync";
 import { openExternalUrl } from "@/lib/utils/openUrl";
 import { PreviewTabBar } from "./PreviewTabBar";
 import "./markdown/styles/markdown.css";
@@ -61,13 +62,18 @@ export function MarkdownPreview() {
   // 解析 Markdown → HTML
   useEffect(() => {
     let cancelled = false;
+    let raf = 0;
     setLoading(true);
     parseMarkdown(content, resolvedTheme)
       .then((h) => {
-        if (!cancelled) {
-          setHtml(h);
-          setLoading(false);
-        }
+        if (cancelled) return;
+        setHtml(h);
+        setLoading(false);
+        // HTML 更新后等 DOM 布局稳定：重建块缓存，并让预览对齐到编辑器当前位置（解决编辑后错位）
+        raf = requestAnimationFrame(() => {
+          rebuildPreviewBlocks();
+          syncPreviewFromEditor();
+        });
       })
       .catch((e) => {
         console.error("[preview] parse failed:", e);
@@ -75,6 +81,7 @@ export function MarkdownPreview() {
       });
     return () => {
       cancelled = true;
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [content, resolvedTheme]);
 
@@ -161,7 +168,7 @@ export function MarkdownPreview() {
     return () => root.removeEventListener("click", onClick);
   }, []);
 
-  // 滚动同步：预览 → 编辑器（直接写编辑器 scrollTop，绕过 React 中转，1 帧延迟）
+  // 滚动同步：预览 → 编辑器（按预览可视顶部块的源行号，映射到编辑器对应行）
   // 锁机制：程序主动写 scrollTop 前置锁，对方的 scroll handler 检测到锁就跳过
   useEffect(() => {
     if (!scrollSync) return;
@@ -175,20 +182,9 @@ export function MarkdownPreview() {
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
+        syncEditorFromPreview();
         const scrollHeight = el.scrollHeight - el.clientHeight;
         const percent = scrollHeight > 0 ? el.scrollTop / scrollHeight : 0;
-
-        // 直接写编辑器 scrollTop
-        const view = editorViewRef.current;
-        if (view) {
-          const dom = view.scrollDOM;
-          const editorHeight = dom.scrollHeight - dom.clientHeight;
-          if (editorHeight > 0) {
-            lockScrollSync();
-            dom.scrollTop = editorHeight * percent;
-          }
-        }
-
         setScrollPercent(percent, "preview");
       });
     };

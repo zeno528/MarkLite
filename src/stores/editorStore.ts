@@ -10,6 +10,10 @@ export const editorViewRef: { current: EditorView | null } = { current: null };
 /** 预览滚动容器引用（非响应式，供编辑器滚动 handler 直接写预览 scrollTop，绕过 React 中转） */
 export const previewContainerRef: { current: HTMLElement | null } = { current: null };
 
+/** 预览块级元素缓存（非响应式，html 变化时重建）：{ el, line(源行号), top(相对容器内容顶的稳定偏移) }
+ *  滚动同步从百分比升级为行号映射时，按 line 二分查找对应块 */
+export const previewBlocksRef: { current: { el: HTMLElement; line: number; top: number }[] } = { current: [] };
+
 /** localStorage key：上次打开的文件路径（重开自动恢复） */
 export const ACTIVE_FILE_KEY = "marklite:active-file";
 
