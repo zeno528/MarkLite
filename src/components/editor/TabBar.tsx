@@ -19,7 +19,7 @@ export function TabBar() {
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 items-end bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end bg-[var(--color-bg)]">
       {openFiles.map((file) => {
         const isActive = file.path === activeFilePath;
         return (
