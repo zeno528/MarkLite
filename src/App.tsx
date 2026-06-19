@@ -39,6 +39,7 @@ export default function App() {
   const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
   const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   // 初始化设置（延迟到首帧后，不阻塞渲染）
   useEffect(() => {
@@ -178,6 +179,56 @@ export default function App() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  // 拖拽文件到窗口：Tauri webview 事件做视觉反馈 + 文件读取
+  // 依赖 tauri.conf.json 的 app.dragDropEnabled: true（默认）——若改为 false 以启用 HTML5 拖放，本监听将不触发
+  useEffect(() => {
+    const isMd = (p: string) => /\.(md|markdown|mdx)$/i.test(p);
+    const unlistenPromise = (async () => {
+      try {
+        const { getCurrentWebview } = await import("@tauri-apps/api/webview");
+        return getCurrentWebview().onDragDropEvent(async (event) => {
+          switch (event.payload.type) {
+            case "enter":
+              // enter 带 paths：仅当悬停内容含 Markdown 文件时才亮起覆盖层，避免拖入图片等误导
+              setDragging(event.payload.paths.some(isMd));
+              break;
+            case "over":
+              // over 只带 position（无 paths），沿用 enter 的判断结果，无需改动
+              break;
+            case "leave":
+              setDragging(false);
+              break;
+            case "drop": {
+              setDragging(false);
+              const mdPaths = event.payload.paths.filter(isMd);
+              if (mdPaths.length === 0) {
+                notify.warning("仅支持 .md / .markdown / .mdx 文件");
+                return;
+              }
+              // 串行打开：保证激活文件顺序确定（最后一个被拖入的），避免并发读取竞态
+              for (const path of mdPaths) {
+                try {
+                  const content = await readTextFile(path);
+                  const title = path.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
+                  useEditorStore.getState().openFile(path, title, content);
+                } catch (e) {
+                  console.error("[drag-drop] open file failed:", e);
+                  notify.error(`打开失败：${path.split(/[/\\]/).pop() ?? path}`);
+                }
+              }
+              break;
+            }
+          }
+        });
+      } catch (e) {
+        console.error("[drag-drop] webview listener failed:", e);
+        return null;
+      }
+    })();
+
+    return () => { unlistenPromise.then((fn) => fn?.()); };
+  }, []);
+
   // 启动时窗口防白屏：等首帧后 show()
   useEffect(() => {
     const showWindow = async () => {
@@ -264,6 +315,20 @@ export default function App() {
       </Suspense>
       <ToastContainer />
       <ConfirmDialog />
+      {/* 拖拽文件覆盖层 */}
+      {dragging && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[var(--color-accent)] bg-[var(--color-bg-elevated)] px-12 py-8 shadow-lg">
+            <svg className="h-10 w-10 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="12" y1="18" x2="12" y2="12" />
+              <polyline points="9 15 12 12 15 15" />
+            </svg>
+            <span className="text-sm font-medium text-[var(--color-accent)]">释放以打开文件</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

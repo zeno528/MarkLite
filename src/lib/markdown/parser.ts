@@ -9,6 +9,7 @@
  * 同步解析 + 异步增强 + 同步净化 → 整体 < 50ms（首次 < 300ms）
  */
 import { Marked } from "marked";
+import markedFootnote from "marked-footnote";
 import DOMPurify from "dompurify";
 import { highlightCode } from "./shiki";
 
@@ -32,6 +33,7 @@ export async function parseMarkdown(
     gfm: true,
     breaks: false,
   });
+  syncMarked.use(markedFootnote());
 
   // 自定义代码渲染器：输出带唯一 id 的占位符，供 enhanceCodeBlocks 替换为 Shiki 高亮
   syncMarked.use({
@@ -53,7 +55,7 @@ export async function parseMarkdown(
     ALLOWED_TAGS: [
       "h1", "h2", "h3", "h4", "h5", "h6",
       "p", "br", "hr",
-      "strong", "em", "del", "u",
+      "strong", "em", "del", "u", "b", "i",
       "ul", "ol", "li",
       "blockquote",
       "pre", "code",
@@ -61,6 +63,9 @@ export async function parseMarkdown(
       "table", "thead", "tbody", "tr", "th", "td",
       "input",
       "span", "div",
+      "details", "summary",
+      "kbd", "sup", "sub",
+      "section",
     ],
     ALLOWED_ATTR: [
       "href", "title", "alt", "src",
@@ -70,6 +75,7 @@ export async function parseMarkdown(
       "style",
       "align",
       "width", "height",
+      "open",
     ],
     ALLOW_DATA_ATTR: true,
   });

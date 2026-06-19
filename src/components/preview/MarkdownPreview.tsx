@@ -212,13 +212,13 @@ export function MarkdownPreview() {
         ref={containerRef}
         className="min-h-0 flex-1 overflow-auto"
       >
-      <article
-        className={cn(
-          "markdown-body flex flex-col px-12",
-          isCardMode ? "min-h-full w-full" : "w-full",
-        )}
-        style={{ paddingTop: "10px", paddingBottom: "40px" }}
-      >
+        <article
+          className={cn(
+            "markdown-body flex flex-col px-12",
+            isCardMode ? "min-h-full w-full" : "w-full",
+          )}
+          style={{ paddingTop: "10px", paddingBottom: "40px" }}
+        >
           {loading && !html ? (
             <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
               渲染中...
