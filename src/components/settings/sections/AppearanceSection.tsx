@@ -7,8 +7,11 @@ import { Select, type SelectOption } from "@/components/ui/Select";
 /** 字体候选（等宽，适合代码/markdown） */
 const FONT_OPTIONS: SelectOption<string>[] = [
   { value: "JetBrains Mono", label: "JetBrains Mono" },
-  { value: "SF Mono", label: "SF Mono" },
+  { value: "Fira Code", label: "Fira Code" },
+  { value: "Maple Mono", label: "Maple Mono" },
+  { value: "Iosevka", label: "Iosevka" },
   { value: "Cascadia Code", label: "Cascadia Code" },
+  { value: "SF Mono", label: "SF Mono" },
   { value: "Menlo", label: "Menlo" },
   { value: "Consolas", label: "Consolas" },
   { value: "monospace", label: "系统默认" },
