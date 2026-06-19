@@ -3,7 +3,7 @@
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  */
 import { useState, useEffect, useRef } from "react";
-import { FileText, List, Search, FolderOpen, Plus, ChevronDown, X, Trash2 } from "lucide-react";
+import { FileText, List, Search, FolderOpen, Plus, ChevronDown, ChevronsDown, ChevronsUp, X, Trash2 } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
@@ -186,6 +186,8 @@ export function Sidebar() {
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
   const triggerSearchFocus = useUIStore((s) => s.triggerSearchFocus);
+  const expandAll = useFileStore((s) => s.expandAll);
+  const collapseAll = useFileStore((s) => s.collapseAll);
 
   return (
     <aside className="flex h-full shrink-0">
@@ -235,14 +237,32 @@ export function Sidebar() {
             {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
           </span>
           {sidebarTab === "files" && (
-            <Tooltip content="打开文件夹" placement="bottom">
-              <button
-                onClick={openFolderViaDialog}
-                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-              >
-                <Plus size={14} />
-              </button>
-            </Tooltip>
+            <div className="flex items-center gap-1">
+              <Tooltip content="展开全部" placement="bottom">
+                <button
+                  onClick={expandAll}
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+                >
+                  <ChevronsDown size={14} />
+                </button>
+              </Tooltip>
+              <Tooltip content="收起全部" placement="bottom">
+                <button
+                  onClick={collapseAll}
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+                >
+                  <ChevronsUp size={14} />
+                </button>
+              </Tooltip>
+              <Tooltip content="打开文件夹" placement="bottom">
+                <button
+                  onClick={openFolderViaDialog}
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+                >
+                  <Plus size={14} />
+                </button>
+              </Tooltip>
+            </div>
           )}
         </div>
 
