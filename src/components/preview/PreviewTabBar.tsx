@@ -19,43 +19,51 @@ export function PreviewTabBar() {
 
   return (
     <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
-      {openFiles.map((file) => {
+      {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
+        const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
         return (
           <div
             key={file.path}
-            onClick={() => switchFile(file.path)}
-            className={cn(
-              "group relative flex h-[30px] min-w-[80px] shrink-0 basis-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
-              openFiles.length > 1 && "shrink grow",
-              isActive
-                ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
-            )}
+            className="flex items-end"
           >
-            {isActive && (
-              <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg-elevated)]" />
-            )}
-            <Eye size={13} className="shrink-0 opacity-70" />
-            <span className="min-w-0 flex-1 truncate">{file.title}</span>
-            {file.isDirty && (
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-warning)]" />
-            )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                closeFile(file.path);
-              }}
-              title={`关闭 ${file.title}`}
+            <div
+              onClick={() => switchFile(file.path)}
               className={cn(
-                "ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded transition-all",
+                "group relative flex h-[30px] min-w-[80px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+                openFiles.length > 1 && "shrink basis-auto",
                 isActive
-                  ? "hover:bg-[var(--color-bg-muted)] opacity-60 hover:opacity-100"
-                  : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]",
+                  ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
+                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
               )}
             >
-              <X size={11} />
-            </button>
+              {isActive && (
+                <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg-elevated)]" />
+              )}
+              <Eye size={13} className="shrink-0 opacity-70" />
+              <span className="min-w-0 flex-1 truncate">{file.title}</span>
+              {file.isDirty && (
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-warning)]" />
+              )}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeFile(file.path);
+                }}
+                title={`关闭 ${file.title}`}
+                className={cn(
+                  "ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded transition-all",
+                  isActive
+                    ? "hover:bg-[var(--color-bg-muted)] opacity-60 hover:opacity-100"
+                    : "opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-[var(--color-bg-muted)]",
+                )}
+              >
+                <X size={11} />
+              </button>
+            </div>
+            {!isActive && !nextIsActive && (
+              <span className="flex h-[14px] w-px self-center bg-[var(--color-text-subtle)] opacity-30" />
+            )}
           </div>
         );
       })}
