@@ -11,6 +11,7 @@
 import { Marked, Renderer } from "marked";
 import markedFootnote from "marked-footnote";
 import DOMPurify from "dompurify";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { highlightCode } from "./shiki";
 
 /** 代码块占位符自增 id（每次解析重新计数） */
@@ -20,10 +21,12 @@ let nextCodeId = 0;
  * 解析 Markdown → 安全的 HTML
  * @param md Markdown 源文
  * @param theme 主题：'light' | 'dark'
+ * @param filePath 文件路径（用于解析相对图片路径）
  */
 export async function parseMarkdown(
   md: string,
   theme: "light" | "dark",
+  filePath?: string,
 ): Promise<string> {
   if (!md.trim()) return "";
   nextCodeId = 0; // 每次解析重置占位符 id
@@ -127,7 +130,8 @@ export async function parseMarkdown(
     ALLOW_DATA_ATTR: true,
   });
 
-  return safeHtml;
+  // === 阶段 4：解析相对图片路径 ===
+  return filePath ? resolveRelativePaths(safeHtml, filePath) : safeHtml;
 }
 
 /** 异步替换占位符为 Shiki 高亮结果 */
@@ -199,6 +203,25 @@ function unescapeHtml(str: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
+}
+
+/** 把 HTML 中的相对路径（img src、a href）转成基于文件目录的绝对路径 */
+function resolveRelativePaths(html: string, filePath: string): string {
+  // 提取文件所在目录
+  const dir = filePath.replace(/[/\\][^/\\]+$/, "");
+  return html.replace(
+    /(<(?:img|a)\b[^>]*\b(?:src|href)=")([^"]+)(")/gi,
+    (match, prefix, url, suffix) => {
+      // 跳过已经是绝对路径或协议 URL
+      if (/^(https?|asset|data|blob):/.test(url) || /^[/\\]/.test(url)) {
+        return match;
+      }
+      // 相对路径 → 绝对路径 → Tauri asset URL
+      const absPath = `${dir}/${url}`.replace(/\\/g, "/");
+      const assetUrl = convertFileSrc(absPath);
+      return `${prefix}${assetUrl}${suffix}`;
+    },
+  );
 }
 
 /** 预计算每行起始字符 offset（lineStarts[0]=0 即第 1 行起点），供按 offset 反查行号 */

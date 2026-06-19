@@ -64,7 +64,7 @@ export function MarkdownPreview() {
     let cancelled = false;
     let raf = 0;
     setLoading(true);
-    parseMarkdown(content, resolvedTheme)
+    parseMarkdown(content, resolvedTheme, filePath)
       .then((h) => {
         if (cancelled) return;
         setHtml(h);
