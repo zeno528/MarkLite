@@ -4,6 +4,7 @@
  * - 激活标签与预览区同色，形成延伸效果
  * - 使用预览相关图标（Eye）
  */
+import { Fragment } from "react";
 import { X, Eye } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
@@ -23,10 +24,7 @@ export function PreviewTabBar() {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
         return (
-          <div
-            key={file.path}
-            className="flex items-end"
-          >
+          <Fragment key={file.path}>
             <div
               onClick={() => switchFile(file.path)}
               className={cn(
@@ -34,7 +32,7 @@ export function PreviewTabBar() {
                 openFiles.length > 1 && "shrink basis-auto",
                 isActive
                   ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+                  : "rounded-t-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
               )}
             >
               {isActive && (
@@ -62,11 +60,12 @@ export function PreviewTabBar() {
               </button>
             </div>
             {!isActive && !nextIsActive && (
-              <span className="flex h-[14px] w-px self-center bg-[var(--color-text-subtle)] opacity-30" />
+              <span className="flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] opacity-30" />
             )}
-          </div>
+          </Fragment>
         );
       })}
+      {/* 底部分隔线（非激活区域） */}
       <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
     </div>
   );

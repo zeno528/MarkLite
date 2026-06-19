@@ -3,6 +3,7 @@
  * - 标签过多时自动收缩宽度（最小 80px）
  * - 激活标签与编辑区同色，形成延伸效果
  */
+import { Fragment } from "react";
 import { X, FileText } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
@@ -21,10 +22,7 @@ export function TabBar() {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
         return (
-          <div
-            key={file.path}
-            className="flex items-end"
-          >
+          <Fragment key={file.path}>
             <div
               onClick={() => switchFile(file.path)}
               className={cn(
@@ -32,7 +30,7 @@ export function TabBar() {
                 openFiles.length > 1 && "shrink basis-auto",
                 isActive
                   ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                  : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+                  : "rounded-t-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
               )}
             >
               {isActive && (
@@ -60,9 +58,9 @@ export function TabBar() {
               </button>
             </div>
             {!isActive && !nextIsActive && (
-              <span className="flex h-[14px] w-px self-center bg-[var(--color-text-subtle)] opacity-30" />
+              <span className="flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] opacity-30" />
             )}
-          </div>
+          </Fragment>
         );
       })}
       <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
