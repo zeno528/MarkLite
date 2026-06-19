@@ -42,6 +42,10 @@ export const lightTheme = EditorView.theme(
     },
     ".cm-activeLine": {
       backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+      marginLeft: "-16px",
+      marginRight: "-16px",
+      paddingLeft: "16px",
+      paddingRight: "16px",
     },
     ".cm-activeLineGutter": {
       backgroundColor: "color-mix(in oklch, var(--color-accent) 8%, transparent)",
@@ -157,6 +161,10 @@ export const darkTheme = EditorView.theme(
     },
     ".cm-activeLine": {
       backgroundColor: "color-mix(in oklch, var(--color-text) 4%, transparent)",
+      marginLeft: "-16px",
+      marginRight: "-16px",
+      paddingLeft: "16px",
+      paddingRight: "16px",
     },
     ".cm-activeLineGutter": {
       backgroundColor: "color-mix(in oklch, var(--color-accent) 8%, transparent)",
