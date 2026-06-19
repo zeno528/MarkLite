@@ -200,18 +200,25 @@ export const useFileStore = create<FileState>((set, get) => ({
       // 清除所有缓存，强制刷新
       folders.forEach((f) => treeCache.delete(f.path));
 
-      const updatedFolders = await Promise.all(
+      // 并发读树，结果按 path 收集（不携带会过期的 folder 引用）
+      const treeByPath = new Map<string, FileNode[]>();
+      await Promise.all(
         folders.map(async (folder) => {
           try {
-            const tree = await readTreeWithCache(folder.path);
-            return { ...folder, fileTree: tree };
+            treeByPath.set(folder.path, await readTreeWithCache(folder.path));
           } catch (e) {
             console.error("[fileStore] refreshAllTrees failed for:", folder.path, e);
-            return folder;
           }
         }),
       );
-      set({ folders: updatedFolders });
+
+      // 函数式更新 + 按 path 合并：只更新当前 state 中【仍存在】的 folder，
+      // 这样飞行期间 removeFolder 删掉的 folder 不会被陈旧快照复活（竞态修复）
+      set((state) => ({
+        folders: state.folders.map((f) =>
+          treeByPath.has(f.path) ? { ...f, fileTree: treeByPath.get(f.path)! } : f,
+        ),
+      }));
     } catch (e) {
       console.error("[fileStore] refreshAllTrees failed:", e);
     }

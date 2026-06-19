@@ -61,6 +61,9 @@ export async function reloadCurrentFile(silent = false): Promise<boolean> {
     // 4. 刷新所有已打开的文件
     let hasChanges = false;
     for (const file of openFiles) {
+      // 自动刷新（静默模式）跳过有未保存改动的文件——用户内存中的编辑比磁盘旧内容新，
+      // 绝不能用磁盘内容覆盖；手动刷新走上面的确认框由用户决定。
+      if (silent && file.isDirty) continue;
       try {
         const content = await readTextFile(file.path);
         if (content !== file.content) {

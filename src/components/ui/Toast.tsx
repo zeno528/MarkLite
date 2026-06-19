@@ -34,7 +34,7 @@ export function ToastContainer() {
 
   return (
     <div
-      className="pointer-events-none fixed top-[calc(var(--titlebar-height)+35px)] left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2"
+      className="pointer-events-none fixed top-[calc(var(--titlebar-height)+25px)] left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2"
       role="region"
       aria-label="通知"
     >
@@ -46,7 +46,7 @@ export function ToastContainer() {
             role="status"
             aria-live="polite"
             className={cn(
-              "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-2",
+              "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-5 py-2.5",
               "shadow-[0_6px_20px_rgba(0,0,0,0.12),0_0_10px_color-mix(in_oklch,var(--color-accent)_12%,transparent)]",
               n.leaving
                 ? "animate-[toast-out_180ms_ease_forwards]"
@@ -58,7 +58,7 @@ export function ToastContainer() {
               style={{ color }}
               className={cn("shrink-0", spin && "animate-spin")}
             />
-            <span className="flex-1 text-[12.5px] leading-snug text-[var(--color-text)]">
+            <span className="flex-1 text-[14px] font-medium leading-snug text-[var(--color-text)]">
               {n.message}
             </span>
             <button
