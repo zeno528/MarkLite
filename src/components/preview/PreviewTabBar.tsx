@@ -4,7 +4,7 @@
  * - 激活标签与预览区同色，形成延伸效果
  * - 使用预览相关图标（Eye）
  */
-import { X, Eye } from "lucide-react";
+import { X, Eye, XCircle } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
 
@@ -13,6 +13,7 @@ export function PreviewTabBar() {
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
   const switchFile = useEditorStore((s) => s.switchFile);
   const closeFile = useEditorStore((s) => s.closeFile);
+  const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
 
   // 无文件时不显示
   if (openFiles.length === 0) return null;
@@ -61,6 +62,16 @@ export function PreviewTabBar() {
       })}
       {/* 底部分隔线（非激活区域） */}
       <div className="flex-1 self-stretch border-b border-[var(--color-border)]" />
+      {/* 关闭所有按钮 */}
+      {openFiles.length > 1 && (
+        <button
+          onClick={closeAllFiles}
+          title="关闭所有标签"
+          className="flex h-[30px] shrink-0 items-center px-2 text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
+        >
+          <XCircle size={14} />
+        </button>
+      )}
     </div>
   );
 }

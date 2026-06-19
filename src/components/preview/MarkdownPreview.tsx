@@ -215,11 +215,12 @@ export function MarkdownPreview() {
       >
         <article
           className={cn(
-            "markdown-body flex flex-col px-12 py-10",
+            "markdown-body flex flex-col px-12",
             isCardMode
               ? "min-h-full w-full border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
               : "h-full w-full",
           )}
+          style={{ paddingTop: "10px", paddingBottom: "40px" }}
         >
           {loading && !html ? (
             <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">

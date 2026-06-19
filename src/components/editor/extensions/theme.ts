@@ -26,7 +26,7 @@ export const lightTheme = EditorView.theme(
       caretColor: "var(--color-accent)",
       fontFamily: "var(--font-editor)",
       fontSize: "var(--editor-font-size, 14px)",
-      padding: "0 16px",
+      padding: "10px 16px",
       minHeight: "100%",
     },
     ".cm-line": {
@@ -141,7 +141,7 @@ export const darkTheme = EditorView.theme(
       caretColor: "var(--color-accent)",
       fontFamily: "var(--font-editor)",
       fontSize: "var(--editor-font-size, 14px)",
-      padding: "0 16px",
+      padding: "10px 16px",
       minHeight: "100%",
     },
     ".cm-line": {
