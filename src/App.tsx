@@ -5,7 +5,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { SidebarActivityBar, SidebarPanel } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
@@ -299,22 +299,33 @@ export default function App() {
     <div className="flex h-screen w-screen flex-col overflow-hidden">
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
+        {/* 活动栏 - 始终可见 */}
+        <SidebarActivityBar collapsed={!showSidebar} onToggle={() => useUIStore.getState().setShowSidebar(!showSidebar)} />
+        {/* 分隔线 */}
+        <div
+          className="shrink-0"
+          style={{
+            width: "1.5px",
+            backgroundColor: "color-mix(in oklch, var(--color-text) 15%, transparent)",
+          }}
+        />
+        {/* 面板 - 可折叠 */}
         <div
           className="flex shrink-0 overflow-hidden"
           style={{
-            width: showSidebar ? "calc(48px + var(--sidebar-width) + 2px)" : "0px",
+            width: showSidebar ? "calc(var(--sidebar-width) + 1px)" : "0px",
             transition: "width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           <div
             className="flex shrink-0"
             style={{
-              width: "calc(48px + var(--sidebar-width) + 2px)",
+              width: "calc(var(--sidebar-width) + 1px)",
               transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
               transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            <Sidebar />
+            <SidebarPanel />
           </div>
         </div>
         <main className="flex min-h-0 flex-1 overflow-hidden">
