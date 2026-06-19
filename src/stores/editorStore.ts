@@ -25,6 +25,14 @@ function persistActiveFile(path: string | null) {
   } catch {}
 }
 
+/** 把换行符归一化为 LF（\r\n 和单独 \r → \n）。
+ *  CodeMirror 内部强制 LF，store 的 content 必须与之保持一致，否则 CRLF 文件
+ *  打开后 doc(LF) ≠ content(CRLF)，会被误判为已编辑（dirty）。
+ *  仅在文件入口（openFile / reload）调用一次，不进打字热路径。 */
+export function normalizeLineEndings(s: string): string {
+  return s.replace(/\r\n?/g, "\n");
+}
+
 interface OpenFile {
   path: string;
   title: string;
@@ -102,11 +110,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       persistActiveFile(path);
       return;
     }
+    // 归一化为 LF：与 CodeMirror 内部行表示保持一致，避免 CRLF 文件打开即被判为 dirty
+    const normalized = normalizeLineEndings(content);
     const newFile: OpenFile = {
       path,
       title,
-      content,
-      savedContent: content,
+      content: normalized,
+      savedContent: normalized,
       isDirty: false,
       ext,
     };

@@ -2,7 +2,7 @@
  * 应用级操作（打开文件 / 保存）的复用逻辑
  * 供全局快捷键 handler 和 UI 按钮（TopBar）共用，避免逻辑重复
  */
-import { editorViewRef, useEditorStore } from "@/stores/editorStore";
+import { editorViewRef, useEditorStore, normalizeLineEndings } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
 import { FileService } from "@/lib/tauri/fs";
 import { readTextFile } from "@tauri-apps/plugin-fs";
@@ -65,7 +65,8 @@ export async function reloadCurrentFile(silent = false): Promise<boolean> {
       // 绝不能用磁盘内容覆盖；手动刷新走上面的确认框由用户决定。
       if (silent && file.isDirty) continue;
       try {
-        const content = await readTextFile(file.path);
+        // 归一化为 LF：与 openFile 入口一致，避免 CRLF 文件刷新后 doc(LF) ≠ content(CRLF) 被误判 dirty
+        const content = normalizeLineEndings(await readTextFile(file.path));
         if (content !== file.content) {
           updateContent(file.path, content);
           markSaved(file.path);
