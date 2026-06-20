@@ -28,8 +28,8 @@ export function PreviewTabBar() {
             <div
               onClick={() => switchFile(file.path)}
               className={cn(
-                "group relative flex h-[30px] min-w-[80px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
-                openFiles.length > 1 && "shrink basis-auto",
+                "group relative flex h-[30px] w-[160px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
+                openFiles.length > 1 && "shrink min-w-[80px]",
                 isActive
                   ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
                   : "rounded-t-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
