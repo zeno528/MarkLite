@@ -314,7 +314,8 @@ function resolveRelativePaths(html: string, filePath: string): string {
         return match;
       }
       // 相对路径 → 绝对路径 → Tauri asset URL
-      const absPath = `${dir}/${url}`.replace(/\\/g, "/");
+      // decodeURIComponent 解码 %20 等编码字符，还原为文件系统实际路径
+      const absPath = `${dir}/${decodeURIComponent(url)}`.replace(/\\/g, "/");
       const assetUrl = convertFileSrc(absPath);
       return `${prefix}${assetUrl}${suffix}`;
     },
