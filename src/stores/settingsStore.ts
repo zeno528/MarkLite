@@ -39,7 +39,7 @@ interface SettingsState {
 const DEFAULTS = {
   tabSize: 2,
   wordWrap: true,
-  lineNumbers: false,
+  lineNumbers: true,
   autoSave: true,
   autoSaveDelay: 2000,
   autoRefresh: false,

@@ -108,7 +108,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             onClick={openFileViaDialog}
           >
             <FileInput size={14} />
-            <span>打开</span>
           </button>
         </Tooltip>
         <Tooltip content="添加文件夹 (Ctrl+N)" placement="bottom">
@@ -117,7 +116,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             onClick={openFolderViaDialog}
           >
             <FolderPlus size={14} />
-            <span>添加文件夹</span>
           </button>
         </Tooltip>
 
@@ -130,7 +128,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
               disabled={!currentFile || !currentFile.isDirty}
             >
               <Save size={14} />
-              <span>保存</span>
             </button>
           </Tooltip>
         </div>

@@ -244,6 +244,8 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
 /** 面板内容 - 可折叠的文件树/搜索/目录面板 */
 export function SidebarPanel() {
   const sidebarTab = useUIStore((s) => s.sidebarTab);
+  const filesSubTab = useUIStore((s) => s.filesSubTab);
+  const setFilesSubTab = useUIStore((s) => s.setFilesSubTab);
   const openFiles = useEditorStore((s) => s.openFiles);
   const closeAllFiles = useEditorStore((s) => s.closeAllFiles);
   const toggleExpandAll = useFileStore((s) => s.toggleExpandAll);
@@ -255,8 +257,6 @@ export function SidebarPanel() {
     const allDirs = collectDirPaths(activeFolder.fileTree);
     return allDirs.length > 0 && allDirs.every((p) => activeFolder.expanded.includes(p));
   }, [activeFolder]);
-  const [filesSubTab, setFilesSubTab] = useState<"tree" | "recent">("tree");
-
   return (
     <div
       className="flex h-full w-[var(--sidebar-width)] flex-col bg-[var(--color-bg-muted)]"

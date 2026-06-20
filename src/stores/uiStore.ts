@@ -52,6 +52,9 @@ interface UIState {
   setSidebarWidth: (w: number) => void;
   sidebarTab: "files" | "outline" | "search";
   setSidebarTab: (tab: "files" | "outline" | "search") => void;
+  /** 资源管理器内的子标签：文件夹树 / 最近打开（提升为全局 state，供打开文件时联动切换） */
+  filesSubTab: "tree" | "recent";
+  setFilesSubTab: (tab: "tree" | "recent") => void;
   focusSearchTrigger: number;
   triggerSearchFocus: () => void;
 
@@ -129,6 +132,8 @@ export const useUIStore = create<UIState>((set, get) => ({
   },
   sidebarTab: "files",
   setSidebarTab: (sidebarTab) => set({ sidebarTab }),
+  filesSubTab: "tree",
+  setFilesSubTab: (filesSubTab) => set({ filesSubTab }),
   focusSearchTrigger: 0,
   triggerSearchFocus: () => set((s) => ({ focusSearchTrigger: s.focusSearchTrigger + 1 })),
 

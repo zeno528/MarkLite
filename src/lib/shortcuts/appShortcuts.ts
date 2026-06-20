@@ -8,12 +8,15 @@ import { FileService } from "@/lib/tauri/fs";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { confirmDialog } from "@/lib/tauri/dialog";
 import { notify } from "@/stores/notificationStore";
+import { useUIStore } from "@/stores/uiStore";
 
 /** 打开文件（系统对话框选 md → 载入编辑器） */
 export async function openFileViaDialog() {
   const file = await FileService.openFile();
   if (file) {
     useEditorStore.getState().openFile(file.path, file.title, file.content);
+    // 通过对话框打开的文件：切到「最近打开」子标签（openFile 内部已记录到最近列表）
+    useUIStore.getState().setFilesSubTab("recent");
   }
 }
 
@@ -107,6 +110,9 @@ export async function openFolderViaDialog() {
 
   try {
     await useFileStore.getState().addFolder(folder);
+    // 切到资源管理器的文件夹树子标签，确保用户看到新打开的文件夹
+    useUIStore.getState().setSidebarTab("files");
+    useUIStore.getState().setFilesSubTab("tree");
     notify.done(id, `${folderName} 已打开`);
   } catch (e) {
     console.error("[openFolder] failed:", e);

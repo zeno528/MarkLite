@@ -148,6 +148,7 @@ export default function App() {
               const content = await readTextFile(initialFile);
               const title = initialFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
               useEditorStore.getState().openFile(initialFile, title, content);
+              useUIStore.getState().setFilesSubTab("recent");
             } else {
               notify.error("无法打开文件：" + initialFile);
             }
@@ -263,6 +264,7 @@ export default function App() {
                     const content = await readTextFile(p);
                     const title = p.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
                     useEditorStore.getState().openFile(p, title, content);
+                    useUIStore.getState().setFilesSubTab("recent");
                     handled = true;
                   } catch (e) {
                     console.error("[drag-drop] open file failed:", e);
@@ -272,6 +274,8 @@ export default function App() {
                   // 非 .md 文件：尝试作为文件夹添加
                   try {
                     await useFileStore.getState().addFolder(p);
+                    useUIStore.getState().setSidebarTab("files");
+                    useUIStore.getState().setFilesSubTab("tree");
                     handled = true;
                   } catch (e) {
                     console.error("[drag-drop] addFolder failed:", e);
