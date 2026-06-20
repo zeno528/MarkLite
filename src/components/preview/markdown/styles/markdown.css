@@ -209,18 +209,19 @@
 .markdown-body pre {
   position: relative;
   margin: 1.2em 0;
-  padding: 1em 1.2em !important;
+  padding: 1em 1.2em 0.5em !important;
   border-radius: var(--radius-lg) !important;
   border: 1px solid var(--color-border) !important;
   /* 用 color-mix 让背景比卡片底色略深一阶，确保容器可见 */
   background: color-mix(in oklch, var(--color-bg-elevated) 88%, var(--color-text) 4.5%) !important;
-  overflow-x: auto;
   font-family: var(--font-editor);
   font-size: var(--md-code-size);
   line-height: 1.65;
   box-shadow: var(--shadow-sm);
 }
 .markdown-body pre code {
+  display: block;
+  overflow-x: auto;
   padding: 0;
   background: none;
   font-size: inherit;

@@ -171,10 +171,6 @@ export function StatusBar() {
 
         {currentFile && (
           <>
-            {/* 文件类型徽章：accent 淡底胶囊 */}
-            <span className="rounded-md bg-[color-mix(in_oklch,var(--color-accent)_14%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-[var(--color-accent)]">
-              {currentFile.ext.toUpperCase()}
-            </span>
             {/* 保存状态：胶囊样式 */}
             <span
               className={cn(
