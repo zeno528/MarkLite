@@ -58,9 +58,9 @@ export function EditorSection() {
           <NumberField
             value={autoRefreshInterval}
             onChange={(v) => update("autoRefreshInterval", v)}
-            min={5}
+            min={1}
             max={300}
-            step={5}
+            step={1}
             unit="秒"
             aria-label="自动刷新间隔"
           />
