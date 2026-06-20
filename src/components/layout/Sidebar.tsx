@@ -210,7 +210,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
   };
 
   return (
-    <div className="flex w-12 shrink-0 flex-col items-center gap-1.5 border-r border-[var(--color-border)] bg-[var(--color-bg-subtle)] py-3">
+    <div className="flex w-12 shrink-0 flex-col items-center gap-1.5 bg-[var(--color-bg-subtle)] py-3">
       <ActivityBarButton
         active={sidebarTab === "files" && !collapsed}
         onClick={() => handleClick("files")}

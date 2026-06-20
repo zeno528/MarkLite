@@ -351,7 +351,7 @@ export default function App() {
         <div
           className="shrink-0"
           style={{
-            width: "1.5px",
+            width: "1px",
             backgroundColor: "color-mix(in oklch, var(--color-text) 15%, transparent)",
           }}
         />
