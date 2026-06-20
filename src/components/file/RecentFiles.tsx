@@ -1,14 +1,11 @@
 /**
- * 最近使用文件面板
+ * 最近使用文件面板（独立视图）
  *
- * 显示在资源管理器 tab 顶部，分两个区域：
- * - 固定区：pin 的文件，不受清空影响
- * - 最近区：按打开时间排序，可 pin/remove/一键清空
- *
- * 点击文件 = 打开（readTextFile → editorStore.openFile）
+ * 与文件树平级的子视图，通过资源管理器内的子标签切换。
+ * 分固定区和最近区，支持 pin/remove/一键清空。
  */
 import { useState } from "react";
-import { Pin, PinOff, Trash2, FileText, ChevronRight, ChevronDown } from "lucide-react";
+import { Pin, PinOff, Trash2, FileText } from "lucide-react";
 import { useRecentStore } from "@/stores/recentStore";
 import { useEditorStore } from "@/stores/editorStore";
 import { useFileStore } from "@/stores/fileStore";
@@ -41,7 +38,6 @@ async function openRecent(path: string) {
     const title = fileName(path);
     useEditorStore.getState().openFile(path, title, content);
 
-    // 如果文件所在目录已打开在文件树中，同步选中
     const dir = dirPath(path);
     if (dir) {
       const { folders } = useFileStore.getState();
@@ -71,7 +67,6 @@ function RecentItem({
   onRemove: () => void;
 }) {
   const name = fileName(path);
-  const dir = dirPath(path);
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -86,8 +81,6 @@ function RecentItem({
         {pinned ? <Pin size={13} className="fill-current text-[var(--color-accent)]" /> : <FileText size={13} />}
       </span>
       <span className="flex-1 truncate text-[var(--color-text)]">{name}</span>
-      {pinned && <span className="shrink-0 text-[10px] text-[var(--color-text-muted)]">{dir ? dir.split(/[\\/]/).pop() : ""}</span>}
-      {/* 操作按钮 */}
       <div className="flex shrink-0 items-center" style={{ opacity: hovered ? 1 : 0 }}>
         <button
           onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
@@ -115,69 +108,70 @@ export function RecentFiles() {
   const togglePin = useRecentStore((s) => s.togglePin);
   const removeRecent = useRecentStore((s) => s.removeRecent);
   const clearUnpinned = useRecentStore((s) => s.clearUnpinned);
-  const [expanded, setExpanded] = useState(true);
-
-  if (files.length === 0) return null;
 
   const pinned = files.filter((f) => f.pinned);
   const unpinned = files.filter((f) => !f.pinned);
 
   return (
-    <div className="shrink-0 border-b border-[var(--color-border)]">
-      {/* 标题栏 */}
-      <div className="flex h-7 items-center justify-between px-2">
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
-        >
-          {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-          最近使用
-        </button>
-        {unpinned.length > 0 && (
-          <button
-            onClick={clearUnpinned}
-            className="flex items-center gap-0.5 text-[11px] text-[var(--color-text-muted)] hover:text-red-400 transition-colors"
-            title="清空未固定的最近文件"
-          >
-            <Trash2 size={11} />
-            清空
-          </button>
-        )}
-      </div>
-
-      {/* 列表 */}
-      {expanded && (
-        <div className="px-1 pb-2 overflow-y-auto" style={{ maxHeight: "240px" }}>
-          {/* 固定区 */}
-          {pinned.length > 0 && (
-            <div className="mb-1">
-              {pinned.map((f) => (
-                <RecentItem
-                  key={f.path}
-                  path={f.path}
-                  pinned={true}
-                  onTogglePin={() => togglePin(f.path)}
-                  onRemove={() => removeRecent(f.path)}
-                />
-              ))}
-            </div>
-          )}
-          {/* 最近区 */}
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* 操作栏 */}
+      {files.length > 0 && (
+        <div className="flex h-7 shrink-0 items-center justify-between px-2">
+          <span className="text-[11px] text-[var(--color-text-muted)]">
+            {pinned.length > 0 && `${pinned.length} 固定 · `}{unpinned.length} 个文件
+          </span>
           {unpinned.length > 0 && (
-            <div className={cn(pinned.length > 0 && "border-t border-[var(--color-border)] pt-1")}>
-              {unpinned.map((f) => (
-                <RecentItem
-                  key={f.path}
-                  path={f.path}
-                  pinned={false}
-                  onTogglePin={() => togglePin(f.path)}
-                  onRemove={() => removeRecent(f.path)}
-                />
-              ))}
-            </div>
+            <button
+              onClick={clearUnpinned}
+              className="flex items-center gap-0.5 text-[11px] text-[var(--color-text-muted)] hover:text-red-400 transition-colors"
+              title="清空未固定的最近文件"
+            >
+              <Trash2 size={11} />
+              清空
+            </button>
           )}
         </div>
       )}
+
+      {/* 列表（独立滚动） */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-1 pb-2">
+        {files.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center py-12 text-[13px] text-[var(--color-text-muted)]">
+            还没有最近打开的文件
+          </div>
+        ) : (
+          <>
+            {/* 固定区 */}
+            {pinned.length > 0 && (
+              <div className="mb-1">
+                {pinned.map((f) => (
+                  <RecentItem
+                    key={f.path}
+                    path={f.path}
+                    pinned={true}
+                    onTogglePin={() => togglePin(f.path)}
+                    onRemove={() => removeRecent(f.path)}
+                  />
+                ))}
+              </div>
+            )}
+            {/* 最近区 */}
+            {unpinned.length > 0 && (
+              <div className={cn(pinned.length > 0 && "border-t border-[var(--color-border)] pt-1")}>
+                {unpinned.map((f) => (
+                  <RecentItem
+                    key={f.path}
+                    path={f.path}
+                    pinned={false}
+                    onTogglePin={() => togglePin(f.path)}
+                    onRemove={() => removeRecent(f.path)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

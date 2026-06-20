@@ -4,6 +4,11 @@
  * 记录所有打开过的文件，支持固定（pin）和清空（clear unpinned）。
  * 固定的文件置顶且不受清空影响。
  * 持久化到 localStorage。
+ *
+ * 排序规则：
+ * - 已存在的文件再次打开：只更新时间戳，不改变位置（避免列表跳来跳去）
+ * - 新文件：插入到 unpinned 区的顶部
+ * - 固定的文件始终在 unpinned 之前
  */
 import { create } from "zustand";
 
@@ -37,7 +42,7 @@ function restore(): RecentFile[] {
 
 interface RecentState {
   files: RecentFile[];
-  /** 记录打开的文件（已存在则更新时间戳并移到顶部） */
+  /** 记录打开的文件（已存在只更新时间戳不改位置，新文件插入顶部） */
   addRecent: (path: string, title: string) => void;
   /** 切换固定状态 */
   togglePin: (path: string) => void;
@@ -55,22 +60,19 @@ export const useRecentStore = create<RecentState>((set) => ({
       const existing = state.files.find((f) => f.path === path);
       const now = Date.now();
 
-      let next: RecentFile[];
       if (existing) {
-        // 已存在：更新标题和时间戳
-        next = [
-          { ...existing, title, lastOpened: now },
-          ...state.files.filter((f) => f.path !== path),
-        ];
-      } else {
-        // 新记录：插入顶部
-        next = [{ path, title, pinned: false, lastOpened: now }, ...state.files];
+        // 已存在：只更新标题和时间戳，保持原位置不动
+        const next = state.files.map((f) =>
+          f.path === path ? { ...f, title, lastOpened: now } : f,
+        );
+        persist(next);
+        return { files: next };
       }
 
-      // 按固定状态排序：pinned 在前（各自保持插入顺序），unpinned 在后
-      const pinned = next.filter((f) => f.pinned);
-      const unpinned = next.filter((f) => !f.pinned);
-      // unpinned 只保留 MAX_RECENT 条
+      // 新记录：插入到 unpinned 区的顶部
+      const newFile: RecentFile = { path, title, pinned: false, lastOpened: now };
+      const pinned = state.files.filter((f) => f.pinned);
+      const unpinned = [newFile, ...state.files.filter((f) => !f.pinned)];
       const trimmed = [...pinned, ...unpinned.slice(0, MAX_RECENT)];
       persist(trimmed);
       return { files: trimmed };

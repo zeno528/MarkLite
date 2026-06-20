@@ -255,6 +255,7 @@ export function SidebarPanel() {
     const allDirs = collectDirPaths(activeFolder.fileTree);
     return allDirs.length > 0 && allDirs.every((p) => activeFolder.expanded.includes(p));
   }, [activeFolder]);
+  const [filesSubTab, setFilesSubTab] = useState<"tree" | "recent">("tree");
 
   return (
     <div
@@ -278,14 +279,16 @@ export function SidebarPanel() {
                 </button>
               </Tooltip>
             )}
-            <Tooltip content={isAllExpanded ? "收起全部" : "展开全部"} placement="bottom">
-              <button
-                onClick={toggleExpandAll}
-                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-              >
-                {isAllExpanded ? <FoldVertical size={14} /> : <UnfoldVertical size={14} />}
-              </button>
-            </Tooltip>
+            {filesSubTab === "tree" && (
+              <Tooltip content={isAllExpanded ? "收起全部" : "展开全部"} placement="bottom">
+                <button
+                  onClick={toggleExpandAll}
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
+                >
+                  {isAllExpanded ? <FoldVertical size={14} /> : <UnfoldVertical size={14} />}
+                </button>
+              </Tooltip>
+            )}
             <Tooltip content="打开文件夹" placement="bottom">
               <button
                 onClick={openFolderViaDialog}
@@ -298,15 +301,41 @@ export function SidebarPanel() {
         )}
       </div>
 
-      {/* 文件夹选择器 */}
-      {sidebarTab === "files" && <FolderSelect />}
+      {/* 子标签切换器（仅 files tab） */}
+      {sidebarTab === "files" && (
+        <div className="flex shrink-0 gap-0.5 px-2 pb-1.5 pt-1">
+          <button
+            onClick={() => setFilesSubTab("recent")}
+            className={cn(
+              "flex-1 rounded-md px-2 py-1 text-[12px] font-medium transition-colors",
+             filesSubTab === "recent"
+               ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+               : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+           )}
+         >
+            最近打开
+         </button>
+         <button
+           onClick={() => setFilesSubTab("tree")}
+           className={cn(
+             "flex-1 rounded-md px-2 py-1 text-[12px] font-medium transition-colors",
+             filesSubTab === "tree"
+               ? "bg-[var(--color-accent)]/10 text-[var(--color-accent)]"
+               : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+           )}
+         >
+            文件夹
+         </button>
+        </div>
+      )}
 
-      {/* 最近使用文件 */}
-      {sidebarTab === "files" && <RecentFiles />}
+      {/* 文件夹选择器（仅 tree 子标签） */}
+      {sidebarTab === "files" && filesSubTab === "tree" && <FolderSelect />}
 
       {/* 内容区 */}
       <div className="min-h-0 flex-1 overflow-hidden">
-        {sidebarTab === "files" && <FileTree />}
+        {sidebarTab === "files" && filesSubTab === "tree" && <FileTree />}
+        {sidebarTab === "files" && filesSubTab === "recent" && <RecentFiles />}
         {sidebarTab === "search" && <SearchPanel />}
         {sidebarTab === "outline" && <Outline />}
       </div>
