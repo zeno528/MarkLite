@@ -257,10 +257,10 @@ body,
   text-rendering: optimizeLegibility;
 }
 
-/* 滚动条（overlay 风格：默认视觉 5px 极低调，hover 撑满 8px 易点；容器恒定 8px 避免宽度变化抖动） */
+/* 滚动条（overlay 风格：默认视觉 7px，hover 只高亮不变粗；容器恒定 10px 避免宽度变化抖动） */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -268,12 +268,12 @@ body,
 ::-webkit-scrollbar-thumb {
   background-color: color-mix(in oklch, var(--color-text) 22%, transparent);
   border-radius: 999px;
-  border: 1.5px solid transparent; /* 透明内缩：8 - 1.5×2 = 视觉 5px */
+  border: 1.5px solid transparent; /* 透明内缩：10 - 1.5×2 = 视觉 7px */
   background-clip: content-box;
   transition: background-color 0.15s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
-  border-width: 0; /* hover 时 thumb 撑满容器，视觉变粗到 8px */
+  /* hover 只高亮颜色不变粗（去掉原 border-width:0 撑满），粗细保持默认视觉 7px */
   background-color: color-mix(in oklch, var(--color-text) 42%, transparent);
 }
 
@@ -339,6 +339,44 @@ aside ::-webkit-scrollbar-thumb:hover {
   40%  { opacity: 0; transform: scale(0.85); }
   100% { opacity: 0; transform: scale(0.85); max-height: 0; margin-bottom: -8px; }
 }
+
+/* 通用滚动条样式（侧边栏 / 编辑器 / 预览器，统一纤细圆角风格） */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--color-text) 20%, transparent);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklch, var(--color-text) 35%, transparent);
+  background-clip: content-box;
+}
+/* 竖向滚动条两端箭头按钮（侧边栏 / 编辑器 / 预览器） */
+::-webkit-scrollbar-button:vertical {
+  height: 10px;
+  width: 10px;
+  background: transparent;
+  display: block;
+}
+::-webkit-scrollbar-button:vertical:decrement {
+  background: no-repeat center/8px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 4 4 16 20 16z'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:vertical:increment {
+  background: no-repeat center/8px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M12 20 4 8 20 8z'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:vertical:decrement:hover,
+::-webkit-scrollbar-button:vertical:increment:hover {
+  opacity: 0.7;
+}
+/* 隐藏重复的箭头（Chromium 默认两端各显示两个，只保留一个） */
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement {
+  display: none;
+}
+
 /* 通知条动画类（参数集中管理，便于复用/微调）：
  * - toast-anim-in：350ms 弹性曲线 cubic-bezier(0.34,1.56,0.64,1)，带轻微过冲
  * - toast-anim-out：400ms ease，overflow:hidden 配合 max-height 坍缩（margin-bottom -8px 抵消容器 gap-2） */
