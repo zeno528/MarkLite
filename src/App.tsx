@@ -18,6 +18,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
+import { invoke } from "@tauri-apps/api/core";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
@@ -157,15 +158,21 @@ export default function App() {
         }
 
         // 恢复上次打开的文件
-        const lastFile = localStorage.getItem(ACTIVE_FILE_KEY);
+        // 优先：命令行打开的文件（文件关联双击启动）；否则恢复上次打开的文件
+        const initialFile = await invoke<string | null>("get_initial_file").catch(() => null);
+        const lastFile = initialFile ?? localStorage.getItem(ACTIVE_FILE_KEY);
         if (lastFile) {
           promises.push(
             (async () => {
               try {
                 const ok = await FileService.fileExists(lastFile);
                 if (!ok) {
-                  localStorage.removeItem(ACTIVE_FILE_KEY);
-                  notify.info("上次打开的文件已不存在");
+                  if (initialFile) {
+                    notify.error("无法打开文件：" + lastFile);
+                  } else {
+                    localStorage.removeItem(ACTIVE_FILE_KEY);
+                    notify.info("上次打开的文件已不存在");
+                  }
                 } else {
                   const content = await readTextFile(lastFile);
                   const title = lastFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
