@@ -147,7 +147,7 @@ export function RecentFiles() {
 
       {/* 列表 */}
       {expanded && (
-        <div className="px-1 pb-2">
+        <div className="px-1 pb-2 overflow-y-auto" style={{ maxHeight: "240px" }}>
           {/* 固定区 */}
           {pinned.length > 0 && (
             <div className="mb-1">
