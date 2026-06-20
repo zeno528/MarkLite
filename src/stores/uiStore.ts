@@ -23,6 +23,12 @@ const FONT_SIZE_KEY = "marklite:fontsize";
 const FONT_FAMILY_KEY = "marklite:fontfamily";
 const LAYOUT_KEY = "marklite:layout";
 
+/** 侧边栏宽度范围与默认值（与 globals.css 的 --sidebar-* 对齐） */
+export const SIDEBAR_MIN_WIDTH = 200;
+export const SIDEBAR_MAX_WIDTH = 520;
+export const SIDEBAR_DEFAULT_WIDTH = 280;
+const SIDEBAR_WIDTH_KEY = "marklite:sidebar-width";
+
 interface UIState {
   // 配色方案
   colorScheme: ColorScheme; // 用户选择（含 "system"）
@@ -41,6 +47,9 @@ interface UIState {
   showSidebar: boolean;
   toggleSidebar: () => void;
   setShowSidebar: (show: boolean) => void;
+  /** 侧边栏宽度（px），拖拽调节，持久化到 localStorage */
+  sidebarWidth: number;
+  setSidebarWidth: (w: number) => void;
   sidebarTab: "files" | "outline" | "search";
   setSidebarTab: (tab: "files" | "outline" | "search") => void;
   focusSearchTrigger: number;
@@ -110,6 +119,14 @@ export const useUIStore = create<UIState>((set, get) => ({
   showSidebar: true,
   toggleSidebar: () => set((s) => ({ showSidebar: !s.showSidebar })),
   setShowSidebar: (showSidebar) => set({ showSidebar }),
+  sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
+  setSidebarWidth: (w) => {
+    // clamp 到合法范围，同步 CSS 变量 + 持久化
+    const clamped = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, w));
+    set({ sidebarWidth: clamped });
+    document.documentElement.style.setProperty("--sidebar-width", `${clamped}px`);
+    try { localStorage.setItem(SIDEBAR_WIDTH_KEY, String(clamped)); } catch {}
+  },
   sidebarTab: "files",
   setSidebarTab: (sidebarTab) => set({ sidebarTab }),
   focusSearchTrigger: 0,
@@ -165,5 +182,13 @@ if (typeof window !== "undefined") {
     // 恢复布局（layout）
     const savedLayout = localStorage.getItem(LAYOUT_KEY) as LayoutMode | null;
     if (savedLayout) useUIStore.setState({ layout: savedLayout });
+
+    // 恢复侧边栏宽度（同步到 CSS 变量，供布局消费）
+    const savedSidebarWidth = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+    if (savedSidebarWidth && Number.isFinite(+savedSidebarWidth)) {
+      const w = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, +savedSidebarWidth));
+      useUIStore.setState({ sidebarWidth: w });
+      document.documentElement.style.setProperty("--sidebar-width", `${w}px`);
+    }
   } catch {}
 }

@@ -2,7 +2,7 @@
  * MarkLite 主应用
  * 布局：标题栏 + 工具栏 + 主体（侧边栏 + 双栏） + 状态栏
  */
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, useRef, lazy, Suspense, type MouseEvent as ReactMouseEvent } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { SidebarActivityBar, SidebarPanel } from "@/components/layout/Sidebar";
@@ -13,7 +13,7 @@ import { ToastContainer } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { notify } from "@/stores/notificationStore";
-import { useUIStore } from "@/stores/uiStore";
+import { useUIStore, SIDEBAR_MIN_WIDTH, SIDEBAR_MAX_WIDTH, SIDEBAR_DEFAULT_WIDTH } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
@@ -40,6 +40,8 @@ export default function App() {
   const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStart = useRef({ x: 0, w: SIDEBAR_DEFAULT_WIDTH });
 
   // 初始化设置（延迟到首帧后，不阻塞渲染）
   useEffect(() => {
@@ -77,6 +79,39 @@ export default function App() {
 
     return () => clearInterval(intervalId);
   }, [autoRefresh, autoRefreshInterval, setReloading]);
+
+  // 侧边栏宽度拖拽（仿 VSCode）：mousedown 锁定起点，mousemove 直接改 CSS 变量（零 re-render 最丝滑），
+  // mouseup 写一次 store 持久化。用增量 delta，不依赖活动栏等布局偏移。
+  const startResize = (e: ReactMouseEvent) => {
+    e.preventDefault();
+    resizeStart.current = { x: e.clientX, w: useUIStore.getState().sidebarWidth };
+    setIsResizing(true);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
+  useEffect(() => {
+    if (!isResizing) return;
+    const onMove = (e: MouseEvent) => {
+      const delta = e.clientX - resizeStart.current.x;
+      const w = resizeStart.current.w + delta;
+      const clamped = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, w));
+      document.documentElement.style.setProperty("--sidebar-width", `${clamped}px`);
+    };
+    const onUp = () => {
+      const raw = document.documentElement.style.getPropertyValue("--sidebar-width");
+      const w = parseFloat(raw);
+      if (Number.isFinite(w)) useUIStore.getState().setSidebarWidth(w);
+      setIsResizing(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, [isResizing]);
 
   // 启动恢复上次打开的文件夹列表（多文件夹持久化），并读激活文件夹的树
   useEffect(() => {
@@ -324,14 +359,14 @@ export default function App() {
         <div
           className="flex shrink-0 overflow-hidden"
           style={{
-            width: showSidebar ? "calc(var(--sidebar-width) + 1px)" : "0px",
-            transition: "width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+            width: showSidebar ? "var(--sidebar-width)" : "0px",
+            transition: isResizing ? "none" : "width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           <div
             className="flex shrink-0"
             style={{
-              width: "calc(var(--sidebar-width) + 1px)",
+              width: "var(--sidebar-width)",
               transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
               transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
@@ -339,6 +374,17 @@ export default function App() {
             <SidebarPanel />
           </div>
         </div>
+        {/* 侧边栏宽度拖拽条（仿 VSCode）：拖动调节宽度，双击重置默认 */}
+        {showSidebar && (
+          <div
+            onMouseDown={startResize}
+            onDoubleClick={() => useUIStore.getState().setSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
+            title="拖动调节宽度（双击重置）"
+            className="group relative w-1 shrink-0 cursor-col-resize"
+          >
+            <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors group-hover:bg-[var(--color-accent)]" />
+          </div>
+        )}
         <main className="flex min-h-0 flex-1 overflow-hidden">
           {layout === "split" && (
             <SplitView left={<EditorPane />} right={<MarkdownPreview />} />
