@@ -30,6 +30,58 @@ let nextCodeId = 0;
 /** 标题 id 计数器（处理重复 slug） */
 const slugCount = new Map<string, number>();
 
+/** GitHub Alerts 类型正则 */
+const ALERT_RE = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i;
+
+/** 常用 Emoji 短码映射（覆盖 GitHub 高频 emoji，不引入外部依赖） */
+const EMOJI_MAP: Record<string, string> = {
+  "+1": "👍", "-1": "👎", "100": "💯", "1234": "1234",
+  "heart": "❤️", "rocket": "🚀", "fire": "🔥", "star": "⭐",
+  "check": "✅", "x": "❌", "warning": "⚠️", "question": "❓",
+  "exclamation": "❗", "info": "ℹ️", "bulb": "💡", "zap": "⚡",
+  "bug": "🐛", "sparkles": "✨", "memo": "📝", "book": "📖",
+  "eyes": "👀", "tada": "🎉", "pray": "🙏", "thumbsup": "👍",
+  "thumbsdown": "👎", "wave": "👋", "laughing": "😄", "smile": "😊",
+  "cry": "😢", "sob": "😭", "thinking": "🤔", "sweat": "😅",
+  "wink": "😉", "grin": "😁", "blush": "😊", "neutral_face": "😐",
+  "confused": "😕", "disappointed": "😞", "worried": "😟",
+  "partying_face": "🥳", "sunglasses": "😎", "nerd_face": "🤓",
+  "clown_face": "🤡", "cowboy_hat_face": "🤠", "ghost": "👻",
+  "skull": "💀", "alien": "👽", "clap": "👏",
+  "raised_hands": "🙌", "muscle": "💪", "point_right": "👉",
+  "point_left": "👈", "point_up": "☝️", "point_down": "👇",
+  "ok_hand": "👌", "pinched_fingers": "🤌", "handshake": "🤝",
+  "package": "📦", "art": "🎨", "gear": "⚙️", "hammer": "🔨",
+  "wrench": "🔧", "mag": "🔍", "lock": "🔒", "unlock": "🔓",
+  "link": "🔗", "pushpin": "📌", "white_check_mark": "✅",
+  "heavy_check_mark": "✔️", "ballot_box_with_check": "☑️",
+  "negative_squared_cross_mark": "❎", "curly_loop": "➰",
+  "loop": "➿", "bangbang": "‼️", "interrobang": "⁉️",
+  "construction": "🚧", "no_entry": "⛔", "stop_sign": "🛑",
+  "green_circle": "🟢", "red_circle": "🔴", "blue_circle": "🔵",
+  "yellow_circle": "🟡", "orange_circle": "🟠", "purple_circle": "🟣",
+  "black_circle": "⚫", "white_circle": "⚪",
+  "arrow_right": "➡️", "arrow_left": "⬅️", "arrow_up": "⬆️",
+  "arrow_down": "⬇️", "arrow_forward": "▶️", "arrow_backward": "◀️",
+  "fast_forward": "⏩", "rewind": "⏪",
+  "rec": "⏺️", "eject": "⏏️", "play": "▶️", "pause": "⏸️",
+  "stop": "⏹️", "record": "⏺️",
+  "house": "🏠", "office": "🏢", "hospital": "🏥", "school": "🏫",
+  "bank": "🏦", "church": "⛪", "mosque": "🕌", "synagogue": "🕍",
+  "earth_americas": "🌎", "earth_africa": "🌍", "earth_asia": "🌏",
+  "sun_with_face": "🌞", "full_moon_with_face": "🌝",
+  "new_moon_with_face": "🌚", "first_quarter_moon_with_face": "🌛",
+  "last_quarter_moon_with_face": "🌜",
+  "sunny": "☀️", "cloud": "☁️", "rain": "🌧️", "snow": "❄️",
+  "thunderstorm": "⛈️", "tornado": "🌪️", "fog": "🌫️",
+  "umbrella": "☂️", "rainbow": "🌈",
+};
+
+/** 将 :emoji_name: 短码替换为 Unicode emoji */
+function replaceEmoji(html: string): string {
+  return html.replace(/:([a-z0-9_+-]+):/g, (m, name) => EMOJI_MAP[name] ?? m);
+}
+
 /**
  * 解析 Markdown → 安全的 HTML
  * @param md Markdown 源文
@@ -64,6 +116,25 @@ export async function parseMarkdown(
       if (start < 0) return;
       token._sourceLine = lineAt(lineStarts, start);
       srcCursor = start + raw.length; // 严格按 raw 长度推进，消除重复 raw 错位
+
+      // GitHub Alerts 检测：blockquote 首段首 token 以 [!TYPE] 开头
+      if (token.type === "blockquote") {
+        const first = token.tokens?.[0];
+        if (first?.type === "paragraph") {
+          const firstInline = first.tokens?.[0];
+          const text = firstInline?.raw ?? firstInline?.text ?? "";
+          const m = text.match(ALERT_RE);
+          if (m) {
+            token._alertType = m[1].toLowerCase();
+            // 移除 [!TYPE] 前缀
+            const rest = text.slice(m[0].length);
+            if (firstInline) {
+              if (firstInline.raw != null) firstInline.raw = rest;
+              if (firstInline.text != null) firstInline.text = rest;
+            }
+          }
+        }
+      }
     },
   });
   syncMarked.use(markedFootnote());
@@ -91,9 +162,13 @@ export async function parseMarkdown(
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
         return `<p data-source-line="${line}">${this.parser.parseInline(tokens)}</p>\n`;
       },
-      blockquote(this: any, { tokens, _sourceLine }: any) {
+      blockquote(this: any, { tokens, _sourceLine, _alertType }: any) {
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
         const body = this.parser.parse(tokens);
+        // GitHub Alerts：渲染为带 class 的 div，而非 blockquote
+        if (_alertType) {
+          return `<div class="alert alert-${_alertType}" data-source-line="${line}">\n${body}</div>\n`;
+        }
         return `<blockquote data-source-line="${line}">\n${body}</blockquote>\n`;
       },
       hr({ _sourceLine }: any) {
@@ -116,8 +191,11 @@ export async function parseMarkdown(
 
   const rawHtml = await syncMarked.parse(md);
 
+  // === 阶段 1.5：Emoji 短码替换 ===
+  const emojiHtml = replaceEmoji(rawHtml);
+
   // === 阶段 2：异步替换 Shiki 高亮 ===
-  const enhancedHtml = await enhanceCodeBlocks(rawHtml, theme);
+  const enhancedHtml = await enhanceCodeBlocks(emojiHtml, theme);
 
   // === 阶段 3：DOMPurify XSS 防护 ===
   const safeHtml = DOMPurify.sanitize(enhancedHtml, {
