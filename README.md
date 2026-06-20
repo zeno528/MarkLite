@@ -1,6 +1,6 @@
 # MarkLite
 
-![Version](https://img.shields.io/badge/version-0.1.5-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB)

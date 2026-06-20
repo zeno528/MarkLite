@@ -18,7 +18,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
 import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
-import { readTextFile, stat } from "@tauri-apps/plugin-fs";
+import { readTextFile } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import {
