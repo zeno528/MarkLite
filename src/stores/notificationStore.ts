@@ -99,7 +99,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       clearTimeout(t);
       timers.delete(id);
     }
-    // 先标记 leaving 触发淡出动画，180ms（= toast-out 时长）后真正移除
+    // 先标记 leaving 触发退场动画，400ms（= toast-out 时长）后真正移除
     const cur = get().notifications.find((n) => n.id === id);
     if (!cur || cur.leaving) return;
     set((state) => ({
@@ -111,7 +111,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       set((state) => ({
         notifications: state.notifications.filter((n) => n.id !== id),
       }));
-    }, 180);
+    }, 400);
   },
 
   clear: () => {

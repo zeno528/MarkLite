@@ -139,11 +139,12 @@ export const FileService = {
 
     // 并行处理所有条目
     const nodePromises = validEntries.map(async (entry) => {
-      const fullPath = await join(dir, entry.name);
       const isDir = entry.isDirectory;
       // markdown 编辑器：只收录 .md/.markdown/.mdx 文件 + 目录，其他文件不进树
+      // 【性能】先按 name 过滤再 join —— 非 md 文件直接跳过，避免无谓的 join IPC（每个条目一次往返）
       if (!isDir && !/\.(md|markdown|mdx)$/i.test(entry.name ?? "")) return null;
 
+      const fullPath = await join(dir, entry.name);
       const node: FileNode = {
         name: entry.name ?? "",
         path: fullPath,

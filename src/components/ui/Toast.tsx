@@ -1,7 +1,7 @@
 /**
  * 通知条容器（toast）：顶部居中浮现、非阻塞、自动消失
  * 订阅 notificationStore，垂直堆叠渲染。单条 = 类型图标 + 消息 + 关闭按钮。
- * 配色跟随 data-scheme（CSS 变量），进场动画 toast-in（150ms）。
+ * 配色跟随 data-scheme（CSS 变量），进场动画 toast-in（350ms 回弹），退场 toast-out（400ms 坍缩）。
  */
 import {
   CheckCircle2,
@@ -57,9 +57,7 @@ export function ToastContainer() {
               "pointer-events-auto flex min-w-[200px] max-w-[360px] items-center gap-2.5 rounded-full border px-4 py-2",
               toastSkin,
               "shadow-[0_4px_8px_rgba(0,0,0,0.20),0_10px_28px_rgba(0,0,0,0.22),0_0_12px_color-mix(in_oklch,var(--color-accent)_16%,transparent)]",
-              n.leaving
-                ? "animate-[toast-out_180ms_ease_forwards]"
-                : "animate-[toast-in_150ms_ease-forwards]",
+              n.leaving ? "toast-anim-out" : "toast-anim-in",
             )}
           >
             <Icon

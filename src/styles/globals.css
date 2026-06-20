@@ -328,15 +328,26 @@ aside ::-webkit-scrollbar-thumb:hover {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* 通知条进场动画（顶部下滑 + 淡入，150ms） */
+/* 通知条进场动画（顶部下滑 + 缩放 + 淡入，带回弹 overshoot；仿 markspace） */
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(-12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-16px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-/* 通知条退场动画（上滑 + 渐隐，180ms） */
+/* 通知条退场动画（先缩放淡出 0-40%，再高度坍缩让下方平滑补位 40-100%；仿 markspace） */
 @keyframes toast-out {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-12px); }
+  0%   { opacity: 1; transform: scale(1); max-height: 60px; margin-bottom: 0; }
+  40%  { opacity: 0; transform: scale(0.85); }
+  100% { opacity: 0; transform: scale(0.85); max-height: 0; margin-bottom: -8px; }
+}
+/* 通知条动画类（参数集中管理，便于复用/微调）：
+ * - toast-anim-in：350ms 弹性曲线 cubic-bezier(0.34,1.56,0.64,1)，带轻微过冲
+ * - toast-anim-out：400ms ease，overflow:hidden 配合 max-height 坍缩（margin-bottom -8px 抵消容器 gap-2） */
+.toast-anim-in {
+  animation: toast-in 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.toast-anim-out {
+  animation: toast-out 400ms ease forwards;
+  overflow: hidden;
 }
 
 /* 列表项选中态（文件树 / 目录共用）：淡 accent 背景 + 左侧高亮条。行需 position: relative */
