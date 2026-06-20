@@ -66,13 +66,11 @@ export default function App() {
 
       // 静默模式刷新
       reloadCurrentFile(true).then((hasChanges) => {
-        // 只有文件有变化时才显示动画和通知
+        // 文件有变化时只转一下刷新图标——自动刷新不打扰（外部频繁改动时通知条会刷屏）；
+        // 手动刷新的「已刷新」反馈由 StatusBar 自行弹出
         if (hasChanges) {
           setReloading(true);
-          setTimeout(() => {
-            setReloading(false);
-            notify.info("已刷新");
-          }, 500);
+          setTimeout(() => setReloading(false), 500);
         }
       });
     }, autoRefreshInterval * 1000);
