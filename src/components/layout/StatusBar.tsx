@@ -139,23 +139,31 @@ export function StatusBar() {
           </button>
         </Tooltip>
 
-        {/* 自动保存标识 */}
+        {/* 自动保存标识 — 点击关闭 */}
         {autoSave && (
-          <Tooltip content="自动保存已开启" placement="top">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)]">
+          <Tooltip content="自动保存已开启（点击关闭）" placement="top">
+            <button
+              onClick={() => useSettingsStore.getState().update("autoSave", false)}
+              aria-label="关闭自动保存"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)] transition-colors hover:bg-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
+            >
               <Save size={10} />
               <span>自动</span>
-            </span>
+            </button>
           </Tooltip>
         )}
 
-        {/* 自动刷新标识 */}
+        {/* 自动刷新标识 — 点击关闭 */}
         {autoRefresh && (
-          <Tooltip content="自动刷新已开启" placement="top">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)]">
+          <Tooltip content="自动刷新已开启（点击关闭）" placement="top">
+            <button
+              onClick={() => useSettingsStore.getState().update("autoRefresh", false)}
+              aria-label="关闭自动刷新"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)] transition-colors hover:bg-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
+            >
               <RotateCw size={10} />
               <span>同步</span>
-            </span>
+            </button>
           </Tooltip>
         )}
 
