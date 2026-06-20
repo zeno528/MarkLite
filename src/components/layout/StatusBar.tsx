@@ -43,9 +43,11 @@ export function StatusBar() {
   const autoSave = useSettingsStore((s) => s.autoSave);
   const autoRefresh = useSettingsStore((s) => s.autoRefresh);
   const folders = useFileStore((s) => s.folders);
+  const activeFolderPath = useFileStore((s) => s.activeFolderPath);
 
-  // 统计所有打开文件夹下的 md 文件总数
-  const fileCount = folders.reduce((sum, f) => sum + countMdFiles(f.fileTree), 0);
+  // 统计【当前激活文件夹】下的 md 文件数量（而非所有文件夹总和）
+  const activeFolder = folders.find((f) => f.path === activeFolderPath);
+  const fileCount = activeFolder ? countMdFiles(activeFolder.fileTree) : 0;
 
   const handleReload = async () => {
     if (reloading) return; // 旋转中防重复点击
@@ -79,7 +81,7 @@ export function StatusBar() {
     <div
       className="flex h-[var(--statusbar-height)] w-full shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] pr-3 text-xs text-[var(--color-text-muted)]"
     >
-      <div className="flex h-full items-stretch gap-3">
+      <div className="flex h-full items-stretch gap-2">
         {/* 模块1：刷新按钮 */}
         <Tooltip content="刷新 (Ctrl+R) — 从磁盘重新读取当前文件" placement="top" align="left" className="!flex h-full">
           <button
@@ -93,7 +95,7 @@ export function StatusBar() {
         </Tooltip>
 
         {/* 模块2：文档统计 */}
-        <div className="flex items-center gap-2">
+        <div className="-ml-1 flex items-center gap-2">
           {fileCount > 0 && (
             <>
               <span className="inline-flex items-center gap-1">
