@@ -108,6 +108,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),
 
   openFile: (path, title, content) => {
+    // 记录到最近使用（延迟导入避免循环依赖）
+    import("@/stores/recentStore").then(({ useRecentStore }) => {
+      useRecentStore.getState().addRecent(path, title);
+    });
+
     const { openFiles, singleTabMode } = get();
     const ext = path.split(".").pop()?.toLowerCase() ?? "md";
     const existing = openFiles.find((f) => f.path === path);

@@ -6,6 +6,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { FileText, List, Search, FolderOpen, Plus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
+import { RecentFiles } from "@/components/file/RecentFiles";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
 import { Tooltip } from "@/components/ui/Tooltip";
@@ -299,6 +300,9 @@ export function SidebarPanel() {
 
       {/* 文件夹选择器 */}
       {sidebarTab === "files" && <FolderSelect />}
+
+      {/* 最近使用文件 */}
+      {sidebarTab === "files" && <RecentFiles />}
 
       {/* 内容区 */}
       <div className="min-h-0 flex-1 overflow-hidden">
