@@ -14,8 +14,21 @@ import DOMPurify from "dompurify";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { highlightCode } from "./shiki";
 
+/** 标题 slug 生成：中文保留，空格→连字符，去特殊字符，小写 */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w一-鿿-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 /** 代码块占位符自增 id（每次解析重新计数） */
 let nextCodeId = 0;
+
+/** 标题 id 计数器（处理重复 slug） */
+const slugCount = new Map<string, number>();
 
 /**
  * 解析 Markdown → 安全的 HTML
@@ -30,6 +43,7 @@ export async function parseMarkdown(
 ): Promise<string> {
   if (!md.trim()) return "";
   nextCodeId = 0; // 每次解析重置占位符 id
+  slugCount.clear(); // 每次解析重置标题 slug 计数
 
   // === 阶段 1：marked 解析 ===
   // 预处理每行起始 offset，供 walkTokens 反查块级 token 的源行号（滚动同步按行号映射）
@@ -64,9 +78,14 @@ export async function parseMarkdown(
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
         return `<pre class="shiki-placeholder" data-shiki-id="${id}" data-lang="${lang || ""}" data-source-line="${line}"><code>${escapeHtml(text)}</code></pre>`;
       },
-      heading(this: any, { tokens, depth, _sourceLine }: any) {
+      heading(this: any, { tokens, depth, text: rawText, _sourceLine }: any) {
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
-        return `<h${depth} data-source-line="${line}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
+        const headingText = rawText || tokens?.map((t: any) => t.raw || t.text || "").join("") || "";
+        const base = slugify(headingText);
+        const count = slugCount.get(base) ?? 0;
+        slugCount.set(base, count + 1);
+        const id = count > 0 ? `${base}-${count}` : base;
+        return `<h${depth} id="${id}" data-source-line="${line}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
       },
       paragraph(this: any, { tokens, _sourceLine }: any) {
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
@@ -212,8 +231,8 @@ function resolveRelativePaths(html: string, filePath: string): string {
   return html.replace(
     /(<(?:img|a)\b[^>]*\b(?:src|href)=")([^"]+)(")/gi,
     (match, prefix, url, suffix) => {
-      // 跳过已经是绝对路径或协议 URL
-      if (/^(https?|asset|data|blob):/.test(url) || /^[/\\]/.test(url)) {
+      // 跳过已经是绝对路径、协议 URL、锚点链接
+      if (/^(https?|asset|data|blob):/.test(url) || /^[/\\]/.test(url) || url.startsWith("#")) {
         return match;
       }
       // 相对路径 → 绝对路径 → Tauri asset URL

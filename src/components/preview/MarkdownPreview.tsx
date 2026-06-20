@@ -157,11 +157,24 @@ export function MarkdownPreview() {
         return;
       }
 
-      // 2) 外部链接 → 系统默认浏览器
+      // 2) 链接处理
       const anchor = target.closest("a") as HTMLAnchorElement | null;
       if (anchor && anchor.href) {
         e.preventDefault();
-        openExternalUrl(anchor.getAttribute("href"));
+        const href = anchor.getAttribute("href") ?? "";
+
+        // 锚点链接 → 预览内跳转
+        if (href.startsWith("#")) {
+          const id = decodeURIComponent(href.slice(1));
+          const targetEl = document.getElementById(id);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          return;
+        }
+
+        // 外部链接 → 系统默认浏览器
+        openExternalUrl(href);
       }
     };
     root.addEventListener("click", onClick);
