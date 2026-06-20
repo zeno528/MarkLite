@@ -211,6 +211,9 @@ export function CodeEditor({
     const dom = view.scrollDOM;
 
     let ticking = false;
+    // settle 校正：CodeMirror 虚拟滚动在滚动停止后才修正 scrollHeight，
+    // rAF 读到的 editorMax 可能偏大 → percent 偏小（底部差 ~3%），停止后二次同步补正
+    let settleTimer: ReturnType<typeof setTimeout> | null = null;
     const handler = () => {
       if (isScrollSyncing()) return; // 程序触发的滚动（如预览同步过来的），跳过
       if (ticking) return;
@@ -223,11 +226,17 @@ export function CodeEditor({
         const percent = height > 0 ? top / height : 0;
         setScrollPercent(percent, "editor");
       });
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        if (isScrollSyncing()) return;
+        syncPreviewFromEditor();
+      }, 150);
     };
 
     dom.addEventListener("scroll", handler, { passive: true });
     return () => {
       dom.removeEventListener("scroll", handler);
+      if (settleTimer) clearTimeout(settleTimer);
     };
   }, [editorReady, scrollSync, setScrollPercent]);
 

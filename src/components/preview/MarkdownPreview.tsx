@@ -188,6 +188,8 @@ export function MarkdownPreview() {
     if (!el) return;
 
     let ticking = false;
+    // settle 校正：滚动停止后二次同步，修正虚拟滚动 scrollHeight 漂移导致的底部偏差
+    let settleTimer: ReturnType<typeof setTimeout> | null = null;
     const handler = () => {
       if (isScrollSyncing()) return; // 程序触发的滚动（如编辑器同步过来的），跳过
       if (ticking) return;
@@ -199,10 +201,18 @@ export function MarkdownPreview() {
         const percent = scrollHeight > 0 ? el.scrollTop / scrollHeight : 0;
         setScrollPercent(percent, "preview");
       });
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        if (isScrollSyncing()) return;
+        syncEditorFromPreview();
+      }, 150);
     };
 
     el.addEventListener("scroll", handler, { passive: true });
-    return () => el.removeEventListener("scroll", handler);
+    return () => {
+      el.removeEventListener("scroll", handler);
+      if (settleTimer) clearTimeout(settleTimer);
+    };
   }, [scrollSync, setScrollPercent]);
 
   // 仅预览模式用卡片包裹（边框 + 圆角表达卡片视觉），双栏模式直接平铺
