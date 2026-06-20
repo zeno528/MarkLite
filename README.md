@@ -1,6 +1,6 @@
 # MarkLite
 
-![Version](https://img.shields.io/badge/version-0.2.2-blue)
+![Version](https://img.shields.io/badge/version-0.2.3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
 ![React](https://img.shields.io/badge/React-19-61DAFB)
@@ -13,10 +13,11 @@
 
 ## 特性
 
-- ⚡ **轻量** 
-- 🎨 **现代 UI** — 双栏布局、亮暗主题、流畅动效
-- 🛠 **功能完整** — CodeMirror 6 编辑、Shiki 代码高亮、GFM 支持、自动保存
-- 📁 **文件管理** — 文件树、多 Tab、滚动同步、查找替换
+- 极小体积，安装包不到 10MB
+- 秒级启动，大文档编辑流畅
+- 多种配色方案，可跟随系统
+- 编辑器与预览实时同步滚动
+- 自动保存，支持自动刷新
 
 ## 技术栈
 
