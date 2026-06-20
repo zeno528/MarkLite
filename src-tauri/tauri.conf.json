@@ -67,6 +67,7 @@
         "type": "embedBootstrapper"
       },
       "nsis": {
+        "languages": ["SimpChinese"],
         "installerHooks": "./nsis-hooks.nsh"
       }
     }
