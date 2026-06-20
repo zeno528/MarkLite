@@ -51,11 +51,23 @@
       "icons/icon.ico"
     ],
     "category": "Productivity",
+    "fileAssociations": [
+      {
+        "ext": ["md"],
+        "name": "Markdown",
+        "mimeType": "text/markdown",
+        "role": "Editor"
+      }
+    ],
+    "resources": ["icons/md-file.ico"],
     "shortDescription": "轻量级 Markdown 编辑器",
     "longDescription": "MarkLite 是一款轻量、秒开、跨平台（macOS + Windows）的现代化 Markdown 编辑器，基于 Tauri + React + CodeMirror 6 构建。",
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installerHooks": "./nsis-hooks.nsh"
       }
     }
   }
