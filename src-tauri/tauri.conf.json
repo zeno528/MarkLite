@@ -53,7 +53,7 @@
     "category": "Productivity",
     "fileAssociations": [
       {
-        "ext": ["md"],
+        "ext": ["md", "markdown"],
         "name": "Markdown",
         "mimeType": "text/markdown",
         "role": "Editor"
