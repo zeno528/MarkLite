@@ -138,6 +138,25 @@ export default function App() {
             active = old;
           }
         }
+
+        // 命令行打开的文件（文件关联双击启动）——即使没有文件夹也要加载
+        const initialFile = await invoke<string | null>("get_initial_file").catch(() => null);
+        if (initialFile) {
+          try {
+            const ok = await FileService.fileExists(initialFile);
+            if (ok) {
+              const content = await readTextFile(initialFile);
+              const title = initialFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
+              useEditorStore.getState().openFile(initialFile, title, content);
+            } else {
+              notify.error("无法打开文件：" + initialFile);
+            }
+          } catch (e) {
+            console.error("[App] initial file open failed:", e);
+            notify.error("打开文件失败");
+          }
+        }
+
         if (folders.length === 0) return;
         useFileStore.setState({ folders, activeFolderPath: active });
 
@@ -157,22 +176,16 @@ export default function App() {
           );
         }
 
-        // 恢复上次打开的文件
-        // 优先：命令行打开的文件（文件关联双击启动）；否则恢复上次打开的文件
-        const initialFile = await invoke<string | null>("get_initial_file").catch(() => null);
-        const lastFile = initialFile ?? localStorage.getItem(ACTIVE_FILE_KEY);
+        // 恢复上次打开的文件（跳过已通过命令行打开的文件）
+        const lastFile = initialFile ? null : localStorage.getItem(ACTIVE_FILE_KEY);
         if (lastFile) {
           promises.push(
             (async () => {
-              try {
+            try {
                 const ok = await FileService.fileExists(lastFile);
                 if (!ok) {
-                  if (initialFile) {
-                    notify.error("无法打开文件：" + lastFile);
-                  } else {
                     localStorage.removeItem(ACTIVE_FILE_KEY);
                     notify.info("上次打开的文件已不存在");
-                  }
                 } else {
                   const content = await readTextFile(lastFile);
                   const title = lastFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
