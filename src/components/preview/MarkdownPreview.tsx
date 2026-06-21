@@ -66,6 +66,36 @@ async function openLinkedMarkdown(
   }
 }
 
+/**
+ * 自定义平滑滚动（替代 scrollIntoView({behavior:"smooth"})）。
+ * 浏览器原生 smooth 动画约 400-600ms 且无法调速；这里用 rAF + easeInOutCubic
+ * 插值，默认 300ms，更快且时长可控。
+ */
+function smoothScrollTo(
+  container: HTMLElement,
+  target: HTMLElement,
+  duration = 300,
+) {
+  const containerTop = container.getBoundingClientRect().top;
+  const targetTop = target.getBoundingClientRect().top;
+  const offset = targetTop - containerTop + container.scrollTop;
+  const start = container.scrollTop;
+  const delta = offset - start;
+  if (Math.abs(delta) < 1) return;
+
+  const startTime = performance.now();
+  // easeInOutCubic：起步和收尾缓，中段快
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const step = (now: number) => {
+    const t = Math.min((now - startTime) / duration, 1);
+    container.scrollTop = start + delta * ease(t);
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 // 复制按钮图标（模块级常量，避免每次 render 重建）
 const COPY_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
@@ -211,12 +241,12 @@ export function MarkdownPreview() {
         e.preventDefault();
         const href = anchor.getAttribute("href") ?? "";
 
-        // 锚点链接 → 预览内跳转
+        // 锚点链接 → 预览内跳转（自定义平滑滚动，比浏览器原生更快可控）
         if (href.startsWith("#")) {
           const id = decodeURIComponent(href.slice(1));
           const targetEl = document.getElementById(id);
           if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            smoothScrollTo(root, targetEl);
           }
           return;
         }

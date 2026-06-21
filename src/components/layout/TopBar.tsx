@@ -15,7 +15,6 @@ import {
   PanelLeft,
   ChevronRight,
 } from "lucide-react";
-import logoSvg from "@/assets/logo.svg";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useEditorStore } from "@/stores/editorStore";
@@ -64,8 +63,23 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]"
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
-        <img src={logoSvg} alt="MarkLite" className="h-[22px] w-[22px] shrink-0" />
-        <span className="shrink-0 text-[14.5px] font-bold tracking-tight">MarkLite</span>
+        {/* 品牌图标（文件夹 + 路径感线条，currentColor 跟随主题） */}
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-label="MarkLite"
+          className="shrink-0 text-[var(--color-accent)] transition-all duration-200 hover:brightness-110 hover:saturate-150"
+        >
+          <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2h9A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-10z" />
+          <path d="M7 12h10" opacity="0.5" />
+          <path d="M7 15h7" opacity="0.32" />
+        </svg>
 
         {!currentFile && rootFolderName && (
           <>
