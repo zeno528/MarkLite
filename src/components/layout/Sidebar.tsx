@@ -4,7 +4,7 @@
  * 拆分为 SidebarActivityBar（始终可见）+ SidebarPanel（可折叠）
  */
 import { useState, useEffect, useRef, useMemo } from "react";
-import { FileText, List, Search, FolderOpen, Plus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle } from "lucide-react";
+import { FileText, List, Search, FolderOpen, FolderPlus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { RecentFiles } from "@/components/file/RecentFiles";
 import { Outline } from "@/components/file/Outline";
@@ -289,12 +289,12 @@ export function SidebarPanel() {
                 </button>
               </Tooltip>
             )}
-            <Tooltip content="打开文件夹" placement="bottom">
+            <Tooltip content="打开文件夹" placement="bottom" align="right">
               <button
                 onClick={openFolderViaDialog}
                 className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
               >
-                <Plus size={14} />
+                <FolderPlus size={14} />
               </button>
             </Tooltip>
           </div>

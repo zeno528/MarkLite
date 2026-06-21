@@ -126,7 +126,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             <FileInput size={14} />
           </button>
         </Tooltip>
-        <Tooltip content="添加文件夹 (Ctrl+N)" placement="bottom">
+        <Tooltip content="打开文件夹 (Ctrl+N)" placement="bottom">
           <button
             className="btn-primary"
             onClick={openFolderViaDialog}

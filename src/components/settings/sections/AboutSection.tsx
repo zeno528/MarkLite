@@ -30,7 +30,7 @@ export function AboutSection() {
           <h2 className="text-lg font-bold text-[var(--color-text)]">MarkLite</h2>
           <div className="mt-1 flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/8 px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-accent)]">
-              版本 · v{version}
+              版本  v{version}
             </span>
             <button
               onClick={handleGitHub}
