@@ -14,7 +14,7 @@ import {
   Settings,
   PanelLeft,
   ChevronRight,
-  Route,
+  House,
 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
@@ -72,14 +72,14 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         className="flex min-w-0 flex-1 items-center gap-1.5 -ml-2 text-[13px]"
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
-        {/* 路径图标：lucide Route（点击 → 编辑器 + 预览器回到顶部） */}
+        {/* 路径图标：lucide House（点击 → 编辑器 + 预览器回到顶部） */}
         <Tooltip content="回到顶部" placement="bottom" align="left">
           <button
             onClick={handleScrollToTop}
             aria-label="回到顶部"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-accent)] transition-colors hover:bg-[var(--color-bg-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-accent)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           >
-            <Route size={22} strokeWidth={1.6} className="transition-transform duration-200 hover:scale-110" />
+            <House size={22} strokeWidth={1.6} className="transition-transform duration-200 hover:scale-110" />
           </button>
         </Tooltip>
 
