@@ -15,7 +15,56 @@ import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
 import { rebuildPreviewBlocks, syncEditorFromPreview, syncPreviewFromEditor } from "@/lib/utils/scrollSync";
 import { openExternalUrl } from "@/lib/utils/openUrl";
 import { PreviewTabBar } from "./PreviewTabBar";
+import { readTextFile, exists } from "@tauri-apps/plugin-fs";
+import { join, dirname, basename } from "@tauri-apps/api/path";
+import { notify } from "@/stores/notificationStore";
 import "./markdown/styles/markdown.css";
+
+/** Markdown 文件扩展名 */
+const MARKDOWN_EXT = /\.(md|markdown|mdx)$/i;
+
+/**
+ * 把预览里的相对 Markdown 链接在编辑器内打开（多语言 README 互链等场景）。
+ * 解析规则：以当前文件所在目录为基准，拼接 href 得到目标文件绝对路径。
+ * @returns true 已处理（成功打开 / 文件不存在已提示），false 非 md 相对链接、交给外部链接逻辑
+ */
+async function openLinkedMarkdown(
+  href: string,
+  currentPath: string,
+): Promise<boolean> {
+  const raw = (href ?? "").trim();
+  if (!raw) return false;
+
+  // 分离锚点：README_EN.md#features → README_EN.md（锚点暂不跨文件跳转）
+  const hashIdx = raw.indexOf("#");
+  let pathPart = hashIdx >= 0 ? raw.slice(0, hashIdx) : raw;
+  if (!pathPart) return false; // 纯锚点，交给锚点逻辑
+
+  // 仅处理 markdown 文件；带协议（http://…）或绝对路径（/…）的不接手
+  pathPart = decodeURIComponent(pathPart);
+  if (!MARKDOWN_EXT.test(pathPart)) return false;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(pathPart) || pathPart.startsWith("/")) {
+    return false;
+  }
+
+  try {
+    const dir = await dirname(currentPath);
+    const targetPath = await join(dir, pathPart);
+    if (!(await exists(targetPath))) {
+      notify.error(`找不到文件：${pathPart}`);
+      return true; // 已提示，不再交给浏览器
+    }
+    const content = await readTextFile(targetPath);
+    const name = await basename(targetPath);
+    const title = name.replace(/\.(md|markdown|mdx)$/i, "");
+    useEditorStore.getState().openFile(targetPath, title, content);
+    return true;
+  } catch (e) {
+    console.error("[preview] 打开链接文件失败:", pathPart, e);
+    notify.error("打开文件失败");
+    return true;
+  }
+}
 
 // 复制按钮图标（模块级常量，避免每次 render 重建）
 const COPY_ICON =
@@ -172,7 +221,13 @@ export function MarkdownPreview() {
           return;
         }
 
-        // 外部链接 → 系统默认浏览器
+        // 相对路径 Markdown 文件链接 → 在编辑器内打开（多语言 README 互链等）
+        const currentPath = useEditorStore.getState().currentFile?.path;
+        if (currentPath && (await openLinkedMarkdown(href, currentPath))) {
+          return;
+        }
+
+        // 其余外部链接 → 系统默认浏览器
         openExternalUrl(href);
       }
     };

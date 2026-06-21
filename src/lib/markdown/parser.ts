@@ -302,12 +302,16 @@ function unescapeHtml(str: string): string {
     .replace(/&#39;/g, "'");
 }
 
-/** 把 HTML 中的相对路径（img src、a href）转成基于文件目录的绝对路径 */
+/** 把 HTML 中的相对图片路径转成 asset URL（仅 <img src>）。
+ *  不改写 <a href>：链接保持原始相对路径，由预览 click handler 处理
+ *  （.md 链接在编辑器内打开，外部链接走浏览器）。
+ *  若改写成 http://asset.localhost/…，openExternalUrl 会误判为外部链接
+ *  并用系统浏览器打开，导致点击 README 互链时弹出浏览器。 */
 function resolveRelativePaths(html: string, filePath: string): string {
   // 提取文件所在目录
   const dir = filePath.replace(/[/\\][^/\\]+$/, "");
   return html.replace(
-    /(<(?:img|a)\b[^>]*\b(?:src|href)=")([^"]+)(")/gi,
+    /(<img\b[^>]*\bsrc=")([^"]+)(")/gi,
     (match, prefix, url, suffix) => {
       // 跳过已经是绝对路径、协议 URL、锚点链接
       if (/^(https?|asset|data|blob):/.test(url) || /^[/\\]/.test(url) || url.startsWith("#")) {

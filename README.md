@@ -31,6 +31,20 @@
 | Markdown | marked + Shiki |
 | 状态管理 | Zustand 5 |
 
+## 配置文件
+
+用户设置（编辑器偏好、自动保存、自动刷新等）保存在 Tauri 应用数据目录：
+
+| 平台 | 路径 |
+|---|---|
+| Windows | `C:\Users\{用户名}\AppData\Roaming\com.zwf.marklite\settings.json` |
+| macOS | `~/Library/Application Support/com.zwf.marklite/settings.json` |
+| Linux | `~/.local/share/com.zwf.marklite/settings.json` |
+| macOS | `~/Library/Application Support/com.zwf.marklite/settings.json` |
+| Linux | `~/.local/share/com.zwf.marklite/settings.json` |
+
+卸载重装不会丢失配置；手动删除该文件可恢复默认设置。
+
 ## 开发
 
 环境要求：Node.js ≥ 20、pnpm ≥ 9、Rust ≥ 1.77
