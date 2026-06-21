@@ -19,7 +19,7 @@ export function PreviewTabBar() {
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
+<div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
       {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;

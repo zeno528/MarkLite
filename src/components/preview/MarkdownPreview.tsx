@@ -307,7 +307,6 @@ export function MarkdownPreview() {
     <div
       className={cn(
         "flex h-full w-full flex-col bg-[var(--color-bg-elevated)]",
-        isCardMode && "border border-[var(--color-border)]",
       )}
     >
       <PreviewTabBar />

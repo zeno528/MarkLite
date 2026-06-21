@@ -404,9 +404,8 @@ export default function App() {
             onMouseDown={startResize}
             onDoubleClick={() => useUIStore.getState().setSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
            title="拖动调节宽度（双击重置）"
-           className="group relative w-1 shrink-0 cursor-col-resize bg-[var(--color-bg-elevated)]"
+           className="group relative w-px shrink-0 cursor-col-resize border-r border-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors hover:border-[var(--color-accent)] before:absolute before:-inset-x-[3px] before:inset-y-0 before:cursor-col-resize before:content-['']"
          >
-           <div className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors group-hover:bg-[var(--color-accent)]" />
          </div>
         )}
         <main className="flex min-h-0 flex-1 overflow-hidden">

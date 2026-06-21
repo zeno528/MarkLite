@@ -63,10 +63,10 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]"
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
-        {/* 品牌图标（文件夹 + 路径感线条，currentColor 跟随主题） */}
+        {/* 品牌图标：双层文件夹错位叠加（路径背景 + 当前文件），currentColor 跟随主题 */}
         <svg
-          width="22"
-          height="22"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -76,9 +76,17 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           aria-label="MarkLite"
           className="shrink-0 text-[var(--color-accent)] transition-all duration-200 hover:brightness-110 hover:saturate-150"
         >
-          <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2h9A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5v-10z" />
-          <path d="M7 12h10" opacity="0.5" />
-          <path d="M7 15h7" opacity="0.32" />
+          {/* 后文件夹（淡色错位 = 路径背景） */}
+          <path
+            d="M3 8.5A1.5 1.5 0 0 1 4.5 7h3l1.5 1.5h7A1.5 1.5 0 0 1 17.5 10v1"
+            opacity="0.38"
+            strokeWidth="1.25"
+          />
+          {/* 前文件夹（主体，含文件） */}
+          <path d="M5 12.5A1.5 1.5 0 0 1 6.5 11h3l1.5 1.5H17a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 17 18.5H6.5A1.5 1.5 0 0 1 5 17v-4.5z" />
+          {/* 文件内容线（渐淡） */}
+          <path d="M8.5 15h4.5" opacity="0.55" />
+          <path d="M8.5 16.8h3" opacity="0.35" />
         </svg>
 
         {!currentFile && rootFolderName && (
