@@ -1,109 +1,72 @@
 /**
- * 自定义 Tooltip 组件
- * - 替代原生 title 属性
- * - 延迟显示（300ms）
- * - 支持四个方向：top / bottom / left / right
- * - 自动适应边界
+ * Tooltip - hover/focus 提示浮层
+ * - 包裹单个 children（button / link / icon）
+ * - placement: top / bottom / left / right
+ * - align: 水平对齐（top/bottom 时为 left/center/right；left/right 时为 top/center/bottom）
+ * - className: 透传给 wrapper（用于 stretch 父容器等布局需求）
  */
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
-type TooltipPlacement = "top" | "bottom" | "left" | "right";
+type Placement = "top" | "bottom" | "left" | "right";
+type Align = "left" | "center" | "right";
 
 interface TooltipProps {
-  content: string;
-  children: React.ReactNode;
+  content: ReactNode;
+  placement?: Placement;
+  align?: Align;
   className?: string;
-  delay?: number;
-  /** 显示方向，默认 top */
-  placement?: TooltipPlacement;
-  /** 水平对齐，默认 center */
-  align?: "center" | "left";
+  children: ReactElement;
 }
 
-export function Tooltip({ content, children, className, delay = 300, placement = "top", align = "center" }: TooltipProps) {
+export function Tooltip({
+  content,
+  placement = "top",
+  align = "center",
+  className,
+  children,
+}: TooltipProps) {
   const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const timerRef = useRef(0);
-  const triggerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const offset = 8;
+  // 浮层位置：placement 决定锚边，align 决定侧位
+  const placementClass = {
+    top: "bottom-full mb-1.5",
+    bottom: "top-full mt-1.5",
+    left: "right-full mr-1.5",
+    right: "left-full ml-1.5",
+  }[placement];
 
-    let x = 0;
-    let y = 0;
-
-    switch (placement) {
-      case "top":
-        x = align === "left" ? rect.left : rect.left + rect.width / 2;
-        y = rect.top - offset;
-        break;
-      case "bottom":
-        x = align === "left" ? rect.left : rect.left + rect.width / 2;
-        y = rect.bottom + offset;
-        break;
-      case "left":
-        x = rect.left - offset;
-        y = rect.top + rect.height / 2;
-        break;
-      case "right":
-        x = rect.right + offset;
-        y = rect.top + rect.height / 2;
-        break;
-    }
-
-    setPosition({ x, y });
-    timerRef.current = window.setTimeout(() => setVisible(true), delay);
-  }, [delay, placement]);
-
-  const handleMouseLeave = useCallback(() => {
-    clearTimeout(timerRef.current);
-    setVisible(false);
-  }, []);
-
-  useEffect(() => {
-    return () => clearTimeout(timerRef.current);
-  }, []);
-
-  const getTransform = () => {
-    switch (placement) {
-      case "top":
-        return align === "left" ? "translate(0, -100%)" : "translate(-50%, -100%)";
-      case "bottom":
-        return align === "left" ? "translate(0, 0)" : "translate(-50%, 0)";
-      case "left":
-        return "translate(-100%, -50%)";
-      case "right":
-        return "translate(0, -50%)";
-    }
-  };
+  const alignClass = {
+    left: placement === "top" || placement === "bottom" ? "left-0" : "top-0",
+    right: placement === "top" || placement === "bottom" ? "right-0" : "bottom-0",
+    center:
+      placement === "top" || placement === "bottom"
+        ? "left-1/2 -translate-x-1/2"
+        : "top-1/2 -translate-y-1/2",
+  }[align];
 
   return (
-    <div
-      ref={triggerRef}
+    <span
       className={cn("relative inline-flex", className)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+      onFocus={() => setVisible(true)}
+      onBlur={() => setVisible(false)}
     >
       {children}
       {visible && (
-        <div
-          className="pointer-events-none fixed z-[100] rounded-md bg-[var(--color-bg-elevated)] border border-[var(--color-border)] px-2.5 py-1.5 text-xs text-[var(--color-text)] shadow-md whitespace-nowrap"
-          style={{
-            left: position.x,
-            top: position.y,
-            transform: getTransform(),
-          }}
+        <span
+          role="tooltip"
+          className={cn(
+            "pointer-events-none absolute z-[100] whitespace-nowrap rounded-md",
+            "bg-[var(--color-text)] px-2 py-1 text-xs text-[var(--color-bg-elevated)] shadow-md",
+            placementClass,
+            alignClass,
+          )}
         >
           {content}
-          {align === "left" && placement === "top" && (
-            <div
-              className="absolute -bottom-[3px] left-2 h-[6px] w-[6px] rotate-45 border-b border-r border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
-            />
-          )}
-        </div>
+        </span>
       )}
-    </div>
+    </span>
   );
 }
