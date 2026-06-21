@@ -66,19 +66,20 @@ export function Tooltip({
       onBlur={hide}
     >
       {children}
-      {visible && (
-        <span
-          role="tooltip"
-          className={cn(
-            "pointer-events-none absolute z-[100] whitespace-nowrap rounded-md",
-            "bg-[var(--color-text)] px-2 py-1 text-xs text-[var(--color-bg-elevated)] shadow-md",
-            placementClass,
-            alignClass,
-          )}
-        >
-          {content}
-        </span>
-      )}
+      <span
+        role="tooltip"
+        className={cn(
+          "pointer-events-none absolute z-[100] whitespace-nowrap rounded-md",
+          "bg-[var(--color-text)] px-2 py-1 text-xs text-[var(--color-bg-elevated)] shadow-md",
+          "transition-opacity duration-150",
+          visible ? "opacity-100" : "opacity-0",
+          placementClass,
+          alignClass,
+        )}
+        style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+      >
+        {content}
+      </span>
     </span>
   );
 }
