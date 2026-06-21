@@ -105,7 +105,6 @@ export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
   const filePath = useEditorStore((s) => s.currentFile?.path);
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
-  const layout = useUIStore((s) => s.layout);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
   const setScrollPercent = useEditorStore((s) => s.setScrollPercent);
 
@@ -299,9 +298,6 @@ export function MarkdownPreview() {
       if (settleTimer) clearTimeout(settleTimer);
     };
   }, [scrollSync, setScrollPercent]);
-
-  // 仅预览模式用卡片包裹（边框 + 圆角表达卡片视觉），双栏模式直接平铺
-  const isCardMode = layout === "preview-only";
 
   return (
     <div
