@@ -40,10 +40,10 @@ const DEFAULTS = {
   tabSize: 2,
   wordWrap: true,
   lineNumbers: true,
-  autoSave: true,
+  autoSave: false,
   autoSaveDelay: 2000,
-  autoRefresh: false,
-  autoRefreshInterval: 30,
+  autoRefresh: true,
+  autoRefreshInterval: 10,
   scrollSync: true,
 };
 

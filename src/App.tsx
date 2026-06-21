@@ -378,13 +378,7 @@ export default function App() {
         {/* 活动栏 - 始终可见 */}
         <SidebarActivityBar collapsed={!showSidebar} onToggle={() => useUIStore.getState().setShowSidebar(!showSidebar)} />
         {/* 分隔线 */}
-        <div
-          className="shrink-0"
-          style={{
-            width: "1px",
-            backgroundColor: "color-mix(in oklch, var(--color-text) 15%, transparent)",
-          }}
-        />
+        <div className="shrink-0 w-px bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)]" />
         {/* 面板 - 可折叠 */}
         <div
           className="flex shrink-0 overflow-hidden"
@@ -410,10 +404,10 @@ export default function App() {
             onMouseDown={startResize}
             onDoubleClick={() => useUIStore.getState().setSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
             title="拖动调节宽度（双击重置）"
-            className="group relative w-1 shrink-0 cursor-col-resize"
-          >
-            <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors group-hover:bg-[var(--color-accent)]" />
-          </div>
+           className="group relative w-1 shrink-0 cursor-col-resize"
+         >
+            <div className="absolute inset-y-0 left-0 w-px bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors group-hover:bg-[var(--color-accent)]" />
+         </div>
         )}
         <main className="flex min-h-0 flex-1 overflow-hidden">
           {layout === "split" && (
