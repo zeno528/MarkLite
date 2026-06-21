@@ -19,6 +19,7 @@ import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore
 import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
 import { FileService } from "@/lib/tauri/fs";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
@@ -32,6 +33,37 @@ import { useRefreshStore } from "@/stores/refreshStore";
 
 // 延迟加载非首屏组件
 const SettingsDialog = lazy(() => import("@/components/settings/SettingsDialog").then(m => ({ default: m.SettingsDialog })));
+
+const isMdPath = (p: string) => /\.(md|markdown|mdx)$/i.test(p);
+
+/// 打开一个目标路径：.md 文件 → 载入编辑器；文件夹 → 加入侧边栏。
+/// 供「命令行首启 / 文件关联首启 / 拖入窗口 / 已运行时收到 open-file 事件」四处复用，
+/// 行为与拖入窗口的 drop 分支完全对齐（文件和文件夹都支持）。
+async function openTarget(path: string): Promise<boolean> {
+  try {
+    const ok = await FileService.fileExists(path);
+    if (!ok) {
+      notify.error("无法打开：" + path);
+      return false;
+    }
+    if (isMdPath(path)) {
+      const content = await readTextFile(path);
+      const title = path.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
+      useEditorStore.getState().openFile(path, title, content);
+      useUIStore.getState().setFilesSubTab("recent");
+      return true;
+    }
+    // 文件夹：加入侧边栏并切到文件树
+    await useFileStore.getState().addFolder(path);
+    useUIStore.getState().setSidebarTab("files");
+    useUIStore.getState().setFilesSubTab("tree");
+    return true;
+  } catch (e) {
+    console.error("[openTarget] failed:", path, e);
+    notify.error("打开失败");
+    return false;
+  }
+}
 
 export default function App() {
   const layout = useUIStore((s) => s.layout);
@@ -139,24 +171,11 @@ export default function App() {
           }
         }
 
-        // 命令行打开的文件（文件关联双击启动）——即使没有文件夹也要加载
-        const initialFile = await invoke<string | null>("get_initial_file").catch(() => null);
-        if (initialFile) {
-          try {
-            const ok = await FileService.fileExists(initialFile);
-            if (ok) {
-              const content = await readTextFile(initialFile);
-              const title = initialFile.split(/[/\\]/).pop()!.replace(/\.(md|markdown|mdx)$/i, "");
-              useEditorStore.getState().openFile(initialFile, title, content);
-              useUIStore.getState().setFilesSubTab("recent");
-            } else {
-              notify.error("无法打开文件：" + initialFile);
-            }
-          } catch (e) {
-            console.error("[App] initial file open failed:", e);
-            notify.error("打开文件失败");
-          }
-        }
+       // 命令行打开的文件（文件关联双击启动）——即使没有文件夹也要加载
+       const initialFile = await invoke<string | null>("get_initial_file").catch(() => null);
+       if (initialFile) {
+          await openTarget(initialFile);
+       }
 
         if (folders.length === 0) return;
         useFileStore.setState({ folders, activeFolderPath: active });
@@ -233,11 +252,19 @@ export default function App() {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  // 已运行时收到 open-file 事件（single-instance 回调 emit）：拖文件到桌面图标/双击关联文件，
+  // 第二个实例被单例插件拦截 → 文件路径转给当前实例打开
+  useEffect(() => {
+   const unlistenPromise = listen<string>("open-file", (event) => {
+      openTarget(event.payload);
+   });
+    return () => { unlistenPromise.then((fn) => fn()); };
+  }, []);
+
   // 拖拽文件到窗口：Tauri webview 事件做视觉反馈 + 文件读取
   // 依赖 tauri.conf.json 的 app.dragDropEnabled: true（默认）——若改为 false 以启用 HTML5 拖放，本监听将不触发
-  useEffect(() => {
-    const isMd = (p: string) => /\.(md|markdown|mdx)$/i.test(p);
-    const unlistenPromise = (async () => {
+ useEffect(() => {
+   const unlistenPromise = (async () => {
       try {
         const { getCurrentWebview } = await import("@tauri-apps/api/webview");
         return getCurrentWebview().onDragDropEvent(async (event) => {
@@ -252,42 +279,21 @@ export default function App() {
             case "leave":
               setDragging(false);
               break;
-            case "drop": {
-              setDragging(false);
-              const paths = event.payload.paths;
-              let handled = false;
+           case "drop": {
+             setDragging(false);
+             const paths = event.payload.paths;
+             let handled = false;
 
+              // 复用 openTarget（与首启/事件路径同一逻辑：.md 文件打开，文件夹加入侧边栏）
               for (const p of paths) {
-                if (isMd(p)) {
-                  // Markdown 文件：打开
-                  try {
-                    const content = await readTextFile(p);
-                    const title = p.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? "untitled";
-                    useEditorStore.getState().openFile(p, title, content);
-                    useUIStore.getState().setFilesSubTab("recent");
-                    handled = true;
-                  } catch (e) {
-                    console.error("[drag-drop] open file failed:", e);
-                    notify.error(`打开失败：${p.split(/[/\\]/).pop() ?? p}`);
-                  }
-                } else {
-                  // 非 .md 文件：尝试作为文件夹添加
-                  try {
-                    await useFileStore.getState().addFolder(p);
-                    useUIStore.getState().setSidebarTab("files");
-                    useUIStore.getState().setFilesSubTab("tree");
-                    handled = true;
-                  } catch (e) {
-                    console.error("[drag-drop] addFolder failed:", e);
-                  }
-                }
+                if (await openTarget(p)) handled = true;
               }
 
-              if (!handled) {
-                notify.warning("仅支持 .md 文件或文件夹");
-              }
-              break;
-            }
+             if (!handled) {
+               notify.warning("仅支持 .md 文件或文件夹");
+             }
+             break;
+           }
           }
         });
       } catch (e) {

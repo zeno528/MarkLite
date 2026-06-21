@@ -1,6 +1,6 @@
 [package]
 name = "marklite"
-version = "0.2.3"
+version = "0.2.4"
 description = "MarkLite - 轻量级 Markdown 编辑器"
 authors = ["zwf"]
 edition = "2024"
@@ -29,6 +29,8 @@ tauri-plugin-store = "2"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-window-state = "2"
+# 单例插件：仅桌面端。已运行时拖文件到图标/双击关联文件，把 argv 转给现有实例而非开新窗口
+tauri-plugin-single-instance = "2"
 
 # ===== Release 优化 =====
 # 目标：包体积 < 10MB，启动 < 300ms

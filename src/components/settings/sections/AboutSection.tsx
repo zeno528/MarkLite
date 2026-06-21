@@ -1,14 +1,24 @@
 /**
- * 关于页面：项目信息、版本号、技术栈
+ * 关于页面：项目信息、版本号
  */
 import { ExternalLink } from "lucide-react";
 import logoSvg from "@/assets/logo.svg";
 import { version } from "../../../../package.json";
-import { openUrl } from "@tauri-apps/plugin-opener";
+import { openUrl as openSystemUrl } from "@tauri-apps/plugin-opener";
 
 export function AboutSection() {
   const handleGitHub = async () => {
-    await openUrl("https://github.com/zeno528/MarkLite");
+    await openSystemUrl("https://github.com/zeno528/MarkLite");
+  };
+
+  const handleDefaultApps = async () => {
+    // 打开 Windows「设置 → 应用 → 默认应用」页，引导用户手动将 .md 关联到 MarkLite
+    // Windows 8+ 禁止程序自动改默认关联，只能引导用户手动设置
+    try {
+      await openSystemUrl("ms-settings:defaultapps");
+    } catch (e) {
+      console.error("[About] open default apps failed:", e);
+    }
   };
 
   return (
@@ -44,66 +54,27 @@ export function AboutSection() {
         </p>
       </div>
 
-      {/* 技术栈 */}
+      {/* 设为默认 .md 程序 */}
       <div>
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-          技术栈
+          设为默认 Markdown 程序
         </h3>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">前端：</span>
-            <span className="text-[var(--color-text)]">React 19 + TypeScript</span>
-          </div>
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">编辑器：</span>
-            <span className="text-[var(--color-text)]">CodeMirror 6</span>
-          </div>
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">框架：</span>
-            <span className="text-[var(--color-text)]">Tauri 2</span>
-          </div>
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">样式：</span>
-            <span className="text-[var(--color-text)]">Tailwind CSS v4</span>
-          </div>
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">状态：</span>
-            <span className="text-[var(--color-text)]">Zustand 5</span>
-          </div>
-          <div className="rounded-md bg-[var(--color-bg-muted)] px-3 py-2">
-            <span className="text-[var(--color-text-muted)]">构建：</span>
-            <span className="text-[var(--color-text)]">Vite 7</span>
-          </div>
+        <div className="rounded-lg bg-[var(--color-bg-muted)] p-4">
+          <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">
+            如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将
+            <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.md</code>
+            与
+            <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.markdown</code>
+            的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。
+          </p>
+          <button
+            onClick={handleDefaultApps}
+            className="mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-text)] transition-colors hover:border-[var(--color-border-strong)]"
+          >
+            打开系统设置
+            <ExternalLink size={12} className="text-[var(--color-text-subtle)]" />
+          </button>
         </div>
-      </div>
-
-      {/* 特性 */}
-      <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-          特性
-        </h3>
-        <ul className="space-y-1.5 text-xs text-[var(--color-text-muted)]">
-          <li className="flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-[var(--color-success)]" />
-            极小的安装包体积（&lt;10MB）
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-[var(--color-success)]" />
-            秒级启动，大文档不卡顿
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-[var(--color-success)]" />
-            多种配色方案 + 系统跟随
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-[var(--color-success)]" />
-            编辑器与预览实时同步滚动
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="h-1 w-1 rounded-full bg-[var(--color-success)]" />
-            自动保存 + 自动刷新
-          </li>
-        </ul>
       </div>
 
     </div>

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use std::path::Path;
 use std::fs;
 use std::sync::Mutex;
@@ -15,6 +15,27 @@ pub struct FileNode {
 
 /// 启动时通过文件关联打开的文件路径（argv 中提取，前端调用 get_initial_file 取走）
 struct InitialFile(Mutex<Option<String>>);
+
+/// 从命令行参数中提取要打开的目标路径：Markdown 文件 或 文件夹。
+/// 对齐拖入窗口的行为——既支持 .md 文件，也支持文件夹（拖到桌面图标时两者都要识别）。
+/// 用 OsString 解码（to_string_lossy），避免中文/特殊字符路径 panic。
+fn extract_target_from_args<I, S>(args: I) -> Option<String>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<std::ffi::OsStr>,
+{
+    args.into_iter().find_map(|p| {
+        let s = p.as_ref().to_string_lossy();
+        let lower = s.to_lowercase();
+        let is_md = lower.ends_with(".md") || lower.ends_with(".markdown") || lower.ends_with(".mdx");
+        // .md 文件直接接受；目录需确认存在（防止把无关参数当文件夹）
+        if is_md || Path::new(p.as_ref()).is_dir() {
+            Some(s.into_owned())
+        } else {
+            None
+        }
+    })
+}
 
 /// 前端初始化时调用，取走启动参数中的文件路径（取后清空，只返回一次）
 #[tauri::command]
@@ -94,15 +115,21 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
-            // 从命令行参数提取 .md 文件路径（Windows 文件关联打开时传入）
-            let initial = std::env::args()
-                .skip(1)
-                .find(|p| {
-                    let lower = p.to_lowercase();
-                    lower.ends_with(".md") || lower.ends_with(".markdown") || lower.ends_with(".mdx")
-                });
-            app.manage(InitialFile(Mutex::new(initial)));
+        // 单例：应用已运行时，再次拖文件到图标/双击关联文件启动的新实例会被拦截，
+        // 文件路径通过 argv 传到这里 → emit 事件给现有实例打开，并聚焦其窗口
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            if let Some(file) = extract_target_from_args(args.into_iter().skip(1)) {
+                let _ = app.emit("open-file", file);
+            }
+            if let Some(w) = app.get_webview_window("main") {
+                let _ = w.unminimize();
+                let _ = w.set_focus();
+            }
+        }))
+       .setup(|app| {
+           // 从命令行参数提取 .md 文件路径（Windows 文件关联打开时传入）
+            let initial = extract_target_from_args(std::env::args_os().into_iter().skip(1));
+           app.manage(InitialFile(Mutex::new(initial)));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![read_folder_tree, get_initial_file])

@@ -14,6 +14,13 @@
     "fs:allow-remove",
     "fs:allow-rename",
     "opener:allow-reveal-item-in-dir",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "ms-settings:*" },
+        { "url": "https://github.com/zeno528/MarkLite" }
+      ]
+    },
     "store:default",
     {
       "identifier": "fs:scope",
