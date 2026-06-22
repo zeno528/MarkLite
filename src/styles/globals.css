@@ -52,7 +52,7 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
 
   /* 布局尺寸 */
-  --titlebar-height: 28px;
+  --titlebar-height: 32px;
   --statusbar-height: 24px;
   --sidebar-width: 280px;
   --sidebar-min-width: 200px;
@@ -591,4 +591,36 @@ body {
 .btn-ghost:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* ===== 自定义标题栏窗口控件按钮（Windows/Linux） =====
+   尺寸 46×32 匹配标题栏高度，无圆角贴合右上角 */
+.titlebar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.titlebar-btn:hover {
+  background: color-mix(in oklch, var(--color-text) 8%, transparent);
+  color: var(--color-text);
+}
+.titlebar-btn:active {
+  background: color-mix(in oklch, var(--color-text) 14%, transparent);
+}
+/* 关闭按钮 hover 红（Windows 11 标准 #c42b1c） */
+.titlebar-close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+}
+.titlebar-close:active {
+  background: #b0271a;
+  color: #ffffff;
 }

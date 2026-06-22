@@ -126,7 +126,7 @@ export function StatusBar() {
       </div>
       <div className="flex items-center gap-2">
         {/* 单标签模式 */}
-        <Tooltip content={singleTabMode ? "单标签模式：已开启（新文件替换当前标签）" : "单标签模式：已关闭"} placement="top">
+        <Tooltip content={singleTabMode ? "单标签模式：已开启" : "单标签模式：已关闭"} placement="top">
           <button
             onClick={toggleSingleTabMode}
             className={cn(
@@ -143,7 +143,7 @@ export function StatusBar() {
 
         {/* 自动保存标识 — 点击关闭 */}
         {autoSave && (
-          <Tooltip content="自动保存已开启（点击关闭）" placement="top">
+          <Tooltip content="自动保存已开启" placement="top">
             <button
               onClick={() => useSettingsStore.getState().update("autoSave", false)}
               aria-label="关闭自动保存"
@@ -157,7 +157,7 @@ export function StatusBar() {
 
         {/* 自动刷新标识 — 点击关闭 */}
         {autoRefresh && (
-          <Tooltip content="自动刷新已开启（点击关闭）" placement="top">
+          <Tooltip content="自动刷新已开启" placement="top">
             <button
               onClick={() => useSettingsStore.getState().update("autoRefresh", false)}
               aria-label="关闭自动刷新"

@@ -4,6 +4,7 @@
  */
 import { useEffect, useState, useRef, lazy, Suspense, type MouseEvent as ReactMouseEvent } from "react";
 import { TopBar } from "@/components/layout/TopBar";
+import { TitleBar } from "@/components/layout/TitleBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { SidebarActivityBar, SidebarPanel } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
@@ -23,6 +24,7 @@ import { listen } from "@tauri-apps/api/event";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
+import { getPlatformSync } from "@/lib/utils/platform";
 import {
   openFileViaDialog,
   openFolderViaDialog,
@@ -311,6 +313,11 @@ export default function App() {
       const win = getMainWindow();
       if (!win) return;
       try {
+        // Windows/Linux：关闭系统装饰，改用自定义标题栏
+        // macOS 保留原生装饰 + titleBarStyle:Overlay（红绿灯叠加）
+        if (getPlatformSync() !== "macos") {
+          await win.setDecorations(false);
+        }
         await win.show();
       } catch (e) {
         console.error("[App] show window failed:", e);
@@ -373,6 +380,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
+      <TitleBar />
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         {/* 活动栏 - 始终可见 */}

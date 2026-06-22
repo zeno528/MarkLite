@@ -26,5 +26,11 @@
       "identifier": "fs:scope",
       "allow": [{ "path": "**" }]
     }
+    ,
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-set-decorations",
+    "core:window:allow-show"
   ]
 }
