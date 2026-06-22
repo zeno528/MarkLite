@@ -139,7 +139,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
     <div
       data-tauri-drag-region
       className={cn(
-        "flex h-9 w-full shrink-0 select-none items-center justify-between",
+        "flex h-10 w-full shrink-0 select-none items-center justify-between",
         frostedTitlebar ? "titlebar-frosted" : "bg-[var(--color-bg-muted)]",
       )}
       style={{ WebkitAppRegion: "drag" } as CSSProperties}

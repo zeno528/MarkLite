@@ -5,7 +5,7 @@
  * - 行宽限制 ~70ch 居中 + 卡片化（阅读优先排版）
  * - 跟随配色方案（resolvedTheme）
  */
-import { useEffect, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useRef, useState } from "react";
 import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -103,6 +103,8 @@ const CHECK_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
+  // useDeferredValue：输入期间预览用旧值渲染（不阻塞输入），停顿后 React 后台用新值重解析（自适应，无固定延迟）——官方推荐替代防抖
+  const deferredContent = useDeferredValue(content);
   const filePath = useEditorStore((s) => s.currentFile?.path);
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
@@ -143,12 +145,12 @@ export function MarkdownPreview() {
     });
   }, [filePath]);
 
-  // 解析 Markdown → HTML
+  // 解析 Markdown → HTML（用 deferredContent：输入期间 React 用旧值渲染不阻塞，停顿后后台重解析，自适应无固定延迟）
   useEffect(() => {
     let cancelled = false;
     let raf = 0;
     setLoading(true);
-    parseMarkdown(content, resolvedTheme, filePath)
+    parseMarkdown(deferredContent, resolvedTheme, filePath)
       .then((h) => {
         if (cancelled) return;
         setHtml(h);
@@ -188,7 +190,7 @@ export function MarkdownPreview() {
       cancelled = true;
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [content, resolvedTheme, filePath]);
+  }, [deferredContent, resolvedTheme, filePath]);
 
   // 给每个代码块注入复制按钮（GitHub 风格：图标，hover 显示，融入代码块）
   // MutationObserver 监听 childList（不含 subtree，避免滚动时 content-visibility 重排触发高频回调）

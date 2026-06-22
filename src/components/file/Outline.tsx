@@ -2,7 +2,7 @@
  * 文档目录 - 从 Markdown 源码提取标题
  * - 点击标题：若有编辑器则直接跳转；否则（纯预览模式）先切到 split 布局并记下待跳转行
  */
-import { useEffect, useMemo, useRef } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef } from "react";
 import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { EditorView } from "@codemirror/view";
 import { Trans } from "@lingui/react/macro";
@@ -81,7 +81,9 @@ export function Outline() {
   const pendingJumpLine = useEditorStore((s) => s.pendingJumpLine);
   const setPendingJumpLine = useEditorStore((s) => s.setPendingJumpLine);
 
-  const headings = useMemo(() => extractHeadings(content), [content]);
+  // useDeferredValue：输入期间用旧标题渲染（不阻塞），停顿后 React 后台重提取（自适应无固定延迟）
+  const deferredContent = useDeferredValue(content);
+  const headings = useMemo(() => extractHeadings(deferredContent), [deferredContent]);
   // 点击锁定：点击标题后直接高亮，不跟随滚动过渡
   const clickedIndexRef = useRef<number | null>(null);
   const clickTimerRef = useRef(0);

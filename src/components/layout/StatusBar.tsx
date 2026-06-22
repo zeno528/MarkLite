@@ -6,7 +6,7 @@
  * - 文件类型
  * - 自动保存/自动刷新状态标识
  */
-import { useEffect, useState } from "react";
+import { useDeferredValue, useMemo } from "react";
 import { RefreshCw, Save, RotateCw, Pin } from "lucide-react";
 import { MdFileIcon } from "@/components/file/MdFileIcon";
 import { useEditorStore } from "@/stores/editorStore";
@@ -38,9 +38,19 @@ export function StatusBar() {
   const cursor = useEditorStore((s) => s.cursor);
   const selection = useEditorStore((s) => s.selection);
   const currentFile = useEditorStore((s) => s.currentFile);
+  // useDeferredValue：输入期间用旧字数渲染（不阻塞），停顿后 React 后台重统计（自适应无固定延迟）
+  const deferredContent = useDeferredValue(currentFile?.content ?? "");
   const singleTabMode = useEditorStore((s) => s.singleTabMode);
   const toggleSingleTabMode = useEditorStore((s) => s.toggleSingleTabMode);
-  const [wc, setWc] = useState({ chars: 0, words: 0, lines: 0 });
+  const wc = useMemo(() => {
+    if (!deferredContent) return { chars: 0, words: 0, lines: 0 };
+    const text = deferredContent;
+    const lines = text.split("\n").length;
+    const chars = text.length;
+    const cnChars = (text.match(/[一-龥]/g) || []).length;
+    const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
+    return { chars, words: cnChars + enWords, lines };
+  }, [deferredContent]);
   const reloading = useRefreshStore((s) => s.reloading);
   const setReloading = useRefreshStore((s) => s.setReloading);
   const autoSave = useSettingsStore((s) => s.autoSave);
@@ -66,19 +76,7 @@ export function StatusBar() {
     }
   };
 
-  // 字数从 CodeMirror 同步 - 但更简单做法是从 currentFile.content 算
-  useEffect(() => {
-    if (!currentFile) {
-      setWc({ chars: 0, words: 0, lines: 0 });
-      return;
-    }
-    const text = currentFile.content;
-    const lines = text.split("\n").length;
-    const chars = text.length;
-    const cnChars = (text.match(/[一-龥]/g) || []).length;
-    const enWords = (text.match(/[a-zA-Z]+/g) || []).length;
-    setWc({ chars, words: cnChars + enWords, lines });
-  }, [currentFile?.content, currentFile]);
+  // 字数 wc 由上方 useMemo(deferredContent) 计算，输入自适应 defer，无需 useEffect
 
   return (
     <div
