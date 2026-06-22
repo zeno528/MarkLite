@@ -5,6 +5,7 @@
 import { useEffect, useState, useRef, lazy, Suspense, type MouseEvent as ReactMouseEvent } from "react";
 import { TopBar } from "@/components/layout/TopBar";
 import { TitleBar } from "@/components/layout/TitleBar";
+import { ShortcutsHelp } from "@/components/ui/ShortcutsHelp";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { SidebarActivityBar, SidebarPanel } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
@@ -26,6 +27,7 @@ import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import { getPlatformSync } from "@/lib/utils/platform";
 import {
+  newFile,
   openFileViaDialog,
   openFolderViaDialog,
   reloadCurrentFile,
@@ -74,6 +76,7 @@ export default function App() {
   const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
   const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const resizeStart = useRef({ x: 0, w: SIDEBAR_DEFAULT_WIDTH });
@@ -370,7 +373,11 @@ export default function App() {
         case "n":
         case "N":
           e.preventDefault();
-          openFolderViaDialog();
+          if (e.shiftKey) {
+            openFolderViaDialog();
+          } else {
+            newFile();
+          }
           break;
       }
     };
@@ -380,7 +387,10 @@ export default function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
-      <TitleBar />
+      <TitleBar
+        onOpenSettings={() => setSettingsOpen(true)}
+        onShowShortcuts={() => setShortcutsOpen(true)}
+      />
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         {/* 活动栏 - 始终可见 */}
@@ -429,6 +439,7 @@ export default function App() {
       <Suspense fallback={null}>
         <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       </Suspense>
+      <ShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
       <ToastContainer />
       <ConfirmDialog />
       {/* 拖拽文件覆盖层 */}

@@ -10,6 +10,16 @@ import { confirmDialog } from "@/lib/tauri/dialog";
 import { notify } from "@/stores/notificationStore";
 import { useUIStore } from "@/stores/uiStore";
 
+/** 未命名文件计数器 */
+let untitledCounter = 0;
+
+/** 新建未命名文件 */
+export async function newFile() {
+  untitledCounter++;
+  const name = `untitled-${untitledCounter}`;
+  useEditorStore.getState().openFile(`${name}.md`, name, "");
+}
+
 /** 打开文件（系统对话框选 md → 载入编辑器） */
 export async function openFileViaDialog() {
   const file = await FileService.openFile();
@@ -25,8 +35,17 @@ export async function saveCurrentFile() {
   const { currentFile, markSaved } = useEditorStore.getState();
   if (!currentFile) return;
   try {
-    await FileService.saveFile(currentFile.path, currentFile.content);
-    markSaved(currentFile.path);
+    // 未命名文件 → 另存为对话框
+    if (currentFile.path.startsWith("untitled-")) {
+      const savedPath = await FileService.saveAsFile(currentFile.content, currentFile.title + ".md");
+      if (!savedPath) return;
+      useEditorStore.getState().closeFile(currentFile.path);
+      const title = savedPath.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? savedPath;
+      useEditorStore.getState().openFile(savedPath, title, currentFile.content);
+    } else {
+      await FileService.saveFile(currentFile.path, currentFile.content);
+      markSaved(currentFile.path);
+    }
   } catch (e) {
     console.error("[save] failed:", e);
     notify.error("保存失败");
