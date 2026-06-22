@@ -114,7 +114,7 @@ export function EditorPane() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-[var(--color-bg)]">
       <TabBar />
-      <div className="min-h-0 flex-1 bg-[var(--color-bg-elevated)]">
+      <div className="min-h-0 flex-1 bg-[var(--color-bg)]">
         <CodeEditor
           key={path}
           value={initValue}

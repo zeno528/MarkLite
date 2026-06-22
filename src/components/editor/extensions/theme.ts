@@ -8,7 +8,7 @@ import { EditorView } from "@codemirror/view";
 export const lightTheme = EditorView.theme(
   {
     "&": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg)",
       color: "var(--color-text)",
       fontSize: "var(--editor-font-size, 14px)",
       fontFamily: "var(--font-editor)",
@@ -53,7 +53,7 @@ export const lightTheme = EditorView.theme(
       fontWeight: "600",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg)",
       color: "var(--color-text-subtle)",
       border: "none",
       borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
@@ -127,7 +127,7 @@ export const lightTheme = EditorView.theme(
 export const darkTheme = EditorView.theme(
   {
     "&": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg)",
       color: "var(--color-text)",
       fontSize: "var(--editor-font-size, 14px)",
       fontFamily: "var(--font-editor)",
@@ -172,7 +172,7 @@ export const darkTheme = EditorView.theme(
       fontWeight: "600",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-bg-elevated)",
+      backgroundColor: "var(--color-bg)",
       color: "var(--color-text-subtle)",
       border: "none",
       borderRight: "1px solid color-mix(in oklch, var(--color-border) 70%, transparent)",
