@@ -134,7 +134,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
   return (
     <div
       data-tauri-drag-region
-      className="flex h-8 w-full shrink-0 select-none items-center justify-between bg-[var(--color-bg-elevated)]"
+      className="flex h-8 w-full shrink-0 select-none items-center justify-between bg-[var(--color-bg-muted)]"
       style={{ WebkitAppRegion: "drag" } as CSSProperties}
     >
       {/* 左侧：logo + 品牌 + 菜单 */}

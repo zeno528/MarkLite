@@ -64,7 +64,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   return (
     <header
       data-tauri-drag-region
-      className="flex h-[50px] w-full shrink-0 items-center gap-2.5 border-b border-[var(--color-border)] bg-[var(--color-bg-muted)] pr-4"
+      className="flex h-[50px] w-full shrink-0 items-center gap-2.5 bg-[color-mix(in_oklch,var(--color-bg-muted)_50%,var(--color-bg-subtle))] pr-4"
       style={{ paddingLeft: mac ? "78px" : "16px", WebkitAppRegion: "drag" } as React.CSSProperties}
     >
       {/* 品牌 + 面包屑 */}

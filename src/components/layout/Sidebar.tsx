@@ -211,7 +211,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
   };
 
   return (
-    <div className="flex w-12 shrink-0 flex-col items-center gap-1.5 bg-[var(--color-bg-subtle)] py-3">
+    <div className="flex w-12 shrink-0 flex-col items-center gap-1.5 bg-[color-mix(in_oklch,var(--color-bg-muted)_50%,var(--color-bg-subtle))] py-3">
       <ActivityBarButton
         active={sidebarTab === "files" && !collapsed}
         onClick={() => handleClick("files")}
@@ -263,7 +263,7 @@ export function SidebarPanel() {
       style={{ minWidth: "var(--sidebar-min-width)", maxWidth: "var(--sidebar-max-width)" }}
     >
       {/* 面板标题栏 */}
-      <div className="flex h-10 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3">
+      <div className="flex h-10 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-muted)] px-3">
         <span className="text-[13px] font-semibold text-[var(--color-text)]">
           {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
         </span>
