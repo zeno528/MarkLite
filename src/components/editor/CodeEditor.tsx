@@ -58,7 +58,6 @@ interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
   onSave?: () => void;
-  onTogglePreview?: () => void;
   onToggleSidebar?: () => void;
 }
 
@@ -66,7 +65,6 @@ export function CodeEditor({
   value,
   onChange,
   onSave,
-  onTogglePreview,
   onToggleSidebar,
 }: CodeEditorProps) {
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
@@ -125,10 +123,10 @@ export function CodeEditor({
 
   const viewRef = useRef<EditorView | null>(null);
   /** 回调的稳定引用：autoSave/shortcuts 读 ref.current，保证扩展只创建一次、闭包始终最新 */
-  const cbRef = useRef({ onSave: onSave ?? null, onTogglePreview: onTogglePreview ?? null, onToggleSidebar: onToggleSidebar ?? null });
+  const cbRef = useRef({ onSave: onSave ?? null, onToggleSidebar: onToggleSidebar ?? null });
   useEffect(() => {
-    cbRef.current = { onSave: onSave ?? null, onTogglePreview: onTogglePreview ?? null, onToggleSidebar: onToggleSidebar ?? null };
-  }, [onSave, onTogglePreview, onToggleSidebar]);
+    cbRef.current = { onSave: onSave ?? null, onToggleSidebar: onToggleSidebar ?? null };
+  }, [onSave, onToggleSidebar]);
   const [editorReady, setEditorReady] = useState(false);
   const [mod, setMod] = useState("Mod-");
 
@@ -167,7 +165,6 @@ export function CodeEditor({
       keymap.of(baseKeymap),
       createShortcuts(mod, () => ({
         onSave: cbRef.current.onSave ?? undefined,
-        onTogglePreview: cbRef.current.onTogglePreview ?? undefined,
         onToggleSidebar: cbRef.current.onToggleSidebar ?? undefined,
       })),
       createHyperlinkHandler(),

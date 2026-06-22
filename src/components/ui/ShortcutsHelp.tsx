@@ -20,6 +20,7 @@ const GROUPS = [
     title: "视图",
     items: [
       { keys: "Ctrl+\\", desc: "切换侧栏" },
+      { keys: "Ctrl+L", desc: "切换布局（双栏/仅编辑/仅预览）" },
       { keys: "Ctrl+F", desc: "搜索" },
       { keys: "Ctrl+,", desc: "设置" },
       { keys: "Esc", desc: "关闭弹窗" },

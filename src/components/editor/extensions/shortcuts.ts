@@ -4,7 +4,6 @@
  * - Cmd/Ctrl+B 加粗（Markdown 风格）
  * - Cmd/Ctrl+I 斜体
  * - Cmd/Ctrl+K 链接
- * - Cmd/Ctrl+Shift+P 切换预览
  * - Cmd/Ctrl+\ 切换侧边栏
  *
  * 注：Cmd/Ctrl 由调用方根据平台传入 prefix
@@ -15,7 +14,6 @@ import { EditorView, keymap, type Command } from "@codemirror/view";
 
 export interface ShortcutHandlers {
   onSave?: () => void;
-  onTogglePreview?: () => void;
   onToggleSidebar?: () => void;
 }
 
@@ -50,10 +48,6 @@ export function createShortcuts(
     [`${mod}b`]: (view) => wrapSelection(view, "**", "**", "bold text"),
     [`${mod}i`]: (view) => wrapSelection(view, "_", "_", "italic text"),
     [`${mod}k`]: (view) => wrapSelection(view, "[", "](https://)", "link text"),
-    [`${mod}Shift-p`]: () => {
-      getHandlers().onTogglePreview?.();
-      return true;
-    },
     [`${mod}\\`]: () => {
       getHandlers().onToggleSidebar?.();
       return true;
