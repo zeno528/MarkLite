@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
  * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
@@ -48,9 +48,9 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
     : null;
 
   const layouts: { mode: LayoutMode; icon: React.ReactNode; label: string }[] = [
-    { mode: "editor-only", icon: <PencilLine size={14} />, label: "编辑视图" },
-    { mode: "split", icon: <Columns2 size={14} />, label: "分屏" },
-    { mode: "preview-only", icon: <BookOpen size={14} />, label: "沉浸式阅读" },
+    { mode: "editor-only", icon: <PencilLine size={14} />, label: "编辑" },
+    { mode: "split", icon: <Columns2 size={14} />, label: "双栏" },
+    { mode: "preview-only", icon: <BookOpen size={14} />, label: "预览" },
   ];
 
   // 点击路径图标：编辑器和预览器同时回到顶部

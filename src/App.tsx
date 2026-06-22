@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MarkLite 主应用
  * 布局：标题栏 + 工具栏 + 主体（侧边栏 + 双栏） + 状态栏
  */
@@ -380,6 +380,13 @@ export default function App() {
             newFile();
           }
           break;
+        case "l":
+        case "L":
+          if (!e.shiftKey) {
+            e.preventDefault();
+            useUIStore.getState().toggleLayout();
+          }
+          break;
       }
     };
     document.addEventListener("keydown", handler);
@@ -458,4 +465,3 @@ export default function App() {
     </div>
   );
 }
-

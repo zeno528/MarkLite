@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 自定义标题栏（替代系统原生窗口装饰）
  *
  * 职责：
@@ -84,17 +84,17 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       label: "视图",
       items: [
         {
-          label: "编辑视图",
+          label: "编辑",
           checked: layout === "editor-only",
           onClick: () => setLayout("editor-only" as LayoutMode),
         },
         {
-          label: "分屏",
+          label: "双栏",
           checked: layout === "split",
           onClick: () => setLayout("split" as LayoutMode),
         },
         {
-          label: "沉浸式阅读",
+          label: "预览",
           checked: layout === "preview-only",
           onClick: () => setLayout("preview-only" as LayoutMode),
         },
