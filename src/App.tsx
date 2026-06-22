@@ -395,8 +395,6 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* 活动栏 - 始终可见 */}
         <SidebarActivityBar collapsed={!showSidebar} onToggle={() => useUIStore.getState().setShowSidebar(!showSidebar)} />
-        {/* 分隔线 */}
-        <div className="shrink-0 w-px bg-[color-mix(in_oklch,var(--color-text)_15%,transparent)]" />
         {/* 面板 - 可折叠 */}
         <div
           className="flex shrink-0 overflow-hidden"
@@ -422,7 +420,7 @@ export default function App() {
             onMouseDown={startResize}
             onDoubleClick={() => useUIStore.getState().setSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
            title="拖动调节宽度（双击重置）"
-           className="group relative w-px shrink-0 cursor-col-resize border-r border-[color-mix(in_oklch,var(--color-text)_15%,transparent)] transition-colors hover:border-[var(--color-accent)] before:absolute before:-inset-x-[3px] before:inset-y-0 before:cursor-col-resize before:content-['']"
+           className="group relative w-0 shrink-0 cursor-col-resize before:absolute before:-inset-x-[3px] before:inset-y-0 before:cursor-col-resize before:content-['']"
          >
          </div>
         )}
@@ -459,3 +457,4 @@ export default function App() {
     </div>
   );
 }
+
