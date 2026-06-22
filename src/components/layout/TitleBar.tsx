@@ -126,7 +126,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       items: [
         { label: "快捷键参考", shortcut: "Ctrl+K Ctrl+S", onClick: onShowShortcuts },
         { type: "separator" },
-        { label: "关于 MarkLite", onClick: onOpenSettings },
+        { label: "关于", onClick: onOpenSettings },
       ],
     },
   ];
@@ -140,9 +140,6 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       {/* 左侧：logo + 品牌 + 菜单 */}
       <div className="flex items-center gap-2" style={{ paddingLeft: mac ? "78px" : "12px" }}>
         <img src={logoSvg} alt="MarkLite" className="h-4 w-4 shrink-0" draggable={false} />
-        <span className="mr-1 text-[12px] font-medium tracking-tight text-[var(--color-text-muted)]">
-          MarkLite
-        </span>
         <MenuBar menus={menus} />
       </div>
 
