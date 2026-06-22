@@ -2,7 +2,7 @@
  * 自定义标题栏（替代系统原生窗口装饰）
  *
  * 职责：
- * - 应用品牌标识（左）
+ * - 应用 logo + 品牌名（左）
  * - 窗口控件：最小化 / 最大化-还原 / 关闭（右，仅 Windows/Linux）
  * - 整栏可拖拽移动窗口（data-tauri-drag-region），双击标题栏自动最大化/还原
  *
@@ -16,6 +16,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { getMainWindow } from "@/lib/window";
 import { getPlatformSync } from "@/lib/utils/platform";
+import logoSvg from "@/assets/logo.svg";
 
 export function TitleBar() {
   // 同步检测：首帧即正确，避免 macOS 上闪烁 Windows 三按钮
@@ -43,12 +44,12 @@ export function TitleBar() {
       className="flex h-8 w-full shrink-0 select-none items-center justify-between bg-[var(--color-bg-elevated)]"
       style={{ WebkitAppRegion: "drag" } as CSSProperties}
     >
-      {/* 左侧：品牌标识（macOS 留红绿灯 78px 安全区） */}
+      {/* 左侧：logo + 品牌名（macOS 留红绿灯 78px 安全区） */}
       <div
         className="flex items-center gap-2"
         style={{ paddingLeft: mac ? "78px" : "12px" }}
       >
-        <span className="h-2 w-2 rounded-full bg-[var(--color-accent)] shadow-sm" />
+        <img src={logoSvg} alt="MarkLite" className="h-4 w-4 shrink-0" draggable={false} />
         <span className="text-[12px] font-medium tracking-tight text-[var(--color-text-muted)]">
           MarkLite
         </span>
