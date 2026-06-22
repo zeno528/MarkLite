@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 文件标签栏 - Edge 浏览器风格自适应标签
  * - 标签过多时自动收缩宽度（最小 80px）
  * - 激活标签与编辑区同色，形成延伸效果
@@ -21,6 +21,7 @@ export function TabBar() {
       {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
+        const showDivider = !isActive && !nextIsActive;
         return (
           <Fragment key={file.path}>
             <div
@@ -57,9 +58,13 @@ export function TabBar() {
                 <X size={11} />
               </button>
             </div>
-            {!isActive && !nextIsActive && (
-              <span className="flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] opacity-30" />
-            )}
+            {/* 始终渲染分隔线占位，避免出现/消失导致布局抖动 */}
+            <span
+              className={cn(
+                "flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] transition-opacity",
+                showDivider ? "opacity-30" : "opacity-0 pointer-events-none",
+              )}
+            />
           </Fragment>
         );
       })}

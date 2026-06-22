@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 预览标签栏 - VSCode 风格延伸式标签
  * - 始终显示（即使只有 1 个文件）
  * - 激活标签与预览区同色，形成延伸效果
@@ -19,10 +19,11 @@ export function PreviewTabBar() {
   if (openFiles.length === 0) return null;
 
   return (
-<div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
       {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
+        const showDivider = !isActive && !nextIsActive;
         return (
           <Fragment key={file.path}>
             <div
@@ -59,9 +60,13 @@ export function PreviewTabBar() {
                 <X size={11} />
               </button>
             </div>
-            {!isActive && !nextIsActive && (
-              <span className="flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] opacity-30" />
-            )}
+            {/* 始终渲染分隔线占位，避免出现/消失导致布局抖动 */}
+            <span
+              className={cn(
+                "flex h-[14px] w-px shrink-0 self-center bg-[var(--color-text-subtle)] transition-opacity",
+                showDivider ? "opacity-30" : "opacity-0 pointer-events-none",
+              )}
+            />
           </Fragment>
         );
       })}
