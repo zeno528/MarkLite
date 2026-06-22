@@ -282,7 +282,7 @@
   height: 26px;
   padding: 0;
   color: var(--color-text-muted);
-  background: transparent;
+  background: var(--color-bg-muted);
   border: 0;
   border-radius: 6px;
   cursor: pointer;
@@ -299,15 +299,16 @@
 }
 
 .markdown-body .copy-btn:hover {
-  background: color-mix(in oklch, var(--color-text) 10%, transparent);
+  background: color-mix(in oklch, var(--color-bg-muted) 78%, var(--color-text) 16%);
   color: var(--color-text);
 }
 .markdown-body .copy-btn.copied {
   color: var(--color-success);
+  background: var(--color-bg-muted);
   opacity: 1;
 }
 .markdown-body .copy-btn.copied:hover {
-  background: color-mix(in oklch, var(--color-success) 15%, transparent);
+  background: color-mix(in oklch, var(--color-bg-muted) 82%, var(--color-success) 18%);
 }
 
 /* 表格（整体宽度始终 = 容器宽度，列按内容比例分配，超长内容单元格内换行，不撑破） */
