@@ -6,6 +6,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import { ResizeHandle } from "./ResizeHandle";
 
 interface SplitViewProps {
   left: React.ReactNode;
@@ -61,7 +62,7 @@ export function SplitView({
 
   const startDrag = () => {
     dragging.current = true;
-    document.body.style.cursor = direction === "horizontal" ? "col-resize" : "row-resize";
+    document.body.style.cursor = direction === "horizontal" ? "ew-resize" : "ns-resize";
     document.body.style.userSelect = "none";
   };
 
@@ -84,14 +85,9 @@ export function SplitView({
       >
         {left}
       </div>
-      <div
+      <ResizeHandle
+        direction={direction}
         onMouseDown={startDrag}
-        className={cn(
-          "shrink-0 select-none bg-[var(--color-border)] transition-colors hover:bg-[var(--color-accent)]",
-          isH
-            ? "w-px cursor-col-resize hover:w-0.5"
-            : "h-px cursor-row-resize hover:h-0.5",
-        )}
       />
       <div className="flex-1 overflow-hidden">{right}</div>
     </div>

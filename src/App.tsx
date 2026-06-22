@@ -9,6 +9,7 @@ import { ShortcutsHelp } from "@/components/ui/ShortcutsHelp";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { SidebarActivityBar, SidebarPanel } from "@/components/layout/Sidebar";
 import { SplitView } from "@/components/layout/SplitView";
+import { ResizeHandle } from "@/components/layout/ResizeHandle";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { MarkdownPreview } from "@/components/preview/MarkdownPreview";
 import { ToastContainer } from "@/components/ui/Toast";
@@ -124,7 +125,7 @@ export default function App() {
     e.preventDefault();
     resizeStart.current = { x: e.clientX, w: useUIStore.getState().sidebarWidth };
     setIsResizing(true);
-    document.body.style.cursor = "col-resize";
+    document.body.style.cursor = "ew-resize";
     document.body.style.userSelect = "none";
   };
   useEffect(() => {
@@ -416,13 +417,13 @@ export default function App() {
         </div>
         {/* 侧边栏宽度拖拽条（仿 VSCode）：拖动调节宽度，双击重置默认 */}
         {showSidebar && (
-          <div
+          <ResizeHandle
+            direction="horizontal"
             onMouseDown={startResize}
             onDoubleClick={() => useUIStore.getState().setSidebarWidth(SIDEBAR_DEFAULT_WIDTH)}
-           title="拖动调节宽度（双击重置）"
-           className="group relative w-0 shrink-0 cursor-col-resize before:absolute before:-inset-x-[3px] before:inset-y-0 before:cursor-col-resize before:content-['']"
-         >
-         </div>
+            title="拖动调节宽度（双击重置）"
+            isDragging={isResizing}
+          />
         )}
         <main className="flex min-h-0 flex-1 overflow-hidden">
           {layout === "split" && (

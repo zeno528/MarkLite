@@ -259,7 +259,7 @@ export function SidebarPanel() {
   }, [activeFolder]);
   return (
     <div
-      className="flex h-full w-[var(--sidebar-width)] flex-col bg-[var(--color-bg)]"
+      className="flex h-full w-[var(--sidebar-width)] flex-col bg-[var(--color-bg-muted)]"
       style={{ minWidth: "var(--sidebar-min-width)", maxWidth: "var(--sidebar-max-width)" }}
     >
       {/* 面板标题栏 */}
