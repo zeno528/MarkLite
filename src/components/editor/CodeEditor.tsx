@@ -50,7 +50,7 @@ import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { getCmMod } from "@/lib/utils/platform";
-import { isScrollSyncing } from "@/lib/utils/scrollSyncLock";
+import { isScrollSyncing, lockScrollSync } from "@/lib/utils/scrollSyncLock";
 import { syncPreviewFromEditor } from "@/lib/utils/scrollSync";
 import { cn } from "@/lib/utils/cn";
 
@@ -264,6 +264,20 @@ export function CodeEditor({
           // 切换文件会按 key=path 重建编辑器：重置光标到开头，避免上一文件的 cursor 残留，
           // 否则目录用过期的 currentLine 算 active，永远高亮到最后一个标题
           setCursor({ line: 1, ch: 0 });
+          // 模式切换重建编辑器时保留阅读进度（文件切换时 scrollPercentPath≠activeFilePath，从顶部开始）
+          const { scrollPercent, scrollPercentPath, activeFilePath } =
+            useEditorStore.getState();
+          if (scrollPercentPath === activeFilePath && scrollPercent > 0) {
+            const dom = view.scrollDOM;
+            // 推迟一帧等 CodeMirror 完成布局，scrollHeight 才准确
+            requestAnimationFrame(() => {
+              const max = dom.scrollHeight - dom.clientHeight;
+              if (max > 0) {
+                lockScrollSync();
+                dom.scrollTop = max * scrollPercent;
+              }
+            });
+          }
         }}
         basicSetup={{
           lineNumbers: lineNumbersEnabled,

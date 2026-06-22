@@ -122,12 +122,19 @@ export function MarkdownPreview() {
     };
   }, []);
 
-  // 切换文档时预览滚动归零（预览只挂载一次、容器复用，scrollTop 会残留）。
+  // 切换文档时预览滚动归零（同实例下切换文件，scrollTop 会残留）。
+  // 但「同文件的模式切换」要保留阅读进度——此时 scrollPercentPath === filePath，
+  // 跳过归零，交给下方解析 effect 按 scrollPercent 恢复。
   // rAF 推迟一帧等 HTML 解析；lockScrollSync 防止归零被同步 handler 当用户滚动联动编辑器。
   const lastPathRef = useRef<string | undefined>(undefined);
+  // 挂载后首次解析标志：用于区分「模式切换重建 → 恢复进度」与「同文件编辑 → 跟随编辑器」
+  const isFirstParseRef = useRef(true);
   useEffect(() => {
     if (lastPathRef.current === filePath) return;
     lastPathRef.current = filePath;
+    const { scrollPercent, scrollPercentPath } = useEditorStore.getState();
+    // 同文件模式切换：不归零，解析 effect 里恢复阅读进度
+    if (scrollPercentPath === filePath && scrollPercent > 0) return;
     requestAnimationFrame(() => {
       const el = containerRef.current;
       if (!el) return;
@@ -146,10 +153,31 @@ export function MarkdownPreview() {
         if (cancelled) return;
         setHtml(h);
         setLoading(false);
-        // HTML 更新后等 DOM 布局稳定：重建块缓存，并让预览对齐到编辑器当前位置（解决编辑后错位）
+        // HTML 更新后等 DOM 布局稳定再做位置处理
         raf = requestAnimationFrame(() => {
           rebuildPreviewBlocks();
-          syncPreviewFromEditor();
+          const el = containerRef.current;
+          if (!el) {
+            isFirstParseRef.current = false;
+            return;
+          }
+          const { scrollPercent, scrollPercentPath } = useEditorStore.getState();
+          // 挂载后首次解析 + 同文件模式切换 → 按阅读进度恢复滚动位置
+          // 其余情况（编辑、配色切换、换文件后的解析）→ 对齐编辑器当前位置（解决编辑后错位）
+          if (
+            isFirstParseRef.current &&
+            scrollPercentPath === filePath &&
+            scrollPercent > 0
+          ) {
+            const max = el.scrollHeight - el.clientHeight;
+            if (max > 0) {
+              lockScrollSync();
+              el.scrollTop = max * scrollPercent;
+            }
+          } else {
+            syncPreviewFromEditor();
+          }
+          isFirstParseRef.current = false;
         });
       })
       .catch((e) => {
@@ -160,7 +188,7 @@ export function MarkdownPreview() {
       cancelled = true;
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [content, resolvedTheme]);
+  }, [content, resolvedTheme, filePath]);
 
   // 给每个代码块注入复制按钮（GitHub 风格：图标，hover 显示，融入代码块）
   // MutationObserver 监听 childList（不含 subtree，避免滚动时 content-visibility 重排触发高频回调）

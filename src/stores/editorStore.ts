@@ -63,6 +63,8 @@ interface EditorState {
 
   // === 滚动位置 ===
   scrollPercent: number;
+  /** scrollPercent 对应的文件路径（用于区分「同文件模式切换→恢复」与「换文件→从顶部」） */
+  scrollPercentPath: string | null;
   /** 滚动来源，用于双向同步防循环 */
   scrollSource: "editor" | "preview" | null;
   setScrollPercent: (p: number, source: "editor" | "preview") => void;
@@ -95,6 +97,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   cursor: { line: 1, ch: 0 },
   selection: { text: "", chars: 0, words: 0 },
   scrollPercent: 0,
+  scrollPercentPath: null,
   scrollSource: null,
   searchVisible: false,
   singleTabMode: false,
@@ -102,7 +105,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setCursor: (cursor) => set({ cursor }),
   setSelection: (selection) => set({ selection }),
-  setScrollPercent: (scrollPercent, source) => set({ scrollPercent, scrollSource: source }),
+  setScrollPercent: (scrollPercent, source) =>
+    set({ scrollPercent, scrollSource: source, scrollPercentPath: get().activeFilePath }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
   toggleSingleTabMode: () => set((s) => ({ singleTabMode: !s.singleTabMode })),
   setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),
