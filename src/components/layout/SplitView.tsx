@@ -88,6 +88,8 @@ export function SplitView({
       <ResizeHandle
         direction={direction}
         onMouseDown={startDrag}
+        onDoubleClick={() => setRatio(initialRatio)}
+        title="拖动调节宽度（双击重置）"
       />
       <div className="flex-1 overflow-hidden">{right}</div>
     </div>
