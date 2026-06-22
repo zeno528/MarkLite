@@ -17,7 +17,7 @@ export function TabBar() {
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg-muted)]">
       {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
@@ -29,12 +29,12 @@ export function TabBar() {
                 "group relative flex h-[30px] w-[160px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
                 openFiles.length > 1 && "shrink min-w-[80px]",
                 isActive
-                  ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
-                  : "rounded-t-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
+                  ? "bg-[var(--color-bg)] text-[var(--color-text)] rounded-t-md"
+                  : "rounded-t-md text-[var(--color-text-muted)] hover:text-[var(--color-text)]",
               )}
             >
               {isActive && (
-                <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg-elevated)]" />
+                <div className="absolute -bottom-px left-0 right-0 h-px bg-[var(--color-bg)]" />
               )}
               <FileText size={13} className="shrink-0 opacity-70" />
               <span className="min-w-0 flex-1 truncate">{file.title}</span>
