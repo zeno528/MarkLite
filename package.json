@@ -8,6 +8,7 @@
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile --typescript",
     "lingui:sync": "lingui extract && lingui compile --typescript",
+    "translate": "node --env-file=.env scripts/translate.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"

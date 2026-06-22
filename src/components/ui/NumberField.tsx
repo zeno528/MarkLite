@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -21,7 +21,7 @@ export function NumberField({
   min?: number;
   max?: number;
   step?: number;
-  unit?: string;
+  unit?: ReactNode;
   width?: string;
   "aria-label"?: string;
 }) {

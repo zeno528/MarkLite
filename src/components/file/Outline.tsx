@@ -1,10 +1,11 @@
-/**
+﻿/**
  * 文档目录 - 从 Markdown 源码提取标题
  * - 点击标题：若有编辑器则直接跳转；否则（纯预览模式）先切到 split 布局并记下待跳转行
  */
 import { useEffect, useMemo, useRef } from "react";
 import { useEditorStore, editorViewRef } from "@/stores/editorStore";
 import { EditorView } from "@codemirror/view";
+import { Trans } from "@lingui/react/macro";
 import { cn } from "@/lib/utils/cn";
 
 interface Heading {
@@ -160,7 +161,7 @@ export function Outline() {
   if (headings.length === 0) {
     return (
       <div className="flex h-full items-center justify-center p-4 text-xs text-[var(--color-text-subtle)]">
-        无标题
+        <Trans>无标题</Trans>
       </div>
     );
   }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 文件树组件
  * - 递归渲染 FileNode
  * - 目录可展开/折叠
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils/cn";
 import { MdFileIcon } from "@/components/file/MdFileIcon";
 import { FileService } from "@/lib/tauri/fs";
 import { confirmDialog } from "@/lib/tauri/dialog";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import { notify } from "@/stores/notificationStore";
 
 interface MenuState {
@@ -36,7 +38,7 @@ export function FileTree() {
   if (!activeFolder) {
     return (
       <div className="flex h-full items-center justify-center p-4 text-xs text-[var(--color-text-subtle)]">
-        未打开文件夹
+        <Trans>未打开文件夹</Trans>
       </div>
     );
   }
@@ -267,6 +269,7 @@ function FileContextMenu({
   onClose: () => void;
   onRenameStart: (path: string) => void;
 }) {
+  const { i18n } = useLingui();
   const refreshActiveTree = useFileStore((s) => s.refreshActiveTree);
 
   const handleReveal = async () => {
@@ -279,7 +282,13 @@ function FileContextMenu({
   };
 
   const handleDelete = async () => {
-    const ok = await confirmDialog(`确定删除「${menu.name}」？此操作不可撤销。`, "删除文件", "删除", "取消", true);
+    const ok = await confirmDialog(
+      i18n.t("确定删除「{name}」？此操作不可撤销。", { name: menu.name }),
+      i18n.t("删除文件"),
+      i18n.t("删除"),
+      i18n.t("取消"),
+      true,
+    );
     if (!ok) {
       onClose();
       return;
@@ -289,10 +298,10 @@ function FileContextMenu({
       // 若该文件正在编辑器中打开，一并移除
       useEditorStore.getState().closeFile(menu.path);
       await refreshActiveTree();
-      notify.success("已删除");
+      notify.success(i18n.t("已删除"));
     } catch (e) {
       console.error("[FileTree] delete failed:", e);
-      notify.error("删除失败");
+      notify.error(i18n.t("删除失败"));
     }
     onClose();
   };
@@ -321,14 +330,14 @@ function FileContextMenu({
         style={{ left: menu.x, top: menu.y }}
       >
         <button onClick={handleReveal} className={itemCls}>
-          在资源管理器中打开
+          <Trans>在资源管理器中打开</Trans>
         </button>
         <button onClick={handleRename} className={itemCls}>
-          重命名
+          <Trans>重命名</Trans>
         </button>
         <div className="my-1 h-px bg-[var(--color-border)]" />
         <button onClick={handleDelete} className={cn(itemCls, "text-[var(--color-danger)]")}>
-          删除
+          <Trans>删除</Trans>
         </button>
       </div>
     </>

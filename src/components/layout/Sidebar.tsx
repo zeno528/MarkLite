@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 侧边栏 - Activity Bar + 面板布局
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  * 拆分为 SidebarActivityBar（始终可见）+ SidebarPanel（可折叠）
@@ -10,6 +10,8 @@ import { RecentFiles } from "@/components/file/RecentFiles";
 import { Outline } from "@/components/file/Outline";
 import { SearchPanel } from "@/components/file/SearchPanel";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import { useUIStore } from "@/stores/uiStore";
 import { useFileStore, collectDirPaths } from "@/stores/fileStore";
 import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
@@ -45,7 +47,7 @@ function ActivityBarButton({
 }: {
   active: boolean;
   onClick: () => void;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   onMouseDown?: (e: React.MouseEvent) => void;
 }) {
@@ -69,6 +71,7 @@ function ActivityBarButton({
 
 /** 文件夹选择下拉组件 */
 function FolderSelect() {
+  const { i18n } = useLingui();
   const folders = useFileStore((s) => s.folders);
   const activeFolderPath = useFileStore((s) => s.activeFolderPath);
   const setActiveFolder = useFileStore((s) => s.setActiveFolder);
@@ -92,7 +95,7 @@ function FolderSelect() {
 
   if (folders.length === 0) return null;
 
-  const activeName = activeFolderPath ? folderName(activeFolderPath) : "未打开文件夹";
+  const activeName = activeFolderPath ? folderName(activeFolderPath) : i18n.t("未打开文件夹");
 
   return (
     <div ref={ref} className="relative px-2 py-1.5">
@@ -160,10 +163,10 @@ function FolderSelect() {
                 onClick={async () => {
                   const { confirmDialog } = await import("@/lib/tauri/dialog");
                   const ok = await confirmDialog(
-                    `确定清除所有 ${folders.length} 个文件夹？\n编辑器中已打开的文件也将被关闭。`,
-                    "清除所有文件夹",
-                    "清除",
-                    "取消",
+                    i18n.t("确定清除所有 {count} 个文件夹？\n编辑器中已打开的文件也将被关闭。", { count: folders.length }),
+                    i18n.t("清除所有文件夹"),
+                    i18n.t("清除"),
+                    i18n.t("取消"),
                     true,
                   );
                   if (ok) {
@@ -195,6 +198,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
   const setSidebarTab = useUIStore((s) => s.setSidebarTab);
   const triggerSearchFocus = useUIStore((s) => s.triggerSearchFocus);
 
+  const { i18n } = useLingui();
   const handleClick = (tab: "files" | "outline" | "search") => {
     clearSearchHighlights();
     if (collapsed) {
@@ -215,14 +219,14 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
       <ActivityBarButton
         active={sidebarTab === "files" && !collapsed}
         onClick={() => handleClick("files")}
-        title="文件资源管理器"
+        title={i18n.t("文件资源管理器")}
       >
         <FileText size={20} />
       </ActivityBarButton>
       <ActivityBarButton
         active={sidebarTab === "outline" && !collapsed}
         onClick={() => handleClick("outline")}
-        title="目录"
+        title={i18n.t("目录")}
       >
         <List size={20} />
       </ActivityBarButton>
@@ -233,7 +237,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
           handleClick("search");
           triggerSearchFocus();
         }}
-        title="搜索 (Ctrl+F)"
+        title={<Trans>搜索 <kbd>Ctrl+F</kbd></Trans>}
       >
         <Search size={20} />
       </ActivityBarButton>
@@ -243,6 +247,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
 
 /** 面板内容 - 可折叠的文件树/搜索/目录面板 */
 export function SidebarPanel() {
+  const { i18n } = useLingui();
   const sidebarTab = useUIStore((s) => s.sidebarTab);
   const filesSubTab = useUIStore((s) => s.filesSubTab);
   const setFilesSubTab = useUIStore((s) => s.setFilesSubTab);
@@ -265,12 +270,12 @@ export function SidebarPanel() {
       {/* 面板标题栏 */}
       <div className="flex h-10 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-muted)] px-3">
         <span className="text-[13px] font-semibold text-[var(--color-text)]">
-          {sidebarTab === "files" ? "资源管理器" : sidebarTab === "search" ? "搜索" : "目录"}
+          {sidebarTab === "files" ? i18n.t("资源管理器") : sidebarTab === "search" ? i18n.t("搜索") : i18n.t("目录")}
         </span>
         {sidebarTab === "files" && (
           <div className="flex items-center gap-1">
             {openFiles.length > 1 && (
-              <Tooltip content="关闭所有标签" placement="bottom">
+              <Tooltip content={<Trans>关闭所有标签</Trans>} placement="bottom">
                 <button
                   onClick={closeAllFiles}
                   className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
@@ -280,7 +285,7 @@ export function SidebarPanel() {
               </Tooltip>
             )}
             {filesSubTab === "tree" && (
-              <Tooltip content={isAllExpanded ? "收起全部" : "展开全部"} placement="bottom">
+              <Tooltip content={isAllExpanded ? <Trans>收起全部</Trans> : <Trans>展开全部</Trans>} placement="bottom">
                 <button
                   onClick={toggleExpandAll}
                   className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
@@ -289,7 +294,7 @@ export function SidebarPanel() {
                 </button>
               </Tooltip>
             )}
-            <Tooltip content="打开文件夹" placement="bottom" align="right">
+            <Tooltip content={<Trans>打开文件夹</Trans>} placement="bottom" align="right">
               <button
                 onClick={openFolderViaDialog}
                 className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
@@ -313,7 +318,7 @@ export function SidebarPanel() {
                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
            )}
          >
-            最近打开
+            <Trans>最近打开</Trans>
          </button>
          <button
            onClick={() => setFilesSubTab("tree")}
@@ -324,7 +329,7 @@ export function SidebarPanel() {
                : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
            )}
          >
-            文件夹
+            <Trans>文件夹</Trans>
          </button>
         </div>
       )}

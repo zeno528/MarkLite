@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /**
  * 设置行容器：左侧标签（+可选描述），右侧控件靠右对齐
  * 统一所有设置项的横向布局
@@ -7,8 +9,8 @@ export function SettingRow({
   description,
   children,
 }: {
-  label: string;
-  description?: string;
+  label: ReactNode;
+  description?: ReactNode;
   children: React.ReactNode;
 }) {
   return (

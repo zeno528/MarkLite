@@ -2,6 +2,7 @@
  * 关于页面：项目信息、版本号
  */
 import { ExternalLink } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
 import logoSvg from "@/assets/logo.svg";
 import { version } from "../../../../package.json";
 import { openUrl as openSystemUrl } from "@tauri-apps/plugin-opener";
@@ -29,8 +30,7 @@ export function AboutSection() {
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">MarkLite</h2>
           <div className="mt-1 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/8 px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-accent)]">
-              版本  v{version}
+            <span className="inline-flex items-center gap-1 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/8 px-2.5 py-0.5 text-[11px] font-medium text-[var(--color-accent)]"><Trans>版本</Trans>  v{version}
             </span>
             <button
               onClick={handleGitHub}
@@ -49,29 +49,30 @@ export function AboutSection() {
       {/* 项目简介 */}
       <div className="rounded-lg bg-[var(--color-bg-muted)] p-4">
         <p className="text-sm leading-relaxed text-[var(--color-text)]">
-          基于 Tauri 2 + React 19 + CodeMirror 6 的轻量级跨平台 Markdown 编辑器。
-          追求极好的性能、极小的占用和极快的启动速度。
+          <Trans>基于 Tauri 2 + React 19 + CodeMirror 6 的轻量级跨平台 Markdown 编辑器。追求极好的性能、极小的占用和极快的启动速度。</Trans>
         </p>
       </div>
 
       {/* 设为默认 .md 程序 */}
       <div>
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-          设为默认 Markdown 程序
+          <Trans>设为默认 Markdown 程序</Trans>
         </h3>
         <div className="rounded-lg bg-[var(--color-bg-muted)] p-4">
           <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">
-            如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将
-            <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.md</code>
-            与
-            <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.markdown</code>
-            的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。
+            <Trans>
+              如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将{" "}
+              <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.md</code>
+              {" "}与{" "}
+              <code className="mx-0.5 rounded bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-text)]">.markdown</code>
+              {" "}的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。
+            </Trans>
           </p>
           <button
             onClick={handleDefaultApps}
             className="mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-text)] transition-colors hover:border-[var(--color-border-strong)]"
           >
-            打开系统设置
+            <Trans>打开系统设置</Trans>
             <ExternalLink size={12} className="text-[var(--color-text-subtle)]" />
           </button>
         </div>

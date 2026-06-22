@@ -1,12 +1,14 @@
-/**
+﻿/**
  * 自定义确认对话框 — 替代系统原生 confirm/ask
  * 居中弹出、毛玻璃遮罩、键盘支持（Enter 确认 / Esc 取消）
  */
 import { useEffect, useRef } from "react";
 import { useConfirmStore } from "@/stores/confirmStore";
+import { useLingui } from "@lingui/react";
 import { cn } from "@/lib/utils/cn";
 
 export function ConfirmDialog() {
+  const { i18n } = useLingui();
   const options = useConfirmStore((s) => s.options);
   const confirm = useConfirmStore((s) => s.confirm);
   const cancel = useConfirmStore((s) => s.cancel);
@@ -38,7 +40,9 @@ export function ConfirmDialog() {
 
   if (!options) return null;
 
-  const { title, message, okLabel = "确定", cancelLabel = "取消", danger } = options;
+  const { title, message, okLabel: rawOk, cancelLabel: rawCancel, danger } = options;
+  const okLabel = rawOk ?? i18n.t("确定");
+  const cancelLabel = rawCancel ?? i18n.t("取消");
 
   return (
     <div

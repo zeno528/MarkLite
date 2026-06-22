@@ -1,9 +1,9 @@
-/**
+﻿/**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
  * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   FolderPlus,
   Save,
@@ -15,7 +15,6 @@ import {
   PanelLeft,
   ChevronRight,
   House,
-  Languages,
 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
@@ -24,7 +23,7 @@ import { useFileStore } from "@/stores/fileStore";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
 import { useLingui } from "@lingui/react";
-import { dynamicActivate, type Locale } from "@/i18n";
+import { Trans } from "@lingui/react/macro";
 import { openFileViaDialog, openFolderViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
 
 interface TopBarProps {
@@ -50,18 +49,12 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
     ? rootFolder.split(/[\\/]/).filter(Boolean).pop() ?? rootFolder
     : null;
 
-  // 国际化：当前语言 + 切换函数（zh-CN ↔ en）
   const { i18n } = useLingui();
-  const currentLocale = i18n.locale as Locale;
-  const toggleLocale = () => {
-    const next: Locale = currentLocale === "zh-CN" ? "en" : "zh-CN";
-    dynamicActivate(next);
-  };
 
-  const layouts: { mode: LayoutMode; icon: React.ReactNode; label: string }[] = [
-    { mode: "editor-only", icon: <PencilLine size={14} />, label: "编辑" },
-    { mode: "split", icon: <Columns2 size={14} />, label: "双栏" },
-    { mode: "preview-only", icon: <BookOpen size={14} />, label: "预览" },
+  const layouts: { mode: LayoutMode; icon: ReactNode; label: ReactNode }[] = [
+    { mode: "editor-only", icon: <PencilLine size={14} />, label: <Trans>编辑</Trans> },
+    { mode: "split", icon: <Columns2 size={14} />, label: <Trans>双栏</Trans> },
+    { mode: "preview-only", icon: <BookOpen size={14} />, label: <Trans>预览</Trans> },
   ];
 
   // 点击路径图标：编辑器和预览器同时回到顶部
@@ -84,10 +77,10 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
         {/* 路径图标：lucide House（点击 → 编辑器 + 预览器回到顶部） */}
-        <Tooltip content="回到顶部" placement="bottom" align="left">
+        <Tooltip content={<Trans>回到顶部</Trans>} placement="bottom" align="left">
           <button
             onClick={handleScrollToTop}
-            aria-label="回到顶部"
+            aria-label={i18n.t(`回到顶部`)}
             className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-accent)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           >
             <House size={22} strokeWidth={1.6} className="transition-transform duration-200 hover:scale-110" />
@@ -129,7 +122,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
       >
         {/* 主操作：打开文件 / 打开文件夹 */}
-        <Tooltip content="打开文件 (Ctrl+O)" placement="bottom">
+        <Tooltip content={<Trans>打开文件 <span className="opacity-70">(Ctrl+O)</span></Trans>} placement="bottom">
           <button
             className="btn-primary"
             onClick={openFileViaDialog}
@@ -137,7 +130,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             <FileInput size={14} />
           </button>
         </Tooltip>
-        <Tooltip content="打开文件夹 (Ctrl+Shift+N)" placement="bottom">
+        <Tooltip content={<Trans>打开文件夹 <span className="opacity-70">(Ctrl+Shift+N)</span></Trans>} placement="bottom">
           <button
             className="btn-primary"
             onClick={openFolderViaDialog}
@@ -148,7 +141,16 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
         {/* 次操作 pill 组：保存 + 布局 */}
         <div className="tool-group">
-          <Tooltip content={currentFile?.isDirty ? "保存 (Ctrl+S) — 有未保存的修改" : "保存 (Ctrl+S)"} placement="bottom">
+          <Tooltip
+            content={
+              currentFile?.isDirty ? (
+                <Trans>保存 <span className="opacity-70">(Ctrl+S)</span> — 有未保存的修改</Trans>
+              ) : (
+                <Trans>保存 <span className="opacity-70">(Ctrl+S)</span></Trans>
+              )
+            }
+            placement="bottom"
+          >
             <button
               className={cn("tbtn", currentFile?.isDirty && "active")}
               onClick={saveCurrentFile}
@@ -173,40 +175,30 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         </div>
 
         {/* 单图标按钮（侧栏 / 设置） */}
-        <Tooltip content="切换侧栏 (Ctrl+\)" placement="bottom">
+        <Tooltip content={<Trans>切换侧栏 <span className="opacity-70">(Ctrl+\)</span></Trans>} placement="bottom">
           <button
             className={cn("icon-btn", showSidebar && "active")}
             onClick={toggleSidebar}
-            aria-label="切换侧栏"
+            aria-label={i18n.t(`切换侧栏`)}
           >
             <PanelLeft size={15} />
           </button>
         </Tooltip>
 
         {onOpenSettings && (
-          <Tooltip content="设置 (Ctrl+,)" placement="bottom" align="right">
+          <Tooltip content={<Trans>设置 <span className="opacity-70">(Ctrl+,)</span></Trans>} placement="bottom" align="right">
             <button
               className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
               onClick={onOpenSettings}
-              aria-label="设置"
+              aria-label={i18n.t(`设置`)}
             >
               <Settings size={15} />
             </button>
           </Tooltip>
         )}
 
-        <Tooltip content={`切换语言（当前：${currentLocale === "zh-CN" ? "中文" : "English"}）`} placement="bottom" align="right">
-          <button
-            className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-            onClick={toggleLocale}
-            aria-label="切换语言"
-          >
-            <Languages size={15} />
-          </button>
-        </Tooltip>
 
       </div>
     </header>
   );
 }
-

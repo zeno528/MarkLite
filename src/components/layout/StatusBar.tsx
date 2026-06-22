@@ -17,6 +17,8 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils/cn";
 import { reloadCurrentFile } from "@/lib/shortcuts/appShortcuts";
 import { notify } from "@/stores/notificationStore";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 
 /** 递归统计文件夹下的 md 文件数量 */
 function countMdFiles(nodes: FileNode[]): number {
@@ -32,6 +34,7 @@ function countMdFiles(nodes: FileNode[]): number {
 }
 
 export function StatusBar() {
+  const { i18n } = useLingui();
   const cursor = useEditorStore((s) => s.cursor);
   const selection = useEditorStore((s) => s.selection);
   const currentFile = useEditorStore((s) => s.currentFile);
@@ -56,7 +59,7 @@ export function StatusBar() {
     try {
       const hasChanges = await Promise.all([reloadCurrentFile(false), minSpin]);
       if (hasChanges[0]) {
-        notify.info("已刷新");
+        notify.info(i18n.t("已刷新"));
       }
     } finally {
       setReloading(false);
@@ -83,12 +86,17 @@ export function StatusBar() {
     >
       <div className="flex h-full items-stretch gap-2">
         {/* 模块1：刷新按钮 */}
-        <Tooltip content="刷新 (Ctrl+R) — 从磁盘重新读取当前文件" placement="top" align="left" className="!flex h-full">
+        <Tooltip
+          content={<Trans>刷新 <span>(Ctrl+R)</span> — 从磁盘重新读取当前文件</Trans>}
+          placement="top"
+          align="left"
+          className="!flex h-full"
+        >
           <button
             className="flex h-full w-12 items-center justify-center border-0 bg-transparent text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--color-text-muted)]"
             onClick={handleReload}
             disabled={!currentFile}
-            aria-label="刷新当前文件"
+            aria-label={i18n.t("刷新当前文件")}
           >
             <RefreshCw size={13} className={cn(reloading && "animate-spin")} />
           </button>
@@ -100,33 +108,34 @@ export function StatusBar() {
             <>
               <span className="inline-flex items-center gap-1">
                 <MdFileIcon size={11} />
-                <span>{fileCount} 个文件</span>
+                <span>{i18n.t("{count} 个文件", { count: fileCount })}</span>
               </span>
               <span className="text-[var(--color-text-subtle)]">·</span>
             </>
           )}
-          <span>{wc.words} 字</span>
+          <span>{i18n.t("{count} 字", { count: wc.words })}</span>
           <span className="text-[var(--color-text-subtle)]">·</span>
-          <span>{wc.lines} 行</span>
+          <span>{i18n.t("{count} 行", { count: wc.lines })}</span>
         </div>
 
         {/* 模块3：光标位置 + 选中信息 */}
         <div className="flex items-center gap-2">
           <span className="text-[var(--color-text-subtle)]">|</span>
-          <span>
-            行 {cursor.line}，列 {cursor.ch + 1}
-          </span>
+          <span>{i18n.t("行 {line}，列 {col}", { line: cursor.line, col: cursor.ch + 1 })}</span>
           {selection.chars > 0 && (
             <>
               <span className="text-[var(--color-text-subtle)]">·</span>
-              <span>选中 {selection.chars} 字符 / {selection.words} 词</span>
+              <span>{i18n.t("选中 {chars} 字符 / {words} 词", { chars: selection.chars, words: selection.words })}</span>
             </>
           )}
         </div>
       </div>
       <div className="flex items-center gap-2">
         {/* 单标签模式 */}
-        <Tooltip content={singleTabMode ? "单标签模式：已开启" : "单标签模式：已关闭"} placement="top">
+        <Tooltip
+          content={singleTabMode ? <Trans>单标签模式：已开启</Trans> : <Trans>单标签模式：已关闭</Trans>}
+          placement="top"
+        >
           <button
             onClick={toggleSingleTabMode}
             className={cn(
@@ -137,34 +146,34 @@ export function StatusBar() {
             )}
           >
             <Pin size={10} />
-            <span>单标签</span>
+            <span><Trans>单标签</Trans></span>
           </button>
         </Tooltip>
 
         {/* 自动保存标识 — 点击关闭 */}
         {autoSave && (
-          <Tooltip content="自动保存已开启" placement="top">
+          <Tooltip content={<Trans>自动保存已开启</Trans>} placement="top">
             <button
               onClick={() => useSettingsStore.getState().update("autoSave", false)}
-              aria-label="关闭自动保存"
+              aria-label={i18n.t("关闭自动保存")}
               className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)] transition-colors hover:bg-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
             >
               <Save size={10} />
-              <span>自动</span>
+              <span><Trans>自动</Trans></span>
             </button>
           </Tooltip>
         )}
 
         {/* 自动刷新标识 — 点击关闭 */}
         {autoRefresh && (
-          <Tooltip content="自动刷新已开启" placement="top">
+          <Tooltip content={<Trans>自动刷新已开启</Trans>} placement="top">
             <button
               onClick={() => useSettingsStore.getState().update("autoRefresh", false)}
-              aria-label="关闭自动刷新"
+              aria-label={i18n.t("关闭自动刷新")}
               className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--color-accent)_10%,transparent)] px-1.5 py-0.5 text-[10px] text-[var(--color-accent)] transition-colors hover:bg-[color-mix(in_oklch,var(--color-accent)_22%,transparent)]"
             >
               <RotateCw size={10} />
-              <span>同步</span>
+              <span><Trans>同步</Trans></span>
             </button>
           </Tooltip>
         )}
@@ -186,7 +195,7 @@ export function StatusBar() {
                   currentFile.isDirty ? "bg-[var(--color-warning)]" : "bg-[var(--color-success)]",
                 )}
               />
-              {currentFile.isDirty ? "未保存" : "已保存"}
+              {currentFile.isDirty ? <Trans>未保存</Trans> : <Trans>已保存</Trans>}
             </span>
           </>
         )}

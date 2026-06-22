@@ -6,8 +6,10 @@
  * 内容切换：淡入过渡（200ms）
  * open/onClose 受控，由 App.tsx 管理
  */
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
 import { cn } from "@/lib/utils/cn";
 import { SECTIONS, type SectionId } from "./sections";
 
@@ -17,6 +19,15 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
+  const { i18n } = useLingui();
+
+  // 分类导航本地化映射（用 <Trans> 才能被 lingui extract 提取）
+  const NAV_LABEL: Record<SectionId, ReactNode> = {
+    appearance: <Trans>外观</Trans>,
+    editor: <Trans>编辑器</Trans>,
+    language: <Trans>语言</Trans>,
+    about: <Trans>关于</Trans>,
+  };
   const [active, setActive] = useState<SectionId>("appearance");
   const [contentKey, setContentKey] = useState(0);
   const [visible, setVisible] = useState(false); // 控制退场动画
@@ -82,7 +93,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
         {/* 左导航 */}
         <nav className="flex w-[160px] shrink-0 flex-col gap-0.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] p-2">
           <h2 className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
-            设置
+            <Trans>设置</Trans>
           </h2>
           {SECTIONS.map((s) => {
             const Icon = s.icon;
@@ -99,7 +110,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
                 )}
               >
                 <Icon size={15} className="shrink-0" />
-                <span>{s.label}</span>
+                <span>{NAV_LABEL[s.id]}</span>
               </button>
             );
           })}
@@ -108,11 +119,11 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
         {/* 右内容 */}
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
-            <h3 className="text-sm font-semibold text-[var(--color-text)]">{current.label}</h3>
+            <h3 className="text-sm font-semibold text-[var(--color-text)]">{NAV_LABEL[active]}</h3>
             <button
               onClick={handleClose}
               className="flex h-6 w-6 items-center justify-center rounded text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]"
-              aria-label="关闭设置"
+              aria-label={i18n.t(`关闭设置`)}
             >
               <X size={14} />
             </button>

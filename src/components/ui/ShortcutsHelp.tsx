@@ -2,29 +2,30 @@
  * 快捷键参考弹窗
  * 居中弹出，Esc 关闭，与 ConfirmDialog 风格一致
  */
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
 import { X } from "lucide-react";
 
-const GROUPS = [
+const RAW_GROUPS: { titleKey: string; items: { keys: string; descKey: string }[] }[] = [
   {
-    title: "文件",
+    titleKey: "文件",
     items: [
-      { keys: "Ctrl+N", desc: "新建文件" },
-      { keys: "Ctrl+O", desc: "打开文件" },
-      { keys: "Ctrl+Shift+N", desc: "打开文件夹" },
-      { keys: "Ctrl+S", desc: "保存文件" },
-      { keys: "Ctrl+R", desc: "刷新文件" },
+      { keys: "Ctrl+N", descKey: "新建文件" },
+      { keys: "Ctrl+O", descKey: "打开文件" },
+      { keys: "Ctrl+Shift+N", descKey: "打开文件夹" },
+      { keys: "Ctrl+S", descKey: "保存文件" },
+      { keys: "Ctrl+R", descKey: "刷新文件" },
     ],
   },
   {
-    title: "视图",
+    titleKey: "视图",
     items: [
-      { keys: "Ctrl+\\", desc: "切换侧栏" },
-      { keys: "Ctrl+L", desc: "切换布局（双栏/仅编辑/仅预览）" },
-      { keys: "Ctrl+F", desc: "搜索" },
-      { keys: "Ctrl+,", desc: "设置" },
-      { keys: "Esc", desc: "关闭弹窗" },
+      { keys: "Ctrl+\\", descKey: "切换侧栏" },
+      { keys: "Ctrl+L", descKey: "切换布局（双栏/仅编辑/仅预览）" },
+      { keys: "Ctrl+F", descKey: "搜索" },
+      { keys: "Ctrl+,", descKey: "设置" },
+      { keys: "Esc", descKey: "关闭弹窗" },
     ],
   },
 ];
@@ -35,6 +36,17 @@ interface ShortcutsHelpProps {
 }
 
 export function ShortcutsHelp({ open, onClose }: ShortcutsHelpProps) {
+  const { i18n } = useLingui();
+
+  const groups = useMemo(
+    () =>
+      RAW_GROUPS.map((g) => ({
+        title: i18n.t(g.titleKey),
+        items: g.items.map((it) => ({ keys: it.keys, desc: i18n.t(it.descKey) })),
+      })),
+    [i18n],
+  );
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -68,7 +80,7 @@ export function ShortcutsHelp({ open, onClose }: ShortcutsHelpProps) {
 
         {/* 快捷键列表 */}
         <div className="space-y-4 px-5 py-4">
-          {GROUPS.map((group) => (
+          {groups.map((group) => (
             <div key={group.title}>
               <div className="mb-2 text-[11px] font-medium uppercase tracking-wide text-[var(--color-text-subtle)]">
                 {group.title}

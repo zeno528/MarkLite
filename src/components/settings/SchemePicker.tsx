@@ -1,21 +1,37 @@
 import { Monitor } from "lucide-react";
+import type { ReactNode } from "react";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import { useUIStore } from "@/stores/uiStore";
-import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/colorSchemes";
+import { COLOR_SCHEMES, type ColorScheme, type SchemeId } from "@/lib/theme/colorSchemes";
 import { cn } from "@/lib/utils/cn";
+
+/** 方案 id → 显示名（<Trans> 才能被 lingui extract 提取） */
+const SCHEME_NAME: Record<SchemeId, ReactNode> = {
+  paper: <Trans>纸白</Trans>,
+  violet: <Trans>薰衣草</Trans>,
+  amber: <Trans>琥珀</Trans>,
+  notion: <Trans>Notion</Trans>,
+  github: <Trans>GitHub</Trans>,
+  midnight: <Trans>子夜</Trans>,
+  ember: <Trans>余烬</Trans>,
+  ink: <Trans>墨黑</Trans>,
+};
 
 /** 配色方案卡片选择器：3 列网格，色点 + 名称（无描述） */
 export function SchemePicker() {
+  const { i18n } = useLingui();
   const colorScheme = useUIStore((s) => s.colorScheme);
   const setColorScheme = useUIStore((s) => s.setColorScheme);
 
-  const items: { value: ColorScheme; name: string; mode: string; dots: string[] | null }[] = [
+  const items: { value: ColorScheme; name: ReactNode; mode: ReactNode; dots: string[] | null }[] = [
     ...COLOR_SCHEMES.map((s) => ({
       value: s.id as ColorScheme,
-      name: s.name,
-      mode: s.mode === "light" ? "浅" : "深",
+      name: SCHEME_NAME[s.id],
+      mode: s.mode === "light" ? i18n.t("浅") : i18n.t("深"),
       dots: [s.swatch.bg, s.swatch.surface, s.swatch.accent],
     })),
-    { value: "system", name: "跟随系统", mode: "自动", dots: null },
+    { value: "system", name: <Trans>跟随系统</Trans>, mode: <Trans>自动</Trans>, dots: null },
   ];
 
   return (

@@ -27,6 +27,7 @@ import {
   openFolderViaDialog,
   saveCurrentFile,
 } from "@/lib/shortcuts/appShortcuts";
+import { useLingui } from "@lingui/react";
 import logoSvg from "@/assets/logo.svg";
 
 interface TitleBarProps {
@@ -35,6 +36,7 @@ interface TitleBarProps {
 }
 
 export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
+  const { i18n } = useLingui();
   const [mac] = useState(() => getPlatformSync() === "macos");
   const [maximized, setMaximized] = useState(false);
 
@@ -65,49 +67,49 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
   // 构建菜单数据
   const menus: { label: string; items: MenuItem[] }[] = [
     {
-      label: "文件",
+      label: i18n.t("文件"),
       items: [
-        { label: "新建文件", shortcut: "Ctrl+N", onClick: newFile },
-        { label: "打开文件", shortcut: "Ctrl+O", onClick: openFileViaDialog },
-        { label: "打开文件夹", shortcut: "Ctrl+Shift+N", onClick: openFolderViaDialog },
+        { label: i18n.t("新建文件"), shortcut: "Ctrl+N", onClick: newFile },
+        { label: i18n.t("打开文件"), shortcut: "Ctrl+O", onClick: openFileViaDialog },
+        { label: i18n.t("打开文件夹"), shortcut: "Ctrl+Shift+N", onClick: openFolderViaDialog },
         { type: "separator" },
-        { label: "保存", shortcut: "Ctrl+S", onClick: saveCurrentFile, disabled: !hasFile },
+        { label: i18n.t("保存"), shortcut: "Ctrl+S", onClick: saveCurrentFile, disabled: !hasFile },
         { type: "separator" },
         {
-          label: "自动刷新",
+          label: i18n.t("自动刷新"),
           checked: autoRefresh,
           onClick: () => updateSettings("autoRefresh", !autoRefresh),
         },
       ],
     },
     {
-      label: "视图",
+      label: i18n.t("视图"),
       items: [
         {
-          label: "编辑",
+          label: i18n.t("编辑"),
           checked: layout === "editor-only",
           onClick: () => setLayout("editor-only" as LayoutMode),
         },
         {
-          label: "双栏",
+          label: i18n.t("双栏"),
           checked: layout === "split",
           onClick: () => setLayout("split" as LayoutMode),
         },
         {
-          label: "预览",
+          label: i18n.t("预览"),
           checked: layout === "preview-only",
           onClick: () => setLayout("preview-only" as LayoutMode),
         },
         { type: "separator" },
-        { label: "切换侧栏", shortcut: "Ctrl+\\", onClick: toggleSidebar },
+        { label: i18n.t("切换侧栏"), shortcut: "Ctrl+\\", onClick: toggleSidebar },
         { type: "separator" },
         {
           type: "submenu",
-          label: "配色方案",
+          label: i18n.t("配色方案"),
           checked: colorScheme !== "system",
           items: [
             {
-              label: "跟随系统",
+              label: i18n.t("跟随系统"),
               checked: colorScheme === "system",
               onClick: () => setColorScheme("system"),
             },
@@ -122,11 +124,11 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       ],
     },
     {
-      label: "帮助",
+      label: i18n.t("帮助"),
       items: [
-        { label: "快捷键参考", shortcut: "Ctrl+K Ctrl+S", onClick: onShowShortcuts },
+        { label: i18n.t("快捷键参考"), shortcut: "Ctrl+K Ctrl+S", onClick: onShowShortcuts },
         { type: "separator" },
-        { label: "关于", onClick: onOpenSettings },
+        { label: i18n.t("关于"), onClick: onOpenSettings },
       ],
     },
   ];
@@ -149,12 +151,12 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
           className="flex h-full items-stretch"
           style={{ WebkitAppRegion: "no-drag" } as CSSProperties}
         >
-          <button type="button" onClick={onMinimize} aria-label="最小化" title="最小化" className="titlebar-btn">
+          <button type="button" onClick={onMinimize} aria-label={i18n.t("最小化")} title={i18n.t("最小化")} className="titlebar-btn">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M0 5 H10" stroke="currentColor" strokeWidth="1" />
             </svg>
           </button>
-          <button type="button" onClick={onToggleMaximize} aria-label={maximized ? "向下还原" : "最大化"} title={maximized ? "向下还原" : "最大化"} className="titlebar-btn">
+          <button type="button" onClick={onToggleMaximize} aria-label={maximized ? i18n.t("向下还原") : i18n.t("最大化")} title={maximized ? i18n.t("向下还原") : i18n.t("最大化")} className="titlebar-btn">
             {maximized ? (
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                 <rect x="2.5" y="0.5" width="7" height="7" stroke="currentColor" strokeWidth="1" />
@@ -166,7 +168,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
               </svg>
             )}
           </button>
-          <button type="button" onClick={onClose} aria-label="关闭" title="关闭" className="titlebar-btn titlebar-close">
+          <button type="button" onClick={onClose} aria-label={i18n.t("关闭")} title={i18n.t("关闭")} className="titlebar-btn titlebar-close">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
               <path d="M0.5 0.5 L9.5 9.5 M9.5 0.5 L0.5 9.5" stroke="currentColor" strokeWidth="1" />
             </svg>

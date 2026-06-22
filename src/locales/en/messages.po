@@ -13,6 +13,638 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/components/ui/ShortcutsHelp.tsx:60
+#. js-lingui-explicit-id
+#: src/components/settings/SchemePicker.tsx:31
+msgid "浅"
+msgstr "Light"
+
+#. js-lingui-explicit-id
+#: src/components/settings/SchemePicker.tsx:31
+msgid "深"
+msgstr "Dark"
+
+#. js-lingui-explicit-id
+#: src/components/ui/ConfirmDialog.tsx:44
+msgid "确定"
+msgstr "OK"
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:289
+#: src/components/layout/Sidebar.tsx:169
+#: src/components/ui/ConfirmDialog.tsx:45
+msgid "取消"
+msgstr "Cancel"
+
+#. js-lingui-explicit-id
+#: src/components/ui/Toast.tsx:49
+msgid "通知"
+msgstr "Notifications"
+
+#. js-lingui-explicit-id
+#: src/components/ui/Toast.tsx:76
+msgid "关闭通知"
+msgstr "Close Notifications"
+
+#. js-lingui-explicit-id
+#: src/components/settings/SettingsDialog.tsx:126
+msgid "关闭设置"
+msgstr "Close Settings"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/AppearanceSection.tsx:43
+msgid "编辑器字号"
+msgstr "Editor Font Size"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/AppearanceSection.tsx:51
+msgid "编辑器字体"
+msgstr "Editor Font"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:24
+msgid "显示行号"
+msgstr "Show Line Numbers"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:27
+msgid "自动换行"
+msgstr "Auto Wrap"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:36
+msgid "Tab 缩进宽度"
+msgstr "Tab Indent Width"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:40
+msgid "自动保存"
+msgstr "Auto Save"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:51
+msgid "自动保存延迟"
+msgstr "Auto Save Delay"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:79
+#: src/components/settings/sections/EditorSection.tsx:57
+msgid "自动刷新"
+msgstr "Auto Refresh"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:68
+msgid "自动刷新间隔"
+msgstr "Auto Refresh Interval"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/EditorSection.tsx:74
+msgid "滚动同步"
+msgstr "Scroll Sync"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:98
+msgid "未打开文件夹"
+msgstr "No folder opened"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:166
+msgid "确定清除所有 {count} 个文件夹？\n"
+"编辑器中已打开的文件也将被关闭。"
+msgstr "Are you sure you want to clear all {count} folders?"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:167
+msgid "清除所有文件夹"
+msgstr "Clear all folders"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:168
+msgid "清除"
+msgstr "Clear"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:222
+msgid "文件资源管理器"
+msgstr "File Explorer"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:229
+#: src/components/layout/Sidebar.tsx:273
+msgid "目录"
+msgstr "Directory"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:273
+msgid "资源管理器"
+msgstr "Explorer"
+
+#. js-lingui-explicit-id
+#: src/components/layout/Sidebar.tsx:273
+msgid "搜索"
+msgstr "Search"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:62
+msgid "已刷新"
+msgstr "Refreshed"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:99
+msgid "刷新当前文件"
+msgstr "Refresh current file"
+
+#. js-lingui-explicit-id
+#: src/components/file/RecentFiles.tsx:123
+#: src/components/layout/StatusBar.tsx:111
+msgid "{count} 个文件"
+msgstr "{count} files"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:116
+msgid "{count} 字"
+msgstr "{count} characters"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:118
+msgid "{count} 行"
+msgstr "{count} lines"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:124
+msgid "行 {line}，列 {col}"
+msgstr "Line {line}，Column {col}"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:128
+msgid "选中 {chars} 字符 / {words} 词"
+msgstr "Selected {chars} characters / {words} words"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:158
+msgid "关闭自动保存"
+msgstr "Close auto save"
+
+#. js-lingui-explicit-id
+#: src/components/layout/StatusBar.tsx:172
+msgid "关闭自动刷新"
+msgstr "Close auto refresh"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:70
+msgid "文件"
+msgstr "File"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:72
+msgid "新建文件"
+msgstr "New File"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:73
+msgid "打开文件"
+msgstr "Open File"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:74
+msgid "打开文件夹"
+msgstr "Open Folder"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:76
+msgid "保存"
+msgstr "Save"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:86
+msgid "视图"
+msgstr "View"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:89
+msgid "编辑"
+msgstr "Edit"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:94
+msgid "双栏"
+msgstr "Split"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:99
+msgid "预览"
+msgstr "Preview"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:104
+#: src/components/layout/TopBar.tsx:182
+msgid "切换侧栏"
+msgstr "Toggle Sidebar"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:108
+msgid "配色方案"
+msgstr "Color Scheme"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:112
+msgid "跟随系统"
+msgstr "Follow System"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:127
+msgid "帮助"
+msgstr "Help"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:129
+msgid "快捷键参考"
+msgstr "Keyboard Shortcuts Reference"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:131
+msgid "关于"
+msgstr "About"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:154
+#: src/components/layout/TitleBar.tsx:154
+msgid "最小化"
+msgstr "Minimize"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:159
+msgid "向下还原"
+msgstr "Restore Down"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:159
+msgid "最大化"
+msgstr "Maximize"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TitleBar.tsx:171
+#: src/components/layout/TitleBar.tsx:171
+msgid "关闭"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TopBar.tsx:83
+msgid "回到顶部"
+msgstr "Back to Top"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TopBar.tsx:193
+msgid "设置"
+msgstr "Settings"
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:286
+msgid "确定删除「{name}」？此操作不可撤销。"
+msgstr "Delete「{name}」? This action cannot be undone."
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:287
+msgid "删除文件"
+msgstr "Delete File"
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:288
+msgid "删除"
+msgstr "Delete"
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:301
+msgid "已删除"
+msgstr "Deleted"
+
+#. js-lingui-explicit-id
+#: src/components/file/FileTree.tsx:304
+msgid "删除失败"
+msgstr "Delete Failed"
+
+#. js-lingui-explicit-id
+#: src/components/file/RecentFiles.tsx:123
+msgid "{count} 固定"
+msgstr "{count} pinned"
+
+#. js-lingui-explicit-id
+#: src/components/file/RecentFiles.tsx:129
+msgid "清空未固定的最近文件"
+msgstr "Clear unpinned recent files"
+
+#. js-lingui-explicit-id
+#: src/components/editor/TabBar.tsx:27
+msgid "关闭 {title}"
+msgstr "Close {title}"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TopBar.tsx:209
+#~ msgid "中文"
+#~ msgstr "Chinese"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TopBar.tsx:209
+#~ msgid "English"
+#~ msgstr "English"
+
+#. js-lingui-explicit-id
+#: src/components/layout/TopBar.tsx:216
+#~ msgid "切换语言"
+#~ msgstr "Switch Language"
+
+#: src/components/settings/SchemePicker.tsx:15
+msgid "GitHub"
+msgstr "GitHub"
+
+#: src/components/settings/SchemePicker.tsx:14
+msgid "Notion"
+msgstr "Notion"
+
+#: src/components/settings/sections/EditorSection.tsx:29
+msgid "Tab 缩进宽度"
+msgstr "Tab Indent Width"
+
+#: src/components/settings/sections/AppearanceSection.tsx:36
+msgid "代码编辑器的字体大小"
+msgstr "Code Editor Font Size"
+
+#: src/components/settings/SchemePicker.tsx:17
+msgid "余烬"
+msgstr "Ember"
+
+#: src/components/layout/TopBar.tsx:149
+msgid "保存 <0>(Ctrl+S)</0>"
+msgstr "Save <0>(Ctrl+S)</0>"
+
+#: src/components/layout/TopBar.tsx:147
+msgid "保存 <0>(Ctrl+S)</0> — 有未保存的修改"
+msgstr "Save <0>(Ctrl+S)</0> — Unsaved changes"
+
+#: src/components/settings/sections/EditorSection.tsx:43
+msgid "保存延迟"
+msgstr "Save Delay"
+
+#: src/components/settings/sections/EditorSection.tsx:43
+msgid "停止输入后等待此时间再保存"
+msgstr "Wait this time after stopping input to save"
+
+#: src/components/settings/SettingsDialog.tsx:29
+msgid "关于"
+msgstr "About"
+
+#: src/components/layout/Sidebar.tsx:278
+msgid "关闭所有标签"
+msgstr "Close All Tabs"
+
+#: src/components/layout/Sidebar.tsx:321
+msgid "最近打开"
+msgstr "Recent"
+
+#: src/components/layout/TopBar.tsx:178
+msgid "切换侧栏 <0>(Ctrl+\\)</0>"
+msgstr "Toggle Sidebar <0>(Ctrl+\\)</0>"
+
+#: src/components/settings/sections/LanguageSection.tsx:16
+msgid "切换后立即生效，重启后保留"
+msgstr "Takes effect immediately, persists after restart"
+
+#. placeholder {0}: currentLocale === "zh-CN" ? i18n.t(`中文`) : i18n.t(`English`)
+#: src/components/layout/TopBar.tsx:209
+#~ msgid "切换语言（当前：{0}）"
+#~ msgstr "Switch Language (Current: {0})"
+
+#: src/components/file/FileTree.tsx:340
+msgid "删除"
+msgstr "Delete"
+
+#: src/components/layout/StatusBar.tsx:90
+msgid "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
+msgstr "Refresh <0>(Ctrl+R)</0> — Re-read current file from disk"
+
+#: src/components/settings/sections/EditorSection.tsx:60
+msgid "刷新间隔"
+msgstr "Refresh Interval"
+
+#: src/components/layout/StatusBar.tsx:149
+msgid "单标签"
+msgstr "Single tab"
+
+#: src/components/layout/StatusBar.tsx:136
+msgid "单标签模式：已关闭"
+msgstr "Single tab mode：Disabled"
+
+#: src/components/layout/StatusBar.tsx:136
+msgid "单标签模式：已开启"
+msgstr "Single tab mode：Enabled"
+
+#: src/components/layout/TopBar.tsx:56
+msgid "双栏"
+msgstr "Split"
+
+#: src/components/layout/StatusBar.tsx:176
+msgid "同步"
+msgstr "Sync"
+
+#: src/components/layout/TopBar.tsx:80
+msgid "回到顶部"
+msgstr "Back to Top"
+
+#: src/components/file/FileTree.tsx:333
+msgid "在资源管理器中打开"
+msgstr "Open in Explorer"
+
+#: src/components/settings/sections/AboutSection.tsx:52
+msgid "基于 Tauri 2 + React 19 + CodeMirror 6 的轻量级跨平台 Markdown 编辑器。追求极好的性能、极小的占用和极快的启动速度。"
+msgstr "A lightweight cross-platform Markdown editor based on Tauri 2 + React 19 + CodeMirror 6. Pursuing excellent performance, minimal footprint, and fast startup speed."
+
+#: src/components/settings/SettingsDialog.tsx:26
+msgid "外观"
+msgstr "Appearance"
+
+#: src/components/settings/sections/AboutSection.tsx:63
+msgid "如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将 <0>.md</0> 与 <1>.markdown</1> 的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。"
+msgstr "To set MarkLite as the default program for opening Markdown files, in the system \"Default Apps\", set the default app for <0>.md</0> and <1>.markdown</1> to MarkLite. After configuration, you can open files directly by double-clicking."
+
+#: src/components/settings/SchemePicker.tsx:16
+msgid "子夜"
+msgstr "Midnight"
+
+#: src/components/settings/sections/AppearanceSection.tsx:46
+msgid "字体"
+msgstr "Font"
+
+#: src/components/layout/Sidebar.tsx:288
+msgid "展开全部"
+msgstr "Expand All"
+
+#: src/components/layout/StatusBar.tsx:198
+msgid "已保存"
+msgstr "Saved"
+
+#: src/components/ui/ShortcutsHelp.tsx:72
 msgid "快捷键"
 msgstr "Keyboard Shortcuts"
+
+#: src/components/layout/TopBar.tsx:125
+msgid "打开文件 <0>(Ctrl+O)</0>"
+msgstr "Open File <0>(Ctrl+O)</0>"
+
+#: src/components/layout/Sidebar.tsx:297
+msgid "打开文件夹"
+msgstr "Open Folder"
+
+#: src/components/layout/TopBar.tsx:133
+msgid "打开文件夹 <0>(Ctrl+Shift+N)</0>"
+msgstr "Open Folder <0>(Ctrl+Shift+N)</0>"
+
+#: src/components/settings/sections/AboutSection.tsx:75
+msgid "打开系统设置"
+msgstr "Open System Settings"
+
+#: src/components/settings/sections/EditorSection.tsx:29
+msgid "按 Tab 键插入的空格数"
+msgstr "Number of spaces inserted by Tab"
+
+#: src/components/layout/Sidebar.tsx:240
+msgid "搜索 <0>Ctrl+F</0>"
+msgstr "Search <0>Ctrl+F</0>"
+
+#: src/components/layout/Sidebar.tsx:288
+msgid "收起全部"
+msgstr "Collapse All"
+
+#: src/components/layout/Sidebar.tsx:332
+msgid "文件夹"
+msgstr "Folder"
+
+#: src/components/file/Outline.tsx:164
+msgid "无标题"
+msgstr "Untitled"
+
+#: src/components/settings/sections/EditorSection.tsx:23
+msgid "显示行号"
+msgstr "Show Line Numbers"
+
+#: src/components/layout/StatusBar.tsx:198
+msgid "未保存"
+msgstr "Unsaved"
+
+#: src/components/file/FileTree.tsx:41
+msgid "未打开文件夹"
+msgstr "No Folder Open"
+
+#: src/components/settings/sections/EditorSection.tsx:73
+msgid "滚动同步"
+msgstr "Scroll Sync"
+
+#: src/components/settings/sections/AboutSection.tsx:33
+msgid "版本"
+msgstr "Version"
+
+#: src/components/settings/SchemePicker.tsx:13
+msgid "琥珀"
+msgstr "Amber"
+
+#: src/components/settings/sections/LanguageSection.tsx:16
+msgid "界面语言"
+msgstr "Interface Language"
+
+#: src/components/settings/sections/EditorSection.tsx:67
+msgid "秒"
+msgstr "Seconds"
+
+#: src/components/settings/SchemePicker.tsx:11
+msgid "纸白"
+msgstr "Paper White"
+
+#: src/components/layout/TopBar.tsx:55
+msgid "编辑"
+msgstr "Edit"
+
+#: src/components/settings/sections/EditorSection.tsx:39
+msgid "编辑后自动保存到磁盘，防止意外丢失"
+msgstr "Auto save to disk after editing to prevent data loss"
+
+#: src/components/settings/SettingsDialog.tsx:27
+msgid "编辑器"
+msgstr "Editor"
+
+#: src/components/settings/sections/EditorSection.tsx:73
+msgid "编辑器与预览的双向滚动联动"
+msgstr "Bidirectional scroll sync between editor and preview"
+
+#: src/components/settings/sections/AppearanceSection.tsx:36
+msgid "编辑器字号"
+msgstr "Editor Font Size"
+
+#: src/components/layout/StatusBar.tsx:162
+#: src/components/settings/SchemePicker.tsx:34
+msgid "自动"
+msgstr "Auto"
+
+#: src/components/settings/sections/EditorSection.tsx:56
+msgid "自动从磁盘同步文件变更"
+msgstr "Auto sync file changes from disk"
+
+#: src/components/settings/sections/EditorSection.tsx:39
+msgid "自动保存"
+msgstr "Auto Save"
+
+#: src/components/layout/StatusBar.tsx:155
+msgid "自动保存已开启"
+msgstr "Auto save enabled"
+
+#: src/components/settings/sections/EditorSection.tsx:56
+msgid "自动刷新"
+msgstr "Auto Refresh"
+
+#: src/components/layout/StatusBar.tsx:169
+msgid "自动刷新已开启"
+msgstr "Auto refresh enabled"
+
+#: src/components/settings/sections/EditorSection.tsx:26
+msgid "自动换行"
+msgstr "Auto Wrap"
+
+#: src/components/settings/SchemePicker.tsx:12
+msgid "薰衣草"
+msgstr "Lavender"
+
+#: src/components/settings/sections/AboutSection.tsx:59
+msgid "设为默认 Markdown 程序"
+msgstr "Set as Default Markdown Program"
+
+#: src/components/settings/SettingsDialog.tsx:96
+msgid "设置"
+msgstr "Settings"
+
+#: src/components/layout/TopBar.tsx:189
+msgid "设置 <0>(Ctrl+,)</0>"
+msgstr "Settings <0>(Ctrl+,)</0>"
+
+#: src/components/settings/SettingsDialog.tsx:28
+msgid "语言"
+msgstr "Language"
+
+#: src/components/settings/SchemePicker.tsx:34
+msgid "跟随系统"
+msgstr "Follow System"
+
+#: src/components/settings/sections/AppearanceSection.tsx:33
+msgid "配色方案"
+msgstr "Color Scheme"
+
+#: src/components/file/FileTree.tsx:336
+msgid "重命名"
+msgstr "Rename"
+
+#: src/components/layout/TopBar.tsx:57
+msgid "预览"
+msgstr "Preview"
+
+#: src/components/settings/SchemePicker.tsx:18
+msgid "墨黑"
+msgstr "Ink Black"
+

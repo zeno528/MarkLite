@@ -6,9 +6,11 @@
 import { Fragment } from "react";
 import { X, FileText } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
+import { useLingui } from "@lingui/react";
 import { cn } from "@/lib/utils/cn";
 
 export function TabBar() {
+  const { i18n } = useLingui();
   const openFiles = useEditorStore((s) => s.openFiles);
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
   const switchFile = useEditorStore((s) => s.switchFile);
@@ -22,6 +24,7 @@ export function TabBar() {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
         const showDivider = !isActive && !nextIsActive;
+        const closeTitle = i18n.t("关闭 {title}", { title: file.title });
         return (
           <Fragment key={file.path}>
             <div
@@ -47,7 +50,7 @@ export function TabBar() {
                   e.stopPropagation();
                   closeFile(file.path);
                 }}
-                title={`关闭 ${file.title}`}
+                title={closeTitle}
                 className={cn(
                   "ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded transition-all",
                   isActive

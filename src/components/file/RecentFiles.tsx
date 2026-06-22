@@ -13,6 +13,7 @@ import { readTextFile } from "@tauri-apps/plugin-fs";
 import { FileService } from "@/lib/tauri/fs";
 import { notify } from "@/stores/notificationStore";
 import { cn } from "@/lib/utils/cn";
+import { useLingui } from "@lingui/react";
 
 /** 取路径的文件名（不含扩展名） */
 function fileName(path: string): string {
@@ -104,6 +105,7 @@ function RecentItem({
 }
 
 export function RecentFiles() {
+  const { i18n } = useLingui();
   const files = useRecentStore((s) => s.files);
   const togglePin = useRecentStore((s) => s.togglePin);
   const removeRecent = useRecentStore((s) => s.removeRecent);
@@ -118,13 +120,13 @@ export function RecentFiles() {
       {files.length > 0 && (
         <div className="flex h-7 shrink-0 items-center justify-between px-2">
           <span className="text-[11px] text-[var(--color-text-muted)]">
-            {pinned.length > 0 && `${pinned.length} 固定 · `}{unpinned.length} 个文件
+            {pinned.length > 0 && i18n.t("{count} 固定", { count: pinned.length }) + " · "}{i18n.t("{count} 个文件", { count: unpinned.length })}
           </span>
           {unpinned.length > 0 && (
             <button
               onClick={clearUnpinned}
               className="flex items-center gap-0.5 text-[11px] text-[var(--color-text-muted)] hover:text-red-400 transition-colors"
-              title="清空未固定的最近文件"
+              title={i18n.t("清空未固定的最近文件")}
             >
               <Trash2 size={11} />
               清空

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 通知条容器（toast）：顶部居中浮现、非阻塞、自动消失
  * 订阅 notificationStore，垂直堆叠渲染。单条 = 类型图标 + 消息 + 关闭按钮。
  * 配色跟随 data-scheme（CSS 变量），进场动画 toast-in（350ms 回弹），退场 toast-out（400ms 坍缩）。
@@ -17,6 +17,7 @@ import {
   type NotificationType,
 } from "@/stores/notificationStore";
 import { useUIStore } from "@/stores/uiStore";
+import { useLingui } from "@lingui/react";
 import { cn } from "@/lib/utils/cn";
 
 const TYPE_CONFIG: Record<NotificationType, { icon: LucideIcon; color: string; spin?: boolean }> = {
@@ -28,6 +29,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: LucideIcon; color: string; s
 };
 
 export function ToastContainer() {
+  const { i18n } = useLingui();
   const notifications = useNotificationStore((s) => s.notifications);
   const dismiss = useNotificationStore((s) => s.dismiss);
   // 通知条背景与主题明暗「反相」：浅色主题用深色通知条、深色主题用浅色通知条，
@@ -44,7 +46,7 @@ export function ToastContainer() {
     <div
       className="pointer-events-none fixed top-[calc(var(--titlebar-height)+25px)] left-1/2 z-[60] flex -translate-x-1/2 flex-col items-center gap-2"
       role="region"
-      aria-label="通知"
+      aria-label={i18n.t("通知")}
     >
       {notifications.map((n) => {
         const { icon: Icon, color, spin } = TYPE_CONFIG[n.type];
@@ -71,7 +73,7 @@ export function ToastContainer() {
             <button
               className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md opacity-50 transition-opacity hover:opacity-100"
               onClick={() => dismiss(n.id)}
-              aria-label="关闭通知"
+              aria-label={i18n.t("关闭通知")}
             >
               <X size={13} />
             </button>
