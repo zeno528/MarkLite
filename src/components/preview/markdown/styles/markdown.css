@@ -209,7 +209,7 @@
 .markdown-body pre {
   position: relative;
   margin: 1.2em 0;
-  padding: 1em 0.3em 0.1em !important;
+  padding: 0.6em 0.5em 0.6em 0.7em !important;
   border-radius: 8px !important;
   border: 1px solid var(--color-border) !important;
   /* 用 color-mix 让背景比卡片底色略深一阶，确保容器可见 */
@@ -252,10 +252,10 @@
   display: block;
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:decrement {
-  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M4 12 16 4 16 20z'/%3E%3C/svg%3E");
+  background: no-repeat center/8px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M4 12 16 4 16 20z'/%3E%3C/svg%3E");
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:increment {
-  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M20 12 8 4 8 20z'/%3E%3C/svg%3E");
+  background: no-repeat center/8px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M20 12 8 4 8 20z'/%3E%3C/svg%3E");
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:decrement:hover,
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:increment:hover {
