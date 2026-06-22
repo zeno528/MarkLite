@@ -1,10 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
 import { useUIStore } from "@/stores/uiStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { SchemePicker } from "@/components/settings/SchemePicker";
 import { SettingRow } from "@/components/ui/SettingRow";
 import { NumberField } from "@/components/ui/NumberField";
 import { Select, type SelectOption } from "@/components/ui/Select";
+import { Toggle } from "@/components/ui/Toggle";
 
 /** 字体候选（等宽，适合代码/markdown） */
 const FONT_OPTIONS: SelectOption<string>[] = [
@@ -19,13 +21,15 @@ const FONT_OPTIONS: SelectOption<string>[] = [
   { value: "monospace", label: "系统默认" },
 ];
 
-/** 外观：配色方案 / 编辑器字号 / 字体 */
+/** 外观：配色方案 / 编辑器字号 / 字体 / 磨砂标题栏 */
 export function AppearanceSection() {
   const { i18n } = useLingui();
   const fontSize = useUIStore((s) => s.fontSize);
   const setFontSize = useUIStore((s) => s.setFontSize);
   const fontFamily = useUIStore((s) => s.fontFamily);
   const setFontFamily = useUIStore((s) => s.setFontFamily);
+  const frostedTitlebar = useSettingsStore((s) => s.frostedTitlebar);
+  const update = useSettingsStore((s) => s.update);
 
   return (
     <div className="space-y-5">
@@ -50,6 +54,9 @@ export function AppearanceSection() {
           onChange={setFontFamily}
           aria-label={i18n.t(`编辑器字体`)}
         />
+      </SettingRow>
+      <SettingRow label={<Trans>磨砂标题栏</Trans>} description={<Trans>开启后标题栏半透+磨砂模糊，跟随配色</Trans>}>
+        <Toggle checked={frostedTitlebar} onChange={(v) => update("frostedTitlebar", v)} aria-label={i18n.t(`磨砂标题栏`)} />
       </SettingRow>
     </div>
   );

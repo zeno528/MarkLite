@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
  * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
@@ -80,7 +80,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
         <Tooltip content={<Trans>回到顶部</Trans>} placement="bottom" align="left">
           <button
             onClick={handleScrollToTop}
-            aria-label={i18n.t(`回到顶部`)}
+            aria-label={i18n.t("回到顶部")}
             className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-accent)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           >
             <House size={22} strokeWidth={1.6} className="transition-transform duration-200 hover:scale-110" />
@@ -179,7 +179,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           <button
             className={cn("icon-btn", showSidebar && "active")}
             onClick={toggleSidebar}
-            aria-label={i18n.t(`切换侧栏`)}
+            aria-label={i18n.t("切换侧栏")}
           >
             <PanelLeft size={15} />
           </button>
@@ -190,7 +190,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             <button
               className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
               onClick={onOpenSettings}
-              aria-label={i18n.t(`设置`)}
+              aria-label={i18n.t("设置")}
             >
               <Settings size={15} />
             </button>

@@ -52,7 +52,7 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
 
   /* 布局尺寸 */
-  --titlebar-height: 32px;
+  --titlebar-height: 36px;
   --statusbar-height: 24px;
   --sidebar-width: 280px;
   --sidebar-min-width: 200px;
@@ -247,7 +247,7 @@ body,
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--color-bg);
+  background: transparent;
   color: var(--color-text);
   font-family: var(--font-ui);
   font-size: 14px;
@@ -593,6 +593,11 @@ body {
   cursor: default;
 }
 
+/* ===== 磨砂标题栏（纯半透，透出 Tauri Acrylic 系统磨砂） ===== */
+.titlebar-frosted {
+  background: color-mix(in oklch, var(--color-bg-muted) 50%, transparent);
+}
+
 /* ===== 自定义标题栏窗口控件按钮（Windows/Linux） =====
    尺寸 46×32 匹配标题栏高度，无圆角贴合右上角 */
 .titlebar-btn {
@@ -635,7 +640,7 @@ body {
   cursor: default;
   border: 0;
   background: transparent;
-  height: 24px;
+  height: 26px;
   display: inline-flex;
   align-items: center;
 }

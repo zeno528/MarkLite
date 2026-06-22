@@ -150,14 +150,19 @@ Strict rules:
 Strings:
 ${lines}`;
 
+  // DeepSeek V4 默认 thinking 模式；翻译不需要推理，关掉省 token、避免 CoT 干扰输出
+  // 仅对 deepseek-v4* 生效——thinking 是 DeepSeek 特有参数，OpenAI/通义/Moonshot 不认
+  const body = {
+    model: MODEL,
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.2,
+  };
+  if (MODEL.startsWith("deepseek-v4")) body.thinking = { type: "disabled" };
+
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.LLM_API_KEY}` },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const t = await res.text();

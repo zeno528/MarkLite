@@ -9,6 +9,8 @@ interface SettingsState {
   tabSize: number;
   wordWrap: boolean;
   lineNumbers: boolean;
+  /** 磨砂标题栏：开启后标题栏半透+模糊，跟随配色 */
+  frostedTitlebar: boolean;
   /** 自动保存 */
   autoSave: boolean;
   autoSaveDelay: number; // ms
@@ -40,6 +42,7 @@ const DEFAULTS = {
   tabSize: 2,
   wordWrap: true,
   lineNumbers: true,
+  frostedTitlebar: true,
   autoSave: false,
   autoSaveDelay: 2000,
   autoRefresh: true,

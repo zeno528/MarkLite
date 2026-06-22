@@ -14,14 +14,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/settings/SchemePicker.tsx:31
-msgid "浅"
-msgstr "Light"
-
-#. js-lingui-explicit-id
-#: src/components/settings/SchemePicker.tsx:31
-msgid "深"
-msgstr "Dark"
+#: src/components/settings/sections/AppearanceSection.tsx:59
+msgid "磨砂标题栏"
+msgstr "Frosted Title Bar"
 
 #. js-lingui-explicit-id
 #: src/components/ui/ConfirmDialog.tsx:44
@@ -46,17 +41,27 @@ msgid "关闭通知"
 msgstr "Close Notifications"
 
 #. js-lingui-explicit-id
+#: src/components/settings/SchemePicker.tsx:31
+msgid "浅"
+msgstr "Light"
+
+#. js-lingui-explicit-id
+#: src/components/settings/SchemePicker.tsx:31
+msgid "深"
+msgstr "Dark"
+
+#. js-lingui-explicit-id
 #: src/components/settings/SettingsDialog.tsx:126
 msgid "关闭设置"
 msgstr "Close Settings"
 
 #. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:43
+#: src/components/settings/sections/AppearanceSection.tsx:47
 msgid "编辑器字号"
 msgstr "Editor Font Size"
 
 #. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:51
+#: src/components/settings/sections/AppearanceSection.tsx:55
 msgid "编辑器字体"
 msgstr "Editor Font"
 
@@ -86,7 +91,7 @@ msgid "自动保存延迟"
 msgstr "Auto Save Delay"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:79
+#: src/components/layout/TitleBar.tsx:81
 #: src/components/settings/sections/EditorSection.tsx:57
 msgid "自动刷新"
 msgstr "Auto Refresh"
@@ -190,102 +195,102 @@ msgid "关闭自动刷新"
 msgstr "Close auto refresh"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:70
+#: src/components/layout/TitleBar.tsx:72
 msgid "文件"
 msgstr "File"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:72
+#: src/components/layout/TitleBar.tsx:74
 msgid "新建文件"
 msgstr "New File"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:73
+#: src/components/layout/TitleBar.tsx:75
 msgid "打开文件"
 msgstr "Open File"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:74
+#: src/components/layout/TitleBar.tsx:76
 msgid "打开文件夹"
 msgstr "Open Folder"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:76
+#: src/components/layout/TitleBar.tsx:78
 msgid "保存"
 msgstr "Save"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:86
+#: src/components/layout/TitleBar.tsx:88
 msgid "视图"
 msgstr "View"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:89
+#: src/components/layout/TitleBar.tsx:91
 msgid "编辑"
 msgstr "Edit"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:94
+#: src/components/layout/TitleBar.tsx:96
 msgid "双栏"
 msgstr "Split"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:99
+#: src/components/layout/TitleBar.tsx:101
 msgid "预览"
 msgstr "Preview"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:104
+#: src/components/layout/TitleBar.tsx:106
 #: src/components/layout/TopBar.tsx:182
 msgid "切换侧栏"
 msgstr "Toggle Sidebar"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:108
+#: src/components/layout/TitleBar.tsx:110
 msgid "配色方案"
 msgstr "Color Scheme"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:112
+#: src/components/layout/TitleBar.tsx:114
 msgid "跟随系统"
 msgstr "Follow System"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:127
+#: src/components/layout/TitleBar.tsx:129
 msgid "帮助"
 msgstr "Help"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:129
+#: src/components/layout/TitleBar.tsx:131
 msgid "快捷键参考"
 msgstr "Keyboard Shortcuts Reference"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:131
+#: src/components/layout/TitleBar.tsx:133
 msgid "关于"
 msgstr "About"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:154
-#: src/components/layout/TitleBar.tsx:154
+#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:159
 msgid "最小化"
 msgstr "Minimize"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:159
-#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:164
+#: src/components/layout/TitleBar.tsx:164
 msgid "向下还原"
 msgstr "Restore Down"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:159
-#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:164
+#: src/components/layout/TitleBar.tsx:164
 msgid "最大化"
 msgstr "Maximize"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:171
-#: src/components/layout/TitleBar.tsx:171
+#: src/components/layout/TitleBar.tsx:176
+#: src/components/layout/TitleBar.tsx:176
 msgid "关闭"
 msgstr "Close"
 
@@ -366,7 +371,7 @@ msgstr "Notion"
 msgid "Tab 缩进宽度"
 msgstr "Tab Indent Width"
 
-#: src/components/settings/sections/AppearanceSection.tsx:36
+#: src/components/settings/sections/AppearanceSection.tsx:40
 msgid "代码编辑器的字体大小"
 msgstr "Code Editor Font Size"
 
@@ -471,7 +476,7 @@ msgstr "To set MarkLite as the default program for opening Markdown files, in th
 msgid "子夜"
 msgstr "Midnight"
 
-#: src/components/settings/sections/AppearanceSection.tsx:46
+#: src/components/settings/sections/AppearanceSection.tsx:50
 msgid "字体"
 msgstr "Font"
 
@@ -482,6 +487,10 @@ msgstr "Expand All"
 #: src/components/layout/StatusBar.tsx:198
 msgid "已保存"
 msgstr "Saved"
+
+#: src/components/settings/sections/AppearanceSection.tsx:58
+msgid "开启后标题栏半透+磨砂模糊，跟随配色"
+msgstr "Semi-transparent title bar with frosted blur, follows the color scheme"
 
 #: src/components/ui/ShortcutsHelp.tsx:72
 msgid "快捷键"
@@ -551,6 +560,10 @@ msgstr "Amber"
 msgid "界面语言"
 msgstr "Interface Language"
 
+#: src/components/settings/sections/AppearanceSection.tsx:58
+msgid "磨砂标题栏"
+msgstr "Frosted Title Bar"
+
 #: src/components/settings/sections/EditorSection.tsx:67
 msgid "秒"
 msgstr "Seconds"
@@ -575,7 +588,7 @@ msgstr "Editor"
 msgid "编辑器与预览的双向滚动联动"
 msgstr "Bidirectional scroll sync between editor and preview"
 
-#: src/components/settings/sections/AppearanceSection.tsx:36
+#: src/components/settings/sections/AppearanceSection.tsx:40
 msgid "编辑器字号"
 msgstr "Editor Font Size"
 
@@ -632,7 +645,7 @@ msgstr "Language"
 msgid "跟随系统"
 msgstr "Follow System"
 
-#: src/components/settings/sections/AppearanceSection.tsx:33
+#: src/components/settings/sections/AppearanceSection.tsx:37
 msgid "配色方案"
 msgstr "Color Scheme"
 
@@ -647,4 +660,3 @@ msgstr "Preview"
 #: src/components/settings/SchemePicker.tsx:18
 msgid "墨黑"
 msgstr "Ink Black"
-

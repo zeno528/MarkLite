@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 自定义标题栏（替代系统原生窗口装饰）
  *
  * 职责：
@@ -20,6 +20,7 @@ import { MenuBar, type MenuItem } from "@/components/ui/Menu";
 import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { cn } from "@/lib/utils/cn";
 import { useEditorStore } from "@/stores/editorStore";
 import {
   newFile,
@@ -37,6 +38,7 @@ interface TitleBarProps {
 
 export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
   const { i18n } = useLingui();
+  const frostedTitlebar = useSettingsStore((s) => s.frostedTitlebar);
   const [mac] = useState(() => getPlatformSync() === "macos");
   const [maximized, setMaximized] = useState(false);
 
@@ -136,12 +138,15 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
   return (
     <div
       data-tauri-drag-region
-      className="flex h-8 w-full shrink-0 select-none items-center justify-between bg-[var(--color-bg-muted)]"
+      className={cn(
+        "flex h-9 w-full shrink-0 select-none items-center justify-between",
+        frostedTitlebar ? "titlebar-frosted" : "bg-[var(--color-bg-muted)]",
+      )}
       style={{ WebkitAppRegion: "drag" } as CSSProperties}
     >
       {/* 左侧：logo + 品牌 + 菜单 */}
       <div className="flex items-center gap-2" style={{ paddingLeft: mac ? "78px" : "12px" }}>
-        <img src={logoSvg} alt="MarkLite" className="h-4 w-4 shrink-0" draggable={false} />
+        <img src={logoSvg} alt="MarkLite" className="h-[18px] w-[18px] shrink-0" draggable={false} />
         <MenuBar menus={menus} />
       </div>
 

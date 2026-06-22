@@ -432,7 +432,7 @@ export default function App() {
             isDragging={isResizing}
           />
         )}
-        <main className="flex min-h-0 flex-1 overflow-hidden">
+        <main className="flex min-h-0 flex-1 overflow-hidden bg-[var(--color-bg)]">
           {layout === "split" && (
             <SplitView left={<EditorPane />} right={<MarkdownPreview />} />
           )}

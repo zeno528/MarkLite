@@ -22,7 +22,10 @@
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "decorations": true,
-        "transparent": false,
+        "transparent": true,
+        "windowEffects": {
+          "effects": ["acrylic", "underWindowBackground"]
+        },
         "fullscreen": false,
         "resizable": true,
         "center": true
@@ -38,7 +41,7 @@
         }
       }
     },
-    "macOSPrivateApi": false
+    "macOSPrivateApi": true
   },
   "bundle": {
     "active": true,
