@@ -252,10 +252,10 @@
   display: block;
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:decrement {
-  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M16 5 8 12 16 19z'/%3E%3C/svg%3E");
+  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M4 12 16 4 16 20z'/%3E%3C/svg%3E");
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:increment {
-  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M8 5 16 12 8 19z'/%3E%3C/svg%3E");
+  background: no-repeat center/10px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'%3E%3Cpath d='M20 12 8 4 8 20z'/%3E%3C/svg%3E");
 }
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:decrement:hover,
 .markdown-body pre code::-webkit-scrollbar-button:horizontal:increment:hover {
