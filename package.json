@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "lingui:extract": "lingui extract",
+    "lingui:compile": "lingui compile --typescript",
+    "lingui:sync": "lingui extract && lingui compile --typescript",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
@@ -19,6 +22,8 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.43.1",
     "@lezer/highlight": "^1.2.3",
+    "@lingui/core": "^6.4.0",
+    "@lingui/react": "^6.4.0",
     "@tailwindcss/vite": "^4.3.1",
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.1",
@@ -41,6 +46,9 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@lingui/babel-plugin-lingui-macro": "^6.4.0",
+    "@lingui/cli": "^6.4.0",
+    "@lingui/vite-plugin": "^6.4.0",
     "@tauri-apps/cli": "^2.11.2",
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",

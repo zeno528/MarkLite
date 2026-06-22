@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 顶栏（合并自 TitleBar + EditorToolbar，单层）
  * 左：品牌 + 面包屑（rootFolder › filename）   右：主操作（打开） + 药丸次要组（布局 | 侧栏 | 设置）
  * macOS: 留出红绿灯 78px 安全区，整栏可拖拽，按钮区 no-drag
@@ -15,6 +15,7 @@ import {
   PanelLeft,
   ChevronRight,
   House,
+  Languages,
 } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
@@ -22,6 +23,8 @@ import { useEditorStore, editorViewRef, previewContainerRef } from "@/stores/edi
 import { useFileStore } from "@/stores/fileStore";
 import { isMac } from "@/lib/utils/platform";
 import { cn } from "@/lib/utils/cn";
+import { useLingui } from "@lingui/react";
+import { dynamicActivate, type Locale } from "@/i18n";
 import { openFileViaDialog, openFolderViaDialog, saveCurrentFile } from "@/lib/shortcuts/appShortcuts";
 
 interface TopBarProps {
@@ -46,6 +49,14 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
   const rootFolderName = rootFolder
     ? rootFolder.split(/[\\/]/).filter(Boolean).pop() ?? rootFolder
     : null;
+
+  // 国际化：当前语言 + 切换函数（zh-CN ↔ en）
+  const { i18n } = useLingui();
+  const currentLocale = i18n.locale as Locale;
+  const toggleLocale = () => {
+    const next: Locale = currentLocale === "zh-CN" ? "en" : "zh-CN";
+    dynamicActivate(next);
+  };
 
   const layouts: { mode: LayoutMode; icon: React.ReactNode; label: string }[] = [
     { mode: "editor-only", icon: <PencilLine size={14} />, label: "编辑" },
@@ -184,7 +195,18 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           </Tooltip>
         )}
 
+        <Tooltip content={`切换语言（当前：${currentLocale === "zh-CN" ? "中文" : "English"}）`} placement="bottom" align="right">
+          <button
+            className="icon-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            onClick={toggleLocale}
+            aria-label="切换语言"
+          >
+            <Languages size={15} />
+          </button>
+        </Tooltip>
+
       </div>
     </header>
   );
 }
+

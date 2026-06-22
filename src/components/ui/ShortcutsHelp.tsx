@@ -3,6 +3,7 @@
  * 居中弹出，Esc 关闭，与 ConfirmDialog 风格一致
  */
 import { useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
 import { X } from "lucide-react";
 
 const GROUPS = [
@@ -56,7 +57,7 @@ export function ShortcutsHelp({ open, onClose }: ShortcutsHelpProps) {
       >
         {/* 标题栏 */}
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-3">
-          <h2 className="text-[14px] font-semibold text-[var(--color-text)]">快捷键</h2>
+          <h2 className="text-[14px] font-semibold text-[var(--color-text)]"><Trans>快捷键</Trans></h2>
           <button
             onClick={onClose}
             className="flex h-6 w-6 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-muted)]"
