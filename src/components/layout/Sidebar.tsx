@@ -248,7 +248,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
         <ActivityBarButton
           active={false}
           onClick={onToggle}
-          title={<Trans>折叠侧栏 <span className="opacity-70">(Ctrl+\)</span></Trans>}
+          title={<Trans>切换侧栏 <span className="opacity-70">(Ctrl+\)</span></Trans>}
         >
           <PanelLeftClose size={20} />
         </ActivityBarButton>

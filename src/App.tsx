@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MarkLite 主应用
  * 布局：标题栏 + 工具栏 + 主体（侧边栏 + 双栏） + 状态栏
  */
@@ -403,12 +403,20 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* 活动栏 - 始终可见 */}
         <SidebarActivityBar collapsed={!showSidebar} onToggle={() => useUIStore.getState().setShowSidebar(!showSidebar)} />
-        {/* 面板 - 可折叠 */}
+        {/* 面板 - 可折叠
+            性能优化：原 width + transform 双动画，外层 width 触发 layout/paint 是掉帧主因。
+            - 外层不再做 width 过渡，常驻 var(--sidebar-width)，只做 overflow-hidden 裁剪
+            - 空间回收改用 margin-right（不像 width 那样逐帧触发重排）
+            - will-change 提示浏览器提前升合成层 */}
         <div
           className="flex shrink-0 overflow-hidden"
           style={{
-            width: showSidebar ? "var(--sidebar-width)" : "0px",
-            transition: isResizing ? "none" : "width 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+            width: "var(--sidebar-width)",
+            marginRight: showSidebar ? "0px" : "calc(var(--sidebar-width) * -1)",
+            transition: isResizing
+              ? "none"
+              : "margin-right 350ms cubic-bezier(0.22, 1, 0.36, 1)",
+            willChange: "margin-right",
           }}
         >
           <div
@@ -416,7 +424,8 @@ export default function App() {
             style={{
               width: "var(--sidebar-width)",
               transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
-              transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+              transition: "transform 350ms cubic-bezier(0.22, 1, 0.36, 1)",
+              willChange: "transform",
             }}
           >
             <SidebarPanel />
