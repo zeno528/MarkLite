@@ -14,6 +14,46 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:123
+msgid "纸白"
+msgstr "Paper"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:124
+msgid "薰衣草"
+msgstr "Lavender"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:125
+msgid "琥珀"
+msgstr "Amber"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:126
+msgid "Notion"
+msgstr "Notion"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:127
+msgid "GitHub"
+msgstr "GitHub"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:128
+msgid "子夜"
+msgstr "Midnight"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:129
+msgid "余烬"
+msgstr "Ember"
+
+#. js-lingui-explicit-id
+#: src/lib/theme/colorSchemes.ts:130
+msgid "墨黑"
+msgstr "Ink Black"
+
+#. js-lingui-explicit-id
 #: src/components/ui/ConfirmDialog.tsx:44
 msgid "确定"
 msgstr "OK"
@@ -640,3 +680,4 @@ msgstr "Rename"
 #: src/components/layout/TopBar.tsx:54
 msgid "预览"
 msgstr "Preview"
+

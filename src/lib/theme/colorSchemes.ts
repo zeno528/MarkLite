@@ -109,25 +109,24 @@ export function resolveScheme(scheme: ColorScheme, systemIsDark: boolean): Schem
   return scheme === "system" ? resolveSystemScheme(systemIsDark) : scheme;
 }
 
-/** 方案 id → i18n 源 msgid（中文是源语言；po 文件里有英文翻译条目） */
-const SCHEME_NAME_MSGID: Record<SchemeId, string> = {
-  paper: "纸白",
-  violet: "薰衣草",
-  amber: "琥珀",
-  notion: "Notion",
-  github: "GitHub",
-  midnight: "子夜",
-  ember: "余烬",
-  ink: "墨黑",
-};
-
 /**
  * 获取方案当前 locale 的显示名。
  * - 传 i18n：按当前 locale 翻译（中文返回 "纸白"，英文返回 "Paper"）
- * - 不传 i18n：fallback 到源 msgid（用于非 React 上下文）
+ * - 不传 i18n：fallback 到 SchemeMeta.name（用于非 React 上下文）
+ *
+ * 注意：i18n.t() 必须是字面量调用，babel-plugin-lingui-macro 才能识别为 i18n msgid。
+ * 不能用查表 i18n.t(msgid) 的写法，否则 lingui 提取不到 msgid，en 模式会 fallback 到中文。
  */
 export function getSchemeName(scheme: SchemeId, i18n?: I18n): string {
-  const msgid = SCHEME_NAME_MSGID[scheme];
-  if (!i18n) return msgid;
-  return i18n.t(msgid);
+  if (!i18n) return COLOR_SCHEMES.find((s) => s.id === scheme)?.name ?? scheme;
+  switch (scheme) {
+    case "paper":    return i18n.t("纸白");
+    case "violet":   return i18n.t("薰衣草");
+    case "amber":    return i18n.t("琥珀");
+    case "notion":   return i18n.t("Notion");
+    case "github":   return i18n.t("GitHub");
+    case "midnight": return i18n.t("子夜");
+    case "ember":    return i18n.t("余烬");
+    case "ink":      return i18n.t("墨黑");
+  }
 }
