@@ -1,10 +1,10 @@
-﻿/**
+/**
  * 侧边栏 - Activity Bar + 面板布局
  * 左侧窄图标栏切换 面板（文件树/目录/搜索）
  * 拆分为 SidebarActivityBar（始终可见）+ SidebarPanel（可折叠）
  */
 import { useState, useEffect, useRef, useMemo } from "react";
-import { FileText, List, Search, FolderOpen, FolderPlus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle } from "lucide-react";
+import { FileText, List, Search, FolderOpen, FolderPlus, ChevronDown, FoldVertical, UnfoldVertical, X, Trash2, XCircle, PanelLeftClose } from "lucide-react";
 import { FileTree } from "@/components/file/FileTree";
 import { RecentFiles } from "@/components/file/RecentFiles";
 import { Outline } from "@/components/file/Outline";
@@ -17,6 +17,7 @@ import { useFileStore, collectDirPaths } from "@/stores/fileStore";
 import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { openFolderViaDialog } from "@/lib/shortcuts/appShortcuts";
 import { cn } from "@/lib/utils/cn";
+
 
 /** 清除预览区域的搜索高亮和选区 */
 function clearSearchHighlights() {
@@ -215,7 +216,7 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
   };
 
   return (
-    <div className="flex w-12 shrink-0 flex-col items-center gap-1.5 bg-[color-mix(in_oklch,var(--color-bg-muted)_50%,var(--color-bg-subtle))] py-3">
+    <div className="flex h-full w-12 shrink-0 flex-col items-center gap-1.5 bg-[color-mix(in_oklch,var(--color-bg-muted)_50%,var(--color-bg-subtle))] pt-3 pb-2">
       <ActivityBarButton
         active={sidebarTab === "files" && !collapsed}
         onClick={() => handleClick("files")}
@@ -241,6 +242,17 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
       >
         <Search size={20} />
       </ActivityBarButton>
+
+      {/* 切换侧栏：固定在 Activity Bar 最底部 */}
+      <div className="mt-auto">
+        <ActivityBarButton
+          active={false}
+          onClick={onToggle}
+          title={<Trans>折叠侧栏 <span className="opacity-70">(Ctrl+\)</span></Trans>}
+        >
+          <PanelLeftClose size={20} />
+        </ActivityBarButton>
+      </div>
     </div>
   );
 }

@@ -596,6 +596,8 @@ body {
 /* ===== 磨砂标题栏（纯半透，透出 Tauri Acrylic 系统磨砂） ===== */
 .titlebar-frosted {
   background: color-mix(in oklch, var(--color-bg-muted) 50%, transparent);
+  /* 磨砂背景文字可读性：轻微阴影让文字从透明背景浮起（glassmorphism 标准做法，子元素品牌名/菜单继承） */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== 自定义标题栏窗口控件按钮（Windows/Linux） =====
@@ -730,4 +732,3 @@ body {
   top: -5px;
   left: 100%;
 }
-

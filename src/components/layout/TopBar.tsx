@@ -12,7 +12,6 @@ import {
   PencilLine,
   BookOpen,
   Settings,
-  PanelLeft,
   ChevronRight,
   House,
 } from "lucide-react";
@@ -41,8 +40,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
 
   const layout = useUIStore((s) => s.layout);
   const setLayout = useUIStore((s) => s.setLayout);
-  const showSidebar = useUIStore((s) => s.showSidebar);
-  const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   // rootFolder 末级名（路径最后一段），无目录时显示「未打开」
   const rootFolderName = rootFolder
@@ -174,16 +171,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           ))}
         </div>
 
-        {/* 单图标按钮（侧栏 / 设置） */}
-        <Tooltip content={<Trans>切换侧栏 <span className="opacity-70">(Ctrl+\)</span></Trans>} placement="bottom">
-          <button
-            className={cn("icon-btn", showSidebar && "active")}
-            onClick={toggleSidebar}
-            aria-label={i18n.t("切换侧栏")}
-          >
-            <PanelLeft size={15} />
-          </button>
-        </Tooltip>
+        {/* 单图标按钮（设置）—— 侧栏切换已迁到 Activity Bar 底部 */}
 
         {onOpenSettings && (
           <Tooltip content={<Trans>设置 <span className="opacity-70">(Ctrl+,)</span></Trans>} placement="bottom" align="right">
