@@ -38,6 +38,7 @@ import { useRefreshStore } from "@/stores/refreshStore";
 
 // 延迟加载非首屏组件
 const SettingsDialog = lazy(() => import("@/components/settings/SettingsDialog").then(m => ({ default: m.SettingsDialog })));
+import type { SectionId } from "@/components/settings/sections";
 
 const isMdPath = (p: string) => /\.(md|markdown|mdx)$/i.test(p);
 
@@ -77,6 +78,7 @@ export default function App() {
   const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
   const setReloading = useRefreshStore((s) => s.setReloading);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsSection, setSettingsSection] = useState<SectionId | undefined>();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -396,7 +398,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
       <TitleBar
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={(section) => { setSettingsSection(section); setSettingsOpen(true); }}
         onShowShortcuts={() => setShortcutsOpen(true)}
       />
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
@@ -446,7 +448,7 @@ export default function App() {
       <StatusBar />
       <ScrollToTop />
       <Suspense fallback={null}>
-        <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+        <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} />
       </Suspense>
       <ShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
       <ToastContainer />

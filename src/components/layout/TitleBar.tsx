@@ -21,6 +21,7 @@ import { COLOR_SCHEMES, getSchemeName } from "@/lib/theme/colorSchemes";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { cn } from "@/lib/utils/cn";
+import type { SectionId } from "@/components/settings/sections";
 import { useEditorStore } from "@/stores/editorStore";
 import {
   newFile,
@@ -32,7 +33,7 @@ import { useLingui } from "@lingui/react";
 import logoSvg from "@/assets/logo.svg";
 
 interface TitleBarProps {
-  onOpenSettings?: () => void;
+  onOpenSettings?: (section?: SectionId) => void;
   onShowShortcuts?: () => void;
 }
 
@@ -129,7 +130,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       items: [
         { label: i18n.t("快捷键"), onClick: onShowShortcuts },
         { type: "separator" },
-        { label: i18n.t("关于"), onClick: onOpenSettings },
+        { label: i18n.t("关于"), onClick: () => onOpenSettings?.("about") },
       ],
     },
   ];

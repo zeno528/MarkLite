@@ -16,9 +16,10 @@ import { SECTIONS, type SectionId } from "./sections";
 interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
+  initialSection?: SectionId;
 }
 
-export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
+export function SettingsDialog({ open, onClose, initialSection }: SettingsDialogProps) {
   const { i18n } = useLingui();
 
   // 分类导航本地化映射（用 <Trans> 才能被 lingui extract 提取）
@@ -37,6 +38,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
   // open 变化时处理进场/退场
   useEffect(() => {
     if (open) {
+      if (initialSection) setActive(initialSection);
       setMounted(true);
       // 等 DOM 挂载后再触发动画
       requestAnimationFrame(() => {
