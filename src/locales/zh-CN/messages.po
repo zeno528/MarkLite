@@ -14,18 +14,13 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:59
-msgid "磨砂标题栏"
-msgstr "磨砂标题栏"
-
-#. js-lingui-explicit-id
 #: src/components/ui/ConfirmDialog.tsx:44
 msgid "确定"
 msgstr "确定"
 
 #. js-lingui-explicit-id
 #: src/components/file/FileTree.tsx:289
-#: src/components/layout/Sidebar.tsx:169
+#: src/components/layout/Sidebar.tsx:170
 #: src/components/ui/ConfirmDialog.tsx:45
 msgid "取消"
 msgstr "取消"
@@ -64,6 +59,11 @@ msgstr "编辑器字号"
 #: src/components/settings/sections/AppearanceSection.tsx:55
 msgid "编辑器字体"
 msgstr "编辑器字体"
+
+#. js-lingui-explicit-id
+#: src/components/settings/sections/AppearanceSection.tsx:59
+msgid "磨砂标题栏"
+msgstr "磨砂标题栏"
 
 #. js-lingui-explicit-id
 #: src/components/settings/sections/EditorSection.tsx:24
@@ -107,91 +107,91 @@ msgid "滚动同步"
 msgstr "滚动同步"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:98
+#: src/components/layout/Sidebar.tsx:99
 msgid "未打开文件夹"
 msgstr "未打开文件夹"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:166
+#: src/components/layout/Sidebar.tsx:167
 msgid "确定清除所有 {count} 个文件夹？\n"
 "编辑器中已打开的文件也将被关闭。"
 msgstr "确定清除所有 {count} 个文件夹？\n"
 "编辑器中已打开的文件也将被关闭。"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:167
+#: src/components/layout/Sidebar.tsx:168
 msgid "清除所有文件夹"
 msgstr "清除所有文件夹"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:168
+#: src/components/layout/Sidebar.tsx:169
 msgid "清除"
 msgstr "清除"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:222
+#: src/components/layout/Sidebar.tsx:223
 msgid "文件资源管理器"
 msgstr "文件资源管理器"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:229
-#: src/components/layout/Sidebar.tsx:273
+#: src/components/layout/Sidebar.tsx:230
+#: src/components/layout/Sidebar.tsx:285
 msgid "目录"
 msgstr "目录"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:273
+#: src/components/layout/Sidebar.tsx:285
 msgid "资源管理器"
 msgstr "资源管理器"
 
 #. js-lingui-explicit-id
-#: src/components/layout/Sidebar.tsx:273
+#: src/components/layout/Sidebar.tsx:285
 msgid "搜索"
 msgstr "搜索"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:62
+#: src/components/layout/StatusBar.tsx:72
 msgid "已刷新"
 msgstr "已刷新"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:99
+#: src/components/layout/StatusBar.tsx:97
 msgid "刷新当前文件"
 msgstr "刷新当前文件"
 
 #. js-lingui-explicit-id
 #: src/components/file/RecentFiles.tsx:123
-#: src/components/layout/StatusBar.tsx:111
+#: src/components/layout/StatusBar.tsx:109
 msgid "{count} 个文件"
 msgstr "{count} 个文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:116
+#: src/components/layout/StatusBar.tsx:114
 msgid "{count} 字"
 msgstr "{count} 字"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:118
+#: src/components/layout/StatusBar.tsx:116
 msgid "{count} 行"
 msgstr "{count} 行"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:124
+#: src/components/layout/StatusBar.tsx:122
 msgid "行 {line}，列 {col}"
 msgstr "行 {line}，列 {col}"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:128
+#: src/components/layout/StatusBar.tsx:126
 msgid "选中 {chars} 字符 / {words} 词"
 msgstr "选中 {chars} 字符 / {words} 词"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:158
+#: src/components/layout/StatusBar.tsx:156
 msgid "关闭自动保存"
 msgstr "关闭自动保存"
 
 #. js-lingui-explicit-id
-#: src/components/layout/StatusBar.tsx:172
+#: src/components/layout/StatusBar.tsx:170
 msgid "关闭自动刷新"
 msgstr "关闭自动刷新"
 
@@ -242,7 +242,6 @@ msgstr "预览"
 
 #. js-lingui-explicit-id
 #: src/components/layout/TitleBar.tsx:106
-#: src/components/layout/TopBar.tsx:182
 msgid "切换侧栏"
 msgstr "切换侧栏"
 
@@ -296,12 +295,12 @@ msgid "关闭"
 msgstr "关闭"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:83
+#: src/components/layout/TopBar.tsx:80
 msgid "回到顶部"
 msgstr "回到顶部"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:193
+#: src/components/layout/TopBar.tsx:181
 msgid "设置"
 msgstr "设置"
 
@@ -380,11 +379,11 @@ msgstr "代码编辑器的字体大小"
 msgid "余烬"
 msgstr "余烬"
 
-#: src/components/layout/TopBar.tsx:149
+#: src/components/layout/TopBar.tsx:146
 msgid "保存 <0>(Ctrl+S)</0>"
 msgstr "保存 <0>(Ctrl+S)</0>"
 
-#: src/components/layout/TopBar.tsx:147
+#: src/components/layout/TopBar.tsx:144
 msgid "保存 <0>(Ctrl+S)</0> — 有未保存的修改"
 msgstr "保存 <0>(Ctrl+S)</0> — 有未保存的修改"
 
@@ -400,19 +399,19 @@ msgstr "停止输入后等待此时间再保存"
 msgid "关于"
 msgstr "关于"
 
-#: src/components/layout/Sidebar.tsx:278
+#: src/components/layout/Sidebar.tsx:290
 msgid "关闭所有标签"
 msgstr "关闭所有标签"
 
-#: src/components/layout/Sidebar.tsx:321
+#: src/components/layout/Sidebar.tsx:333
 msgid "最近打开"
 msgstr "最近打开"
 
-#: src/components/layout/TopBar.tsx:178
+#: src/components/layout/Sidebar.tsx:251
 msgid "切换侧栏 <0>(Ctrl+\\)</0>"
 msgstr "切换侧栏 <0>(Ctrl+\\)</0>"
 
-#: src/components/settings/sections/LanguageSection.tsx:16
+#: src/components/settings/sections/LanguageSection.tsx:20
 msgid "切换后立即生效，重启后保留"
 msgstr "切换后立即生效，重启后保留"
 
@@ -425,7 +424,7 @@ msgstr "切换后立即生效，重启后保留"
 msgid "删除"
 msgstr "删除"
 
-#: src/components/layout/StatusBar.tsx:90
+#: src/components/layout/StatusBar.tsx:88
 msgid "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
 msgstr "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
 
@@ -433,27 +432,27 @@ msgstr "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
 msgid "刷新间隔"
 msgstr "刷新间隔"
 
-#: src/components/layout/StatusBar.tsx:149
+#: src/components/layout/StatusBar.tsx:147
 msgid "单标签"
 msgstr "单标签"
 
-#: src/components/layout/StatusBar.tsx:136
+#: src/components/layout/StatusBar.tsx:134
 msgid "单标签模式：已关闭"
 msgstr "单标签模式：已关闭"
 
-#: src/components/layout/StatusBar.tsx:136
+#: src/components/layout/StatusBar.tsx:134
 msgid "单标签模式：已开启"
 msgstr "单标签模式：已开启"
 
-#: src/components/layout/TopBar.tsx:56
+#: src/components/layout/TopBar.tsx:53
 msgid "双栏"
 msgstr "双栏"
 
-#: src/components/layout/StatusBar.tsx:176
+#: src/components/layout/StatusBar.tsx:174
 msgid "同步"
 msgstr "同步"
 
-#: src/components/layout/TopBar.tsx:80
+#: src/components/layout/TopBar.tsx:77
 msgid "回到顶部"
 msgstr "回到顶部"
 
@@ -481,11 +480,11 @@ msgstr "子夜"
 msgid "字体"
 msgstr "字体"
 
-#: src/components/layout/Sidebar.tsx:288
+#: src/components/layout/Sidebar.tsx:300
 msgid "展开全部"
 msgstr "展开全部"
 
-#: src/components/layout/StatusBar.tsx:198
+#: src/components/layout/StatusBar.tsx:196
 msgid "已保存"
 msgstr "已保存"
 
@@ -493,19 +492,23 @@ msgstr "已保存"
 msgid "开启后标题栏半透+磨砂模糊，跟随配色"
 msgstr "开启后标题栏半透+磨砂模糊，跟随配色"
 
+#: src/components/settings/sections/LanguageSection.tsx:62
+msgid "当前生效语言"
+msgstr "当前生效语言"
+
 #: src/components/ui/ShortcutsHelp.tsx:72
 msgid "快捷键"
 msgstr "快捷键"
 
-#: src/components/layout/TopBar.tsx:125
+#: src/components/layout/TopBar.tsx:122
 msgid "打开文件 <0>(Ctrl+O)</0>"
 msgstr "打开文件 <0>(Ctrl+O)</0>"
 
-#: src/components/layout/Sidebar.tsx:297
+#: src/components/layout/Sidebar.tsx:309
 msgid "打开文件夹"
 msgstr "打开文件夹"
 
-#: src/components/layout/TopBar.tsx:133
+#: src/components/layout/TopBar.tsx:130
 msgid "打开文件夹 <0>(Ctrl+Shift+N)</0>"
 msgstr "打开文件夹 <0>(Ctrl+Shift+N)</0>"
 
@@ -517,19 +520,19 @@ msgstr "打开系统设置"
 msgid "按 Tab 键插入的空格数"
 msgstr "按 Tab 键插入的空格数"
 
-#: src/components/layout/Sidebar.tsx:240
+#: src/components/layout/Sidebar.tsx:241
 msgid "搜索 <0>Ctrl+F</0>"
 msgstr "搜索 <0>Ctrl+F</0>"
 
-#: src/components/layout/Sidebar.tsx:288
+#: src/components/layout/Sidebar.tsx:300
 msgid "收起全部"
 msgstr "收起全部"
 
-#: src/components/layout/Sidebar.tsx:332
+#: src/components/layout/Sidebar.tsx:344
 msgid "文件夹"
 msgstr "文件夹"
 
-#: src/components/file/Outline.tsx:164
+#: src/components/file/Outline.tsx:166
 msgid "无标题"
 msgstr "无标题"
 
@@ -537,7 +540,7 @@ msgstr "无标题"
 msgid "显示行号"
 msgstr "显示行号"
 
-#: src/components/layout/StatusBar.tsx:198
+#: src/components/layout/StatusBar.tsx:196
 msgid "未保存"
 msgstr "未保存"
 
@@ -557,7 +560,7 @@ msgstr "版本"
 msgid "琥珀"
 msgstr "琥珀"
 
-#: src/components/settings/sections/LanguageSection.tsx:16
+#: src/components/settings/sections/LanguageSection.tsx:19
 msgid "界面语言"
 msgstr "界面语言"
 
@@ -573,7 +576,7 @@ msgstr "秒"
 msgid "纸白"
 msgstr "纸白"
 
-#: src/components/layout/TopBar.tsx:55
+#: src/components/layout/TopBar.tsx:52
 msgid "编辑"
 msgstr "编辑"
 
@@ -593,7 +596,7 @@ msgstr "编辑器与预览的双向滚动联动"
 msgid "编辑器字号"
 msgstr "编辑器字号"
 
-#: src/components/layout/StatusBar.tsx:162
+#: src/components/layout/StatusBar.tsx:160
 #: src/components/settings/SchemePicker.tsx:34
 msgid "自动"
 msgstr "自动"
@@ -606,7 +609,7 @@ msgstr "自动从磁盘同步文件变更"
 msgid "自动保存"
 msgstr "自动保存"
 
-#: src/components/layout/StatusBar.tsx:155
+#: src/components/layout/StatusBar.tsx:153
 msgid "自动保存已开启"
 msgstr "自动保存已开启"
 
@@ -614,7 +617,7 @@ msgstr "自动保存已开启"
 msgid "自动刷新"
 msgstr "自动刷新"
 
-#: src/components/layout/StatusBar.tsx:169
+#: src/components/layout/StatusBar.tsx:167
 msgid "自动刷新已开启"
 msgstr "自动刷新已开启"
 
@@ -634,7 +637,7 @@ msgstr "设为默认 Markdown 程序"
 msgid "设置"
 msgstr "设置"
 
-#: src/components/layout/TopBar.tsx:189
+#: src/components/layout/TopBar.tsx:177
 msgid "设置 <0>(Ctrl+,)</0>"
 msgstr "设置 <0>(Ctrl+,)</0>"
 
@@ -654,7 +657,7 @@ msgstr "配色方案"
 msgid "重命名"
 msgstr "重命名"
 
-#: src/components/layout/TopBar.tsx:57
+#: src/components/layout/TopBar.tsx:54
 msgid "预览"
 msgstr "预览"
 

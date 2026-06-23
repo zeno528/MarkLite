@@ -53,6 +53,7 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
     { mode: "split", icon: <Columns2 size={14} />, label: <Trans>双栏</Trans> },
     { mode: "preview-only", icon: <BookOpen size={14} />, label: <Trans>预览</Trans> },
   ];
+  const activeIndex = Math.max(0, layouts.findIndex((l) => l.mode === layout));
 
   // 点击路径图标：编辑器和预览器同时回到顶部
   const handleScrollToTop = () => {
@@ -158,17 +159,43 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
           </Tooltip>
         </div>
 
-        <div className="tool-group">
-          {layouts.map((l) => (
-            <button
-              key={l.mode}
-              className={cn("tbtn", layout === l.mode && "active")}
-              onClick={() => setLayout(l.mode)}
-            >
-              {l.icon}
-              <span>{l.label}</span>
-            </button>
-          ))}
+        <div
+          className="tool-group relative w-[280px]"
+          style={{
+            ["--seg-active-index" as string]: activeIndex,
+            ["--seg-count" as string]: layouts.length,
+          } as React.CSSProperties}
+        >
+          {/* 滑动指示器：与语言切换同款结构，accent 实色接管 active 背景 */}
+          <div
+            aria-hidden
+            className="seg-indicator absolute inset-y-0.5 left-0.5 rounded-[8px] bg-[var(--color-accent)] shadow-[0_2px_6px_color-mix(in_oklch,var(--color-accent)_35%,transparent)]"
+            style={{
+              width: `calc((100% - 0.25rem) / var(--seg-count))`,
+              transform: `translateX(calc(var(--seg-active-index) * 100%))`,
+              transition: "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)",
+              willChange: "transform",
+            }}
+          />
+          {layouts.map((l) => {
+            const active = layout === l.mode;
+            return (
+              <button
+                key={l.mode}
+                onClick={() => setLayout(l.mode)}
+                className={cn(
+                  "tbtn relative z-10 border-0 flex-1 justify-center",
+                  "transition-colors duration-200",
+                  active
+                    ? "!bg-transparent !text-white hover:!text-white hover:!bg-transparent"
+                    : "hover:!text-[var(--color-text)] hover:!bg-[color-mix(in_oklch,var(--color-text)_8%,transparent)]",
+                )}
+              >
+                {l.icon}
+                <span>{l.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* 单图标按钮（设置）—— 侧栏切换已迁到 Activity Bar 底部 */}
