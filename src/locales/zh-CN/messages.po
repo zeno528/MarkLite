@@ -36,12 +36,12 @@ msgid "关闭通知"
 msgstr "关闭通知"
 
 #. js-lingui-explicit-id
-#: src/components/settings/SchemePicker.tsx:31
+#: src/components/settings/SchemePicker.tsx:19
 msgid "浅"
 msgstr "浅"
 
 #. js-lingui-explicit-id
-#: src/components/settings/SchemePicker.tsx:31
+#: src/components/settings/SchemePicker.tsx:19
 msgid "深"
 msgstr "深"
 
@@ -51,19 +51,14 @@ msgid "关闭设置"
 msgstr "关闭设置"
 
 #. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:47
+#: src/components/settings/sections/AppearanceSection.tsx:43
 msgid "编辑器字号"
 msgstr "编辑器字号"
 
 #. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:55
+#: src/components/settings/sections/AppearanceSection.tsx:51
 msgid "编辑器字体"
 msgstr "编辑器字体"
-
-#. js-lingui-explicit-id
-#: src/components/settings/sections/AppearanceSection.tsx:59
-msgid "磨砂标题栏"
-msgstr "磨砂标题栏"
 
 #. js-lingui-explicit-id
 #: src/components/settings/sections/EditorSection.tsx:24
@@ -91,7 +86,7 @@ msgid "自动保存延迟"
 msgstr "自动保存延迟"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:82
+#: src/components/layout/TitleBar.tsx:80
 #: src/components/settings/sections/EditorSection.tsx:57
 msgid "自动刷新"
 msgstr "自动刷新"
@@ -196,101 +191,101 @@ msgid "关闭自动刷新"
 msgstr "关闭自动刷新"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:73
+#: src/components/layout/TitleBar.tsx:71
 msgid "文件"
 msgstr "文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:75
+#: src/components/layout/TitleBar.tsx:73
 msgid "新建文件"
 msgstr "新建文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:76
+#: src/components/layout/TitleBar.tsx:74
 msgid "打开文件"
 msgstr "打开文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:77
+#: src/components/layout/TitleBar.tsx:75
 msgid "打开文件夹"
 msgstr "打开文件夹"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:79
+#: src/components/layout/TitleBar.tsx:77
 msgid "保存"
 msgstr "保存"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:89
+#: src/components/layout/TitleBar.tsx:87
 msgid "视图"
 msgstr "视图"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:92
+#: src/components/layout/TitleBar.tsx:90
 msgid "编辑"
 msgstr "编辑"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:97
+#: src/components/layout/TitleBar.tsx:95
 msgid "双栏"
 msgstr "双栏"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:102
+#: src/components/layout/TitleBar.tsx:100
 msgid "预览"
 msgstr "预览"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:107
+#: src/components/layout/TitleBar.tsx:105
 msgid "切换侧栏"
 msgstr "切换侧栏"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:111
+#: src/components/layout/TitleBar.tsx:109
 msgid "配色方案"
 msgstr "配色方案"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:115
+#: src/components/layout/TitleBar.tsx:113
 msgid "跟随系统"
 msgstr "跟随系统"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:130
+#: src/components/layout/TitleBar.tsx:128
 msgid "帮助"
 msgstr "帮助"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:132
+#: src/components/layout/TitleBar.tsx:130
 msgid "快捷键参考"
 msgstr "快捷键参考"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:134
+#: src/components/layout/TitleBar.tsx:132
 msgid "关于"
 msgstr "关于"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:160
-#: src/components/layout/TitleBar.tsx:160
+#: src/components/layout/TitleBar.tsx:158
+#: src/components/layout/TitleBar.tsx:158
 msgid "最小化"
 msgstr "最小化"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:165
-#: src/components/layout/TitleBar.tsx:165
+#: src/components/layout/TitleBar.tsx:163
+#: src/components/layout/TitleBar.tsx:163
 msgid "向下还原"
 msgstr "向下还原"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:165
-#: src/components/layout/TitleBar.tsx:165
+#: src/components/layout/TitleBar.tsx:163
+#: src/components/layout/TitleBar.tsx:163
 msgid "最大化"
 msgstr "最大化"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:177
-#: src/components/layout/TitleBar.tsx:177
+#: src/components/layout/TitleBar.tsx:175
+#: src/components/layout/TitleBar.tsx:175
 msgid "关闭"
 msgstr "关闭"
 
@@ -344,47 +339,13 @@ msgstr "清空未固定的最近文件"
 msgid "关闭 {title}"
 msgstr "关闭 {title}"
 
-#. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:209
-#~ msgid "中文"
-#~ msgstr "中文"
-
-#. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:209
-#~ msgid "English"
-#~ msgstr "English"
-
-#. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:216
-#~ msgid "切换语言"
-#~ msgstr "切换语言"
-
-#. placeholder {0}: group.title
-#. placeholder {0}: item.desc
-#: src/components/ui/ShortcutsHelp.tsx:75
-#: src/components/ui/ShortcutsHelp.tsx:81
-#~ msgid "{0}"
-#~ msgstr "{0}"
-
-#: src/components/settings/SchemePicker.tsx:15
-msgid "GitHub"
-msgstr "GitHub"
-
-#: src/components/settings/SchemePicker.tsx:14
-msgid "Notion"
-msgstr "Notion"
-
 #: src/components/settings/sections/EditorSection.tsx:29
 msgid "Tab 缩进宽度"
 msgstr "Tab 缩进宽度"
 
-#: src/components/settings/sections/AppearanceSection.tsx:40
+#: src/components/settings/sections/AppearanceSection.tsx:36
 msgid "代码编辑器的字体大小"
 msgstr "代码编辑器的字体大小"
-
-#: src/components/settings/SchemePicker.tsx:17
-msgid "余烬"
-msgstr "余烬"
 
 #: src/components/layout/TopBar.tsx:147
 msgid "保存 <0>(Ctrl+S)</0>"
@@ -437,11 +398,6 @@ msgstr "切换后立即生效，重启后保留"
 #: src/components/ui/ShortcutsHelp.tsx:87
 msgid "切换布局（双栏/仅编辑/仅预览）"
 msgstr "切换布局（双栏/仅编辑/仅预览）"
-
-#. placeholder {0}: currentLocale === "zh-CN" ? i18n.t(`中文`) : i18n.t(`English`)
-#: src/components/layout/TopBar.tsx:209
-#~ msgid "切换语言（当前：{0}）"
-#~ msgstr "切换语言（当前：{0}）"
 
 #: src/components/file/FileTree.tsx:340
 msgid "删除"
@@ -499,11 +455,7 @@ msgstr "外观"
 msgid "如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将 <0>.md</0> 与 <1>.markdown</1> 的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。"
 msgstr "如需将 MarkLite 设为 Markdown 文件的默认打开程序，请在系统「默认应用」中，将 <0>.md</0> 与 <1>.markdown</1> 的默认应用指定为 MarkLite，设置完成后即可通过双击文件直接打开。"
 
-#: src/components/settings/SchemePicker.tsx:16
-msgid "子夜"
-msgstr "子夜"
-
-#: src/components/settings/sections/AppearanceSection.tsx:50
+#: src/components/settings/sections/AppearanceSection.tsx:46
 msgid "字体"
 msgstr "字体"
 
@@ -514,10 +466,6 @@ msgstr "展开全部"
 #: src/components/layout/StatusBar.tsx:196
 msgid "已保存"
 msgstr "已保存"
-
-#: src/components/settings/sections/AppearanceSection.tsx:58
-msgid "开启后标题栏半透+磨砂模糊，跟随配色"
-msgstr "开启后标题栏半透+磨砂模糊，跟随配色"
 
 #: src/components/settings/sections/LanguageSection.tsx:87
 msgid "当前生效语言"
@@ -600,17 +548,9 @@ msgstr "滚动同步"
 msgid "版本"
 msgstr "版本"
 
-#: src/components/settings/SchemePicker.tsx:13
-msgid "琥珀"
-msgstr "琥珀"
-
 #: src/components/settings/sections/LanguageSection.tsx:25
 msgid "界面语言"
 msgstr "界面语言"
-
-#: src/components/settings/sections/AppearanceSection.tsx:58
-msgid "磨砂标题栏"
-msgstr "磨砂标题栏"
 
 #: src/components/ui/ShortcutsHelp.tsx:85
 msgid "视图"
@@ -619,10 +559,6 @@ msgstr "视图"
 #: src/components/settings/sections/EditorSection.tsx:67
 msgid "秒"
 msgstr "秒"
-
-#: src/components/settings/SchemePicker.tsx:11
-msgid "纸白"
-msgstr "纸白"
 
 #: src/components/layout/TopBar.tsx:52
 msgid "编辑"
@@ -640,12 +576,12 @@ msgstr "编辑器"
 msgid "编辑器与预览的双向滚动联动"
 msgstr "编辑器与预览的双向滚动联动"
 
-#: src/components/settings/sections/AppearanceSection.tsx:40
+#: src/components/settings/sections/AppearanceSection.tsx:36
 msgid "编辑器字号"
 msgstr "编辑器字号"
 
 #: src/components/layout/StatusBar.tsx:160
-#: src/components/settings/SchemePicker.tsx:34
+#: src/components/settings/SchemePicker.tsx:22
 msgid "自动"
 msgstr "自动"
 
@@ -673,10 +609,6 @@ msgstr "自动刷新已开启"
 msgid "自动换行"
 msgstr "自动换行"
 
-#: src/components/settings/SchemePicker.tsx:12
-msgid "薰衣草"
-msgstr "薰衣草"
-
 #: src/components/settings/sections/AboutSection.tsx:59
 msgid "设为默认 Markdown 程序"
 msgstr "设为默认 Markdown 程序"
@@ -694,11 +626,11 @@ msgstr "设置 <0>(Ctrl+,)</0>"
 msgid "语言"
 msgstr "语言"
 
-#: src/components/settings/SchemePicker.tsx:34
+#: src/components/settings/SchemePicker.tsx:22
 msgid "跟随系统"
 msgstr "跟随系统"
 
-#: src/components/settings/sections/AppearanceSection.tsx:37
+#: src/components/settings/sections/AppearanceSection.tsx:33
 msgid "配色方案"
 msgstr "配色方案"
 
@@ -709,7 +641,3 @@ msgstr "重命名"
 #: src/components/layout/TopBar.tsx:54
 msgid "预览"
 msgstr "预览"
-
-#: src/components/settings/SchemePicker.tsx:18
-msgid "墨黑"
-msgstr "墨黑"

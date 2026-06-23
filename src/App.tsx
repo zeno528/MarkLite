@@ -413,10 +413,6 @@ export default function App() {
           style={{
             width: "var(--sidebar-width)",
             marginRight: showSidebar ? "0px" : "calc(var(--sidebar-width) * -1)",
-            transition: isResizing
-              ? "none"
-              : "margin-right 350ms cubic-bezier(0.22, 1, 0.36, 1)",
-            willChange: "margin-right",
           }}
         >
           <div
@@ -424,8 +420,6 @@ export default function App() {
             style={{
               width: "var(--sidebar-width)",
               transform: showSidebar ? "translateX(0)" : "translateX(-100%)",
-              transition: "transform 350ms cubic-bezier(0.22, 1, 0.36, 1)",
-              willChange: "transform",
             }}
           >
             <SidebarPanel />

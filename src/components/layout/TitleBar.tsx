@@ -38,8 +38,6 @@ interface TitleBarProps {
 
 export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
   const { i18n } = useLingui();
-  const frostedTitlebar = useSettingsStore((s) => s.frostedTitlebar);
-  const settingsLoaded = useSettingsStore((s) => s.loaded);
   const [mac] = useState(() => getPlatformSync() === "macos");
   const [maximized, setMaximized] = useState(false);
 
@@ -141,7 +139,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
       data-tauri-drag-region
       className={cn(
         "relative flex h-10 w-full shrink-0 select-none items-center justify-between",
-        settingsLoaded && frostedTitlebar ? "titlebar-frosted" : "bg-[var(--color-bg-muted)]",
+        "bg-[var(--color-bg-muted)]",
       )}
       style={{ WebkitAppRegion: "drag" } as CSSProperties}
     >

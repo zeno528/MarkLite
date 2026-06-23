@@ -23,9 +23,7 @@
         "hiddenTitle": true,
         "decorations": true,
         "transparent": true,
-        "windowEffects": {
-          "effects": ["acrylic", "underWindowBackground"]
-        },
+        "windowEffects": { "effects": [] },
         "fullscreen": false,
         "resizable": true,
         "center": true

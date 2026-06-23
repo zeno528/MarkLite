@@ -593,14 +593,6 @@ body {
   cursor: default;
 }
 
-/* ===== 磨砂标题栏（纯半透，透出 Tauri Acrylic 系统磨砂） ===== */
-.titlebar-frosted {
-  background: color-mix(in oklch, var(--color-bg-muted) 78%, transparent);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  /* 磨砂背景文字可读性：轻微阴影让文字从透明背景浮起（glassmorphism 标准做法，子元素品牌名/菜单继承） */
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
 
 /* ===== 自定义标题栏窗口控件按钮（Windows/Linux） =====
    尺寸 46×32 匹配标题栏高度，无圆角贴合右上角 */
@@ -661,7 +653,7 @@ body {
   left: 0;
   min-width: 200px;
   padding: 4px;
-  /* 菜单始终用纯 elevated 背景（macOS 原生菜单风格），磨砂感由阴影+圆角+边框撑起，不依赖 backdrop-filter（WebView2 上不可靠）；与标题栏磨砂开关解耦。 */
+  /* 菜单用纯 elevated 背景（macOS 原生菜单风格），磨砂感由阴影+圆角+边框撑起，不依赖 backdrop-filter（WebView2 上不可靠） */
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
