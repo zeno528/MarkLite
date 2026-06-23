@@ -1,6 +1,6 @@
 [package]
 name = "marklite"
-version = "0.2.9"
+version = "0.2.10"
 description = "MarkLite - 轻量级 Markdown 编辑器"
 authors = ["zwf"]
 edition = "2024"

@@ -7,6 +7,7 @@
  * - 右键菜单"重命名"为 inline 编辑（文件名就地变输入框，自动选中文本）
  */
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { ChevronRight, ChevronDown, File as FileIcon, Folder, FolderOpen } from "lucide-react";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
 import { useEditorStore } from "@/stores/editorStore";
@@ -141,6 +142,7 @@ function FileTreeItem({
         onContextMenu={(e) => {
           if (node.isDir || !isMd) return; // 仅 md 文件提供右键菜单
           e.preventDefault();
+          setSelected(node.path);
           onContextMenu({ path: node.path, name: node.name, x: e.clientX, y: e.clientY });
         }}
         className={cn(
@@ -269,6 +271,19 @@ function FileContextMenu({
   onClose: () => void;
   onRenameStart: (path: string) => void;
 }) {
+  // 点击外部关闭；右键外部关闭并阻止浏览器默认菜单（但不阻止冒泡，让 FileTreeItem 接管新菜单）
+  useEffect(() => {
+    const handlePointerDown = (e: PointerEvent) => {
+      if (e.button === 2) {
+        e.preventDefault();
+        onClose();
+      } else if (e.button === 0) {
+        onClose();
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [onClose]);
   const { i18n } = useLingui();
   const refreshActiveTree = useFileStore((s) => s.refreshActiveTree);
 
@@ -314,21 +329,11 @@ function FileContextMenu({
   const itemCls =
     "flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-xs text-[var(--color-text)] hover:bg-[var(--color-bg-muted)]";
 
-  return (
-    <>
-      {/* 遮罩：点击/右键外部关闭 */}
-      <div
-        className="fixed inset-0 z-50"
-        onClick={onClose}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          onClose();
-        }}
-      />
-      <div
-        className="fixed z-50 min-w-[150px] rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-1 shadow-[var(--shadow-lg)]"
-        style={{ left: menu.x, top: menu.y }}
-      >
+  return createPortal(
+    <div
+      className="fixed z-50 min-w-[150px] rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-1 shadow-[var(--shadow-lg)]"
+      style={{ left: menu.x, top: menu.y }}
+    >
         <button onClick={handleReveal} className={itemCls}>
           <Trans>在资源管理器中打开</Trans>
         </button>
@@ -339,7 +344,7 @@ function FileContextMenu({
         <button onClick={handleDelete} className={cn(itemCls, "text-[var(--color-danger)]")}>
           <Trans>删除</Trans>
         </button>
-      </div>
-    </>
+    </div>,
+    document.body,
   );
 }
