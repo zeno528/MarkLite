@@ -138,8 +138,8 @@ export async function highlightCode(
   const h = await getHighlighter();
   const themeName = theme === "dark" ? "github-dark" : "github-light";
 
-  // 解析 lang → 标准 BundledLanguage
-  const normalized = (lang || "").toLowerCase().trim();
+  // 解析 lang：OpenCode 等扩展 fence 语法会带 title="..." {lines} 后缀，截取第一段（按空白分割）
+  const normalized = (lang || "").toLowerCase().trim().split(/\s+/)[0];
   const langToUse = await resolveLang(normalized, h);
 
   return h.codeToHtml(code, {
@@ -183,3 +183,5 @@ async function resolveLang(
   // 4) 兜底
   return "text";
 }
+
+

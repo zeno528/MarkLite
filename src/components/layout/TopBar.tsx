@@ -173,8 +173,6 @@ export function TopBar({ onOpenSettings }: TopBarProps) {
             style={{
               width: `calc((100% - 0.25rem) / var(--seg-count))`,
               transform: `translateX(calc(var(--seg-active-index) * 100%))`,
-              transition: "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)",
-              willChange: "transform",
             }}
           />
           {layouts.map((l) => {

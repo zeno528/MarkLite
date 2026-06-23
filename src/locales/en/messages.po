@@ -256,7 +256,7 @@ msgstr "Help"
 
 #. js-lingui-explicit-id
 #: src/components/layout/TitleBar.tsx:130
-msgid "快捷键参考"
+msgid "快捷键"
 msgstr "Keyboard Shortcuts"
 
 #. js-lingui-explicit-id
@@ -294,7 +294,7 @@ msgid "回到顶部"
 msgstr "Back to Top"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:208
+#: src/components/layout/TopBar.tsx:206
 msgid "设置"
 msgstr "Settings"
 
@@ -617,7 +617,7 @@ msgstr "Set as Default Markdown Program"
 msgid "设置"
 msgstr "Settings"
 
-#: src/components/layout/TopBar.tsx:204
+#: src/components/layout/TopBar.tsx:202
 msgid "设置 <0>(Ctrl+,)</0>"
 msgstr "Settings <0>(Ctrl+,)</0>"
 

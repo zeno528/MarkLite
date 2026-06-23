@@ -127,7 +127,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
     {
       label: i18n.t("帮助"),
       items: [
-        { label: i18n.t("快捷键参考"), shortcut: "Ctrl+K Ctrl+S", onClick: onShowShortcuts },
+        { label: i18n.t("快捷键"), onClick: onShowShortcuts },
         { type: "separator" },
         { label: i18n.t("关于"), onClick: onOpenSettings },
       ],

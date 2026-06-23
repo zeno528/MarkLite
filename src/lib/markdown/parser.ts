@@ -147,7 +147,7 @@ export async function parseMarkdown(
       code({ text, lang, _sourceLine }: any) {
         const id = `cb${nextCodeId++}`;
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
-        return `<pre class="shiki-placeholder" data-shiki-id="${id}" data-lang="${lang || ""}" data-source-line="${line}"><code>${escapeHtml(text)}</code></pre>`;
+        return `<pre class="shiki-placeholder" data-shiki-id="${id}" data-lang="${escapeHtml(lang || "")}" data-source-line="${line}"><code>${escapeHtml(text)}</code></pre>`;
       },
       heading(this: any, { tokens, depth, text: rawText, _sourceLine }: any) {
         const line = typeof _sourceLine === "number" ? _sourceLine : "";
@@ -351,3 +351,4 @@ function lineAt(lineStarts: number[], offset: number): number {
   }
   return ans + 1;
 }
+

@@ -1,5 +1,5 @@
 /**
- * 快捷键参考弹窗
+ * 快捷键弹窗
  * 居中弹出，Esc 关闭，与 ConfirmDialog 风格一致
  *
  * 文案用 <Trans id="msgid">...</Trans> 显式标注（macro 模式下，<Trans>{var}</Trans> 不会抽字面量），
