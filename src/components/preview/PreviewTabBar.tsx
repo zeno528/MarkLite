@@ -4,7 +4,8 @@
  * - 激活标签与预览区同色，形成延伸效果
  * - 使用预览相关图标（Eye）
  */
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Eye } from "lucide-react";
 import { useEditorStore } from "@/stores/editorStore";
 import { cn } from "@/lib/utils/cn";
@@ -14,12 +15,13 @@ export function PreviewTabBar() {
   const activeFilePath = useEditorStore((s) => s.activeFilePath);
   const switchFile = useEditorStore((s) => s.switchFile);
   const closeFile = useEditorStore((s) => s.closeFile);
+  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
 
   // 无文件时不显示
   if (openFiles.length === 0) return null;
 
   return (
-    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden bg-[var(--color-bg)]">
+    <div className="flex h-[34px] shrink-0 select-none items-end overflow-hidden border-b border-[var(--color-border)] bg-[var(--color-bg)]">
       {openFiles.map((file, i) => {
         const isActive = file.path === activeFilePath;
         const nextIsActive = openFiles[i + 1]?.path === activeFilePath;
@@ -28,9 +30,13 @@ export function PreviewTabBar() {
           <Fragment key={file.path}>
             <div
               onClick={() => switchFile(file.path)}
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setTooltip({ text: file.title, x: rect.left + rect.width / 2, y: rect.top });
+              }}
+              onMouseLeave={() => setTooltip(null)}
               className={cn(
-                "group relative flex h-[30px] w-[160px] shrink-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
-                openFiles.length > 1 && "shrink min-w-[80px]",
+                "group relative flex h-[30px] shrink basis-[160px] min-w-0 cursor-pointer items-center gap-1.5 px-3 text-xs transition-colors",
                 isActive
                   ? "bg-[var(--color-bg-elevated)] text-[var(--color-text)] rounded-t-md"
                   : "rounded-t-md text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
@@ -70,8 +76,15 @@ export function PreviewTabBar() {
           </Fragment>
         );
       })}
-      {/* 底部分隔线（非激活区域） */}
-      <div className="min-w-0 flex-1 self-stretch border-b border-[var(--color-border)]" />
+      {tooltip && createPortal(
+        <span
+          className="pointer-events-none fixed z-[100] whitespace-nowrap rounded-md bg-[var(--color-text)] px-2 py-1 text-xs text-[var(--color-bg-elevated)] shadow-md"
+          style={{ left: tooltip.x, top: tooltip.y, transform: "translate(-50%, -100%) translateY(-6px)" }}
+        >
+          {tooltip.text}
+        </span>,
+        document.body,
+      )}
     </div>
   );
 }

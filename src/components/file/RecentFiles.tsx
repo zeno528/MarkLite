@@ -69,10 +69,15 @@ function RecentItem({
 }) {
   const name = fileName(path);
   const [hovered, setHovered] = useState(false);
+  const isActive = useEditorStore((s) => s.activeFilePath === path);
 
   return (
     <div
-      className="group flex items-center gap-1 rounded-md px-2 py-1 text-[13px] transition-colors hover:bg-[var(--color-accent)]/8 cursor-pointer"
+      className={cn(
+        "group relative flex h-7 my-0.5 cursor-pointer select-none items-center gap-1.5 rounded-md px-1.5 text-[13px] transition-colors",
+        "hover:bg-[var(--color-bg-muted)]",
+        isActive && ["item-active", "text-[var(--color-accent)] font-medium"],
+      )}
       onClick={() => openRecent(path)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -81,7 +86,7 @@ function RecentItem({
       <span className="shrink-0 text-[var(--color-text-muted)]">
         {pinned ? <Pin size={13} className="fill-current text-[var(--color-accent)]" /> : <FileText size={13} />}
       </span>
-      <span className="flex-1 truncate text-[var(--color-text)]">{name}</span>
+      <span className={cn("flex-1 truncate", isActive ? "text-[var(--color-accent)]" : "text-[var(--color-text)]")}>{name}</span>
       <div className="flex shrink-0 items-center" style={{ opacity: hovered ? 1 : 0 }}>
         <button
           onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
