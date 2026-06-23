@@ -17,7 +17,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { getMainWindow } from "@/lib/window";
 import { getPlatformSync } from "@/lib/utils/platform";
 import { MenuBar, type MenuItem } from "@/components/ui/Menu";
-import { COLOR_SCHEMES } from "@/lib/theme/colorSchemes";
+import { COLOR_SCHEMES, getSchemeName } from "@/lib/theme/colorSchemes";
 import { useUIStore, type LayoutMode } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { cn } from "@/lib/utils/cn";
@@ -118,7 +118,7 @@ export function TitleBar({ onOpenSettings, onShowShortcuts }: TitleBarProps) {
             },
             { type: "separator" },
             ...COLOR_SCHEMES.map((s) => ({
-              label: s.name,
+              label: getSchemeName(s.id, i18n),
               checked: colorScheme === s.id,
               onClick: () => setColorScheme(s.id),
             })),

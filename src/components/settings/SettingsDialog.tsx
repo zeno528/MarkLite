@@ -91,7 +91,7 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 左导航 */}
-        <nav className="flex w-[160px] shrink-0 flex-col gap-0.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] p-2">
+        <nav className="flex w-[160px] shrink-0 flex-col gap-0.5 border-r border-[var(--color-border)] bg-[var(--color-bg)] p-2 select-none">
           <h2 className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-subtle)]">
             <Trans>设置</Trans>
           </h2>
@@ -103,14 +103,14 @@ export function SettingsDialog({ open, onClose }: SettingsDialogProps) {
                 key={s.id}
                 onClick={() => handleTabChange(s.id)}
                 className={cn(
-                  "flex items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-[13px] transition-all duration-150",
+                  "flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-[13px] transition-colors duration-150",
                   isActive
-                    ? "bg-[var(--color-bg-subtle)] font-medium text-[var(--color-accent)]"
+                    ? "bg-[var(--color-bg-subtle)] text-[var(--color-accent)]"
                     : "text-[var(--color-text-muted)] hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-text)]",
                 )}
               >
-                <Icon size={15} className="shrink-0" />
-                <span>{NAV_LABEL[s.id]}</span>
+                <span className="flex h-[15px] w-[15px] shrink-0 items-center justify-center"><Icon size={15} /></span>
+                <span className="flex-1 truncate">{NAV_LABEL[s.id]}</span>
               </button>
             );
           })}

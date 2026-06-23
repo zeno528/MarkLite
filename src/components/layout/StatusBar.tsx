@@ -80,7 +80,7 @@ export function StatusBar() {
 
   return (
     <div
-      className="flex h-[var(--statusbar-height)] w-full shrink-0 items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] pr-3 text-xs text-[var(--color-text-muted)]"
+      className="flex h-[var(--statusbar-height)] w-full shrink-0 select-none items-center justify-between border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] pr-3 text-xs text-[var(--color-text-muted)]"
     >
       <div className="flex h-full items-stretch gap-2">
         {/* 模块1：刷新按钮 */}

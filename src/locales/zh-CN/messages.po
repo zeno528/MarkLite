@@ -91,7 +91,7 @@ msgid "自动保存延迟"
 msgstr "自动保存延迟"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:81
+#: src/components/layout/TitleBar.tsx:82
 #: src/components/settings/sections/EditorSection.tsx:57
 msgid "自动刷新"
 msgstr "自动刷新"
@@ -196,111 +196,111 @@ msgid "关闭自动刷新"
 msgstr "关闭自动刷新"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:72
+#: src/components/layout/TitleBar.tsx:73
 msgid "文件"
 msgstr "文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:74
+#: src/components/layout/TitleBar.tsx:75
 msgid "新建文件"
 msgstr "新建文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:75
+#: src/components/layout/TitleBar.tsx:76
 msgid "打开文件"
 msgstr "打开文件"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:76
+#: src/components/layout/TitleBar.tsx:77
 msgid "打开文件夹"
 msgstr "打开文件夹"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:78
+#: src/components/layout/TitleBar.tsx:79
 msgid "保存"
 msgstr "保存"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:88
+#: src/components/layout/TitleBar.tsx:89
 msgid "视图"
 msgstr "视图"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:91
+#: src/components/layout/TitleBar.tsx:92
 msgid "编辑"
 msgstr "编辑"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:96
+#: src/components/layout/TitleBar.tsx:97
 msgid "双栏"
 msgstr "双栏"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:101
+#: src/components/layout/TitleBar.tsx:102
 msgid "预览"
 msgstr "预览"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:106
+#: src/components/layout/TitleBar.tsx:107
 msgid "切换侧栏"
 msgstr "切换侧栏"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:110
+#: src/components/layout/TitleBar.tsx:111
 msgid "配色方案"
 msgstr "配色方案"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:114
+#: src/components/layout/TitleBar.tsx:115
 msgid "跟随系统"
 msgstr "跟随系统"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:129
+#: src/components/layout/TitleBar.tsx:130
 msgid "帮助"
 msgstr "帮助"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:131
+#: src/components/layout/TitleBar.tsx:132
 msgid "快捷键参考"
 msgstr "快捷键参考"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:133
+#: src/components/layout/TitleBar.tsx:134
 msgid "关于"
 msgstr "关于"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:159
-#: src/components/layout/TitleBar.tsx:159
+#: src/components/layout/TitleBar.tsx:160
+#: src/components/layout/TitleBar.tsx:160
 msgid "最小化"
 msgstr "最小化"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:164
-#: src/components/layout/TitleBar.tsx:164
+#: src/components/layout/TitleBar.tsx:165
+#: src/components/layout/TitleBar.tsx:165
 msgid "向下还原"
 msgstr "向下还原"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:164
-#: src/components/layout/TitleBar.tsx:164
+#: src/components/layout/TitleBar.tsx:165
+#: src/components/layout/TitleBar.tsx:165
 msgid "最大化"
 msgstr "最大化"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TitleBar.tsx:176
-#: src/components/layout/TitleBar.tsx:176
+#: src/components/layout/TitleBar.tsx:177
+#: src/components/layout/TitleBar.tsx:177
 msgid "关闭"
 msgstr "关闭"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:80
+#: src/components/layout/TopBar.tsx:81
 msgid "回到顶部"
 msgstr "回到顶部"
 
 #. js-lingui-explicit-id
-#: src/components/layout/TopBar.tsx:181
+#: src/components/layout/TopBar.tsx:208
 msgid "设置"
 msgstr "设置"
 
@@ -359,6 +359,13 @@ msgstr "关闭 {title}"
 #~ msgid "切换语言"
 #~ msgstr "切换语言"
 
+#. placeholder {0}: group.title
+#. placeholder {0}: item.desc
+#: src/components/ui/ShortcutsHelp.tsx:75
+#: src/components/ui/ShortcutsHelp.tsx:81
+#~ msgid "{0}"
+#~ msgstr "{0}"
+
 #: src/components/settings/SchemePicker.tsx:15
 msgid "GitHub"
 msgstr "GitHub"
@@ -379,17 +386,21 @@ msgstr "代码编辑器的字体大小"
 msgid "余烬"
 msgstr "余烬"
 
-#: src/components/layout/TopBar.tsx:146
+#: src/components/layout/TopBar.tsx:147
 msgid "保存 <0>(Ctrl+S)</0>"
 msgstr "保存 <0>(Ctrl+S)</0>"
 
-#: src/components/layout/TopBar.tsx:144
+#: src/components/layout/TopBar.tsx:145
 msgid "保存 <0>(Ctrl+S)</0> — 有未保存的修改"
 msgstr "保存 <0>(Ctrl+S)</0> — 有未保存的修改"
 
 #: src/components/settings/sections/EditorSection.tsx:43
 msgid "保存延迟"
 msgstr "保存延迟"
+
+#: src/components/ui/ShortcutsHelp.tsx:82
+msgid "保存文件"
+msgstr "保存文件"
 
 #: src/components/settings/sections/EditorSection.tsx:43
 msgid "停止输入后等待此时间再保存"
@@ -399,6 +410,10 @@ msgstr "停止输入后等待此时间再保存"
 msgid "关于"
 msgstr "关于"
 
+#: src/components/ui/ShortcutsHelp.tsx:90
+msgid "关闭弹窗"
+msgstr "关闭弹窗"
+
 #: src/components/layout/Sidebar.tsx:290
 msgid "关闭所有标签"
 msgstr "关闭所有标签"
@@ -407,13 +422,21 @@ msgstr "关闭所有标签"
 msgid "最近打开"
 msgstr "最近打开"
 
+#: src/components/ui/ShortcutsHelp.tsx:86
+msgid "切换侧栏"
+msgstr "切换侧栏"
+
 #: src/components/layout/Sidebar.tsx:251
 msgid "切换侧栏 <0>(Ctrl+\\)</0>"
 msgstr "切换侧栏 <0>(Ctrl+\\)</0>"
 
-#: src/components/settings/sections/LanguageSection.tsx:20
+#: src/components/settings/sections/LanguageSection.tsx:26
 msgid "切换后立即生效，重启后保留"
 msgstr "切换后立即生效，重启后保留"
+
+#: src/components/ui/ShortcutsHelp.tsx:87
+msgid "切换布局（双栏/仅编辑/仅预览）"
+msgstr "切换布局（双栏/仅编辑/仅预览）"
 
 #. placeholder {0}: currentLocale === "zh-CN" ? i18n.t(`中文`) : i18n.t(`English`)
 #: src/components/layout/TopBar.tsx:209
@@ -427,6 +450,10 @@ msgstr "删除"
 #: src/components/layout/StatusBar.tsx:88
 msgid "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
 msgstr "刷新 <0>(Ctrl+R)</0> — 从磁盘重新读取当前文件"
+
+#: src/components/ui/ShortcutsHelp.tsx:83
+msgid "刷新文件"
+msgstr "刷新文件"
 
 #: src/components/settings/sections/EditorSection.tsx:60
 msgid "刷新间隔"
@@ -452,7 +479,7 @@ msgstr "双栏"
 msgid "同步"
 msgstr "同步"
 
-#: src/components/layout/TopBar.tsx:77
+#: src/components/layout/TopBar.tsx:78
 msgid "回到顶部"
 msgstr "回到顶部"
 
@@ -492,23 +519,28 @@ msgstr "已保存"
 msgid "开启后标题栏半透+磨砂模糊，跟随配色"
 msgstr "开启后标题栏半透+磨砂模糊，跟随配色"
 
-#: src/components/settings/sections/LanguageSection.tsx:62
+#: src/components/settings/sections/LanguageSection.tsx:87
 msgid "当前生效语言"
 msgstr "当前生效语言"
 
-#: src/components/ui/ShortcutsHelp.tsx:72
+#: src/components/ui/ShortcutsHelp.tsx:66
 msgid "快捷键"
 msgstr "快捷键"
 
-#: src/components/layout/TopBar.tsx:122
+#: src/components/ui/ShortcutsHelp.tsx:80
+msgid "打开文件"
+msgstr "打开文件"
+
+#: src/components/layout/TopBar.tsx:123
 msgid "打开文件 <0>(Ctrl+O)</0>"
 msgstr "打开文件 <0>(Ctrl+O)</0>"
 
 #: src/components/layout/Sidebar.tsx:309
+#: src/components/ui/ShortcutsHelp.tsx:81
 msgid "打开文件夹"
 msgstr "打开文件夹"
 
-#: src/components/layout/TopBar.tsx:130
+#: src/components/layout/TopBar.tsx:131
 msgid "打开文件夹 <0>(Ctrl+Shift+N)</0>"
 msgstr "打开文件夹 <0>(Ctrl+Shift+N)</0>"
 
@@ -520,6 +552,10 @@ msgstr "打开系统设置"
 msgid "按 Tab 键插入的空格数"
 msgstr "按 Tab 键插入的空格数"
 
+#: src/components/ui/ShortcutsHelp.tsx:88
+msgid "搜索"
+msgstr "搜索"
+
 #: src/components/layout/Sidebar.tsx:241
 msgid "搜索 <0>Ctrl+F</0>"
 msgstr "搜索 <0>Ctrl+F</0>"
@@ -528,9 +564,17 @@ msgstr "搜索 <0>Ctrl+F</0>"
 msgid "收起全部"
 msgstr "收起全部"
 
+#: src/components/ui/ShortcutsHelp.tsx:78
+msgid "文件"
+msgstr "文件"
+
 #: src/components/layout/Sidebar.tsx:344
 msgid "文件夹"
 msgstr "文件夹"
+
+#: src/components/ui/ShortcutsHelp.tsx:79
+msgid "新建文件"
+msgstr "新建文件"
 
 #: src/components/file/Outline.tsx:166
 msgid "无标题"
@@ -560,13 +604,17 @@ msgstr "版本"
 msgid "琥珀"
 msgstr "琥珀"
 
-#: src/components/settings/sections/LanguageSection.tsx:19
+#: src/components/settings/sections/LanguageSection.tsx:25
 msgid "界面语言"
 msgstr "界面语言"
 
 #: src/components/settings/sections/AppearanceSection.tsx:58
 msgid "磨砂标题栏"
 msgstr "磨砂标题栏"
+
+#: src/components/ui/ShortcutsHelp.tsx:85
+msgid "视图"
+msgstr "视图"
 
 #: src/components/settings/sections/EditorSection.tsx:67
 msgid "秒"
@@ -634,10 +682,11 @@ msgid "设为默认 Markdown 程序"
 msgstr "设为默认 Markdown 程序"
 
 #: src/components/settings/SettingsDialog.tsx:96
+#: src/components/ui/ShortcutsHelp.tsx:89
 msgid "设置"
 msgstr "设置"
 
-#: src/components/layout/TopBar.tsx:177
+#: src/components/layout/TopBar.tsx:204
 msgid "设置 <0>(Ctrl+,)</0>"
 msgstr "设置 <0>(Ctrl+,)</0>"
 

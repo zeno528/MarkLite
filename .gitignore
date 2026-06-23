@@ -21,6 +21,10 @@ test-*.png
 ui-demo.html
 ui-redesign-demo.html
 
+# 临时测量/调试脚本
+scripts/measure-*.mjs
+scripts/measure-*.cjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

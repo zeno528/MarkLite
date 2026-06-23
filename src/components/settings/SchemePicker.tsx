@@ -3,20 +3,8 @@ import type { ReactNode } from "react";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useUIStore } from "@/stores/uiStore";
-import { COLOR_SCHEMES, type ColorScheme, type SchemeId } from "@/lib/theme/colorSchemes";
+import { COLOR_SCHEMES, getSchemeName, type ColorScheme } from "@/lib/theme/colorSchemes";
 import { cn } from "@/lib/utils/cn";
-
-/** 方案 id → 显示名（<Trans> 才能被 lingui extract 提取） */
-const SCHEME_NAME: Record<SchemeId, ReactNode> = {
-  paper: <Trans>纸白</Trans>,
-  violet: <Trans>薰衣草</Trans>,
-  amber: <Trans>琥珀</Trans>,
-  notion: <Trans>Notion</Trans>,
-  github: <Trans>GitHub</Trans>,
-  midnight: <Trans>子夜</Trans>,
-  ember: <Trans>余烬</Trans>,
-  ink: <Trans>墨黑</Trans>,
-};
 
 /** 配色方案卡片选择器：3 列网格，色点 + 名称（无描述） */
 export function SchemePicker() {
@@ -27,7 +15,7 @@ export function SchemePicker() {
   const items: { value: ColorScheme; name: ReactNode; mode: ReactNode; dots: string[] | null }[] = [
     ...COLOR_SCHEMES.map((s) => ({
       value: s.id as ColorScheme,
-      name: SCHEME_NAME[s.id],
+      name: getSchemeName(s.id, i18n),
       mode: s.mode === "light" ? i18n.t("浅") : i18n.t("深"),
       dots: [s.swatch.bg, s.swatch.surface, s.swatch.accent],
     })),

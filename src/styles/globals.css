@@ -661,6 +661,7 @@ body {
   left: 0;
   min-width: 200px;
   padding: 4px;
+  /* 菜单始终用纯 elevated 背景（macOS 原生菜单风格），磨砂感由阴影+圆角+边框撑起，不依赖 backdrop-filter（WebView2 上不可靠）；与标题栏磨砂开关解耦。 */
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

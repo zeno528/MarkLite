@@ -1,3 +1,5 @@
+import type { I18n } from "@lingui/core";
+
 /**
  * 配色方案系统 — 方案元数据与解析函数的唯一事实来源
  *
@@ -105,4 +107,27 @@ export function resolveSystemScheme(isDark: boolean): SchemeId {
 /** 把（可能为 system 的）配色方案解析为具体方案 id */
 export function resolveScheme(scheme: ColorScheme, systemIsDark: boolean): SchemeId {
   return scheme === "system" ? resolveSystemScheme(systemIsDark) : scheme;
+}
+
+/** 方案 id → i18n 源 msgid（中文是源语言；po 文件里有英文翻译条目） */
+const SCHEME_NAME_MSGID: Record<SchemeId, string> = {
+  paper: "纸白",
+  violet: "薰衣草",
+  amber: "琥珀",
+  notion: "Notion",
+  github: "GitHub",
+  midnight: "子夜",
+  ember: "余烬",
+  ink: "墨黑",
+};
+
+/**
+ * 获取方案当前 locale 的显示名。
+ * - 传 i18n：按当前 locale 翻译（中文返回 "纸白"，英文返回 "Paper"）
+ * - 不传 i18n：fallback 到源 msgid（用于非 React 上下文）
+ */
+export function getSchemeName(scheme: SchemeId, i18n?: I18n): string {
+  const msgid = SCHEME_NAME_MSGID[scheme];
+  if (!i18n) return msgid;
+  return i18n.t(msgid);
 }
