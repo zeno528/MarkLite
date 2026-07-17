@@ -51,22 +51,28 @@ export default defineConfig({
   },
 
   // 性能优化：代码分割（按需懒加载大型库）
+  // Vite 8 切换到 Rolldown 引擎，output.manualChunks 对象形式被移除。
+  // 改用函数形式 manualChunks（Vite 8 deprecated 但仍支持）——
+  // 通过返回 chunk 名映射到 vendor，最稳，可最大化 HTTP 缓存复用。
   build: {
     target: "esnext",
-    minify: "esbuild",
+    // Vite 8 默认 minify 是 Oxc（Rust 实现，比 esbuild 更快）
     cssMinify: true,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom"],
-          "codemirror-vendor": [
-            "@uiw/react-codemirror",
-            "@codemirror/lang-markdown",
-            "@codemirror/language-data",
-            "@codemirror/state",
-            "@codemirror/view",
-          ],
-          "markdown-vendor": ["marked", "shiki", "dompurify"],
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          // 通过路径里包名判断归属（兼容 pnpm 软链结构）
+          if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("/scheduler/")) {
+            return "react-vendor";
+          }
+          if (id.includes("/@uiw/") || id.includes("/@codemirror/") || id.includes("/@lezer/")) {
+            return "codemirror-vendor";
+          }
+          if (id.includes("/marked/") || id.includes("/shiki/") || id.includes("/dompurify/") || id.includes("/marked-footnote/")) {
+            return "markdown-vendor";
+          }
+          return undefined;
         },
       },
     },
