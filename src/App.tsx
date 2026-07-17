@@ -24,7 +24,6 @@ import { FileService } from "@/lib/tauri/fs";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { readTextFile } from "@tauri-apps/plugin-fs";
-import { warmupShiki } from "@/lib/markdown/shiki";
 import { getMainWindow } from "@/lib/window";
 import { getPlatformSync } from "@/lib/utils/platform";
 import {
@@ -236,19 +235,6 @@ export default function App() {
     restore();
   }, []);
 
-  // 启动后预热 Shiki（idle 时）
-  useEffect(() => {
-    const ric =
-      (window as any).requestIdleCallback ??
-      ((cb: () => void) => setTimeout(cb, 100));
-    const id = ric(() => {
-      warmupShiki();
-    });
-    return () => {
-      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
-  }, []);
 
   // 监听系统明暗变化（仅当配色方案为「跟随系统」时生效）
   useEffect(() => {

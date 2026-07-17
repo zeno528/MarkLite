@@ -197,6 +197,7 @@ export function CodeEditor({
     wordWrapEnabled,
     autoSaveEnabled,
     autoSaveDelay,
+    tabSize,
   ]);
 
   // 滚动同步：编辑器 → 预览（按编辑器可视首行映射到预览对应块；找不到标注块回退百分比）

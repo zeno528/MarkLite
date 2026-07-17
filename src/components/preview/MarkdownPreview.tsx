@@ -9,7 +9,15 @@ import { useDeferredValue, useEffect, useRef, useState } from "react";
 import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { parseMarkdown } from "@/lib/markdown/parser";
+// parser.ts（含 marked + shiki + dompurify）改为 dynamic import，bundle 不进首屏 entry
+// 首次解析时按需下载，shiki 已通过 main.tsx 预热（warmupShiki）所以 highlighter 命中已加载缓存
+
+/** Lazy parseMarkdown：首次调用时 dynamic import parser chunk（marked+shiki+dompurify） */
+const parseMarkdown = async (md: string, theme: "light"|"dark", filePath?: string, signal?: AbortSignal): Promise<string> => {
+  const mod = await import("@/lib/markdown/parser");
+  return mod.parseMarkdown(md, theme, filePath, signal);
+};
+
 import { cn } from "@/lib/utils/cn";
 import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
 import { rebuildPreviewBlocks, syncEditorFromPreview, syncPreviewFromEditor } from "@/lib/utils/scrollSync";
@@ -149,8 +157,17 @@ export function MarkdownPreview() {
   useEffect(() => {
     let cancelled = false;
     let raf = 0;
+    // 切文件时 abort 旧解析（大文档 marked/dompurify 还在跑会让小文档卡一会），
+    // 并立即清空 html 释放大文档 HTML 内存。
+    const controller = new AbortController();
     setLoading(true);
-    parseMarkdown(deferredContent, resolvedTheme, filePath)
+    // 仅在 filePath 变化时清空 html；同文件打字（deferredContent 变化）不清空，
+    // 让 React 用旧 html 渲染避免空白闪烁
+    const isFileSwitch = lastPathRef.current !== filePath;
+    if (isFileSwitch) {
+      setHtml("");
+    }
+    parseMarkdown(deferredContent, resolvedTheme, filePath, controller.signal)
       .then((h) => {
         if (cancelled) return;
         setHtml(h);
@@ -183,11 +200,14 @@ export function MarkdownPreview() {
         });
       })
       .catch((e) => {
+        // AbortError 是切文件时的正常取消，忽略
+        if (e instanceof DOMException && e.name === "AbortError") return;
         console.error("[preview] parse failed:", e);
         if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
+      controller.abort(); // 立即取消大文档解析，释放 CPU 给新文件
       if (raf) cancelAnimationFrame(raf);
     };
   }, [deferredContent, resolvedTheme, filePath]);

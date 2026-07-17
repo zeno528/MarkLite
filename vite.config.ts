@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { lingui } from "@lingui/vite-plugin";
 import path from "node:path";
@@ -13,10 +14,12 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      babel: {
-        plugins: ["@lingui/babel-plugin-lingui-macro"],
-      },
+    react(),
+    // plugin-react 6 用 Oxc 替代 Babel，但 @lingui/babel-plugin-lingui-macro
+    // 是 babel 插件。用 @rolldown/plugin-babel 独立接入以支持 lingui 宏。
+    // 必须在 react() 之后、lingui() 之前。
+    babel({
+      plugins: ["@lingui/babel-plugin-lingui-macro"],
     }),
     tailwindcss(),
     lingui(),
