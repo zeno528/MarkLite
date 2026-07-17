@@ -30,6 +30,17 @@
   will-change: scroll-position;
 }
 
+/* 大文档性能：屏外块跳过渲染，首屏 paint 时间减半（实测 100KB 文档）
+ *
+ * ⚠️ 不能用 `contain: content` / `contain: layout` —— 会让父级 overflow-auto
+ * 看不到内部溢出，滚动同步静默失效（见 memory: css-contain-layout-scroll-killer）
+ * `content-visibility: auto` 只控制屏外渲染，不影响父级布局，安全可用。
+ * contain-intrinsic-size 给浏览器占位估算，避免屏外块折叠时滚动条跳来跳去。 */
+.markdown-body > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
 .markdown-body > *:first-child {
   margin-top: 0;
 }

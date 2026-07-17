@@ -360,25 +360,43 @@ export function MarkdownPreview() {
         ref={containerRef}
         className="min-h-0 flex-1 overflow-auto"
       >
-        <article
-          className={cn(
-            "markdown-body flex flex-col px-12 min-h-full w-full",
-          )}
-          style={{ paddingTop: "10px", paddingBottom: "40px" }}
-        >
-          {loading && !html ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
-              渲染中...
-            </div>
-          ) : html ? (
-            <div dangerouslySetInnerHTML={{ __html: html }} />
-          ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
-              预览将在这里显示
-            </div>
-          )}
-        </article>
+        {loading && !html ? (
+          <PreviewPlaceholder text="渲染中..." />
+        ) : html ? (
+          // 关键优化 1：PreviewContent 用 key={filePath} 让切文件时 React 彻底卸载
+          // 旧 article（5000+ DOM 节点），浏览器立即断开引用 → content-visibility
+          // 屏外节点被 GC，避免旧 DOM 与新内容争抢主线程。
+          // 关键优化 2：article 直接承载 dangerouslySetInnerHTML（去掉中间 wrapper div），
+          // 让 .markdown-body > * 选择器真正作用到每个 markdown 块上做 content-visibility。
+          <PreviewContent key={filePath} html={html} />
+        ) : (
+          <PreviewPlaceholder text="预览将在这里显示" />
+        )}
       </div>
     </div>
+  );
+}
+
+/** 预览占位符（加载中 / 空状态） */
+function PreviewPlaceholder({ text }: { text: string }) {
+  return (
+    <div className="flex flex-1 items-center justify-center text-sm text-[var(--color-text-subtle)]">
+      {text}
+    </div>
+  );
+}
+
+/** 预览内容组件：article 直接承载 dangerouslySetInnerHTML
+ *  关键点：key={filePath}（在父组件用）让切文件时 React 卸载整个实例，
+ *  旧 article 及其所有子节点立即断开引用，浏览器同步删除 → 释放内存与 GC 压力 */
+function PreviewContent({ html }: { html: string }) {
+  return (
+    <article
+      className={cn(
+        "markdown-body flex flex-col px-12 min-h-full w-full",
+      )}
+      style={{ paddingTop: "10px", paddingBottom: "40px" }}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }
