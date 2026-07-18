@@ -681,3 +681,11 @@ msgstr "Rename"
 msgid "预览"
 msgstr "Preview"
 
+#: src/components/settings/sections/EditorSection.tsx:78
+msgid "单标签模式"
+msgstr "Single tab mode"
+
+#: src/components/settings/sections/EditorSection.tsx:78
+msgid "打开新文件时替换当前标签而非追加新标签"
+msgstr "Replace the current tab instead of opening a new one"
+

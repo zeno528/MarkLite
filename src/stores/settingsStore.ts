@@ -23,6 +23,10 @@ interface SettingsState {
   /** 同步滚动 */
   scrollSync: boolean;
 
+  // === 标签 ===
+  /** 单标签模式：打开新文件时替换当前标签而非追加 */
+  singleTabMode: boolean;
+
   // === 状态 ===
   loaded: boolean;
   store: Store | null;
@@ -45,6 +49,7 @@ const DEFAULTS = {
   autoRefresh: true,
   autoRefreshInterval: 10,
   scrollSync: true,
+  singleTabMode: false,
 };
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({

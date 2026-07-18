@@ -16,6 +16,7 @@ export function EditorSection() {
   const autoRefresh = useSettingsStore((s) => s.autoRefresh);
   const autoRefreshInterval = useSettingsStore((s) => s.autoRefreshInterval);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
+  const singleTabMode = useSettingsStore((s) => s.singleTabMode);
   const update = useSettingsStore((s) => s.update);
 
   return (
@@ -72,6 +73,9 @@ export function EditorSection() {
       <div className="my-4 h-px bg-[var(--color-border)]" />
       <SettingRow label={<Trans>滚动同步</Trans>} description={<Trans>编辑器与预览的双向滚动联动</Trans>}>
         <Toggle checked={scrollSync} onChange={(v) => update("scrollSync", v)} aria-label={i18n.t(`滚动同步`)} />
+      </SettingRow>
+      <SettingRow label={<Trans>单标签模式</Trans>} description={<Trans>打开新文件时替换当前标签而非追加新标签</Trans>}>
+        <Toggle checked={singleTabMode} onChange={(v) => update("singleTabMode", v)} aria-label={i18n.t(`单标签模式`)} />
       </SettingRow>
     </div>
   );

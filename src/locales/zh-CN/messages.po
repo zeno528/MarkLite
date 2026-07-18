@@ -681,3 +681,11 @@ msgstr "重命名"
 #: src/components/layout/TopBar.tsx:54
 msgid "预览"
 msgstr "预览"
+
+#: src/components/settings/sections/EditorSection.tsx:78
+msgid "单标签模式"
+msgstr "单标签模式"
+
+#: src/components/settings/sections/EditorSection.tsx:78
+msgid "打开新文件时替换当前标签而非追加新标签"
+msgstr "打开新文件时替换当前标签而非追加新标签"

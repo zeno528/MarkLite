@@ -40,8 +40,7 @@ export function StatusBar() {
   const currentFile = useEditorStore((s) => s.currentFile);
   // useDeferredValue：输入期间用旧字数渲染（不阻塞），停顿后 React 后台重统计（自适应无固定延迟）
   const deferredContent = useDeferredValue(currentFile?.content ?? "");
-  const singleTabMode = useEditorStore((s) => s.singleTabMode);
-  const toggleSingleTabMode = useEditorStore((s) => s.toggleSingleTabMode);
+  const singleTabMode = useSettingsStore((s) => s.singleTabMode);
   const wc = useMemo(() => {
     if (!deferredContent) return { chars: 0, words: 0, lines: 0 };
     const text = deferredContent;
@@ -135,7 +134,7 @@ export function StatusBar() {
           placement="top"
         >
           <button
-            onClick={toggleSingleTabMode}
+            onClick={() => useSettingsStore.getState().update("singleTabMode", !singleTabMode)}
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] transition-colors",
               singleTabMode

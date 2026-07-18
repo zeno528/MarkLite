@@ -3,6 +3,7 @@
  */
 import { create } from "zustand";
 import type { EditorView } from "@codemirror/view";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 /** 编辑器 view 引用（非响应式，供目录等组件直接访问） */
 export const editorViewRef: { current: EditorView | null } = { current: null };
@@ -73,10 +74,6 @@ interface EditorState {
   searchVisible: boolean;
   setSearchVisible: (show: boolean) => void;
 
-  // === 单标签模式 ===
-  singleTabMode: boolean;
-  toggleSingleTabMode: () => void;
-
   // === 待跳转行（纯预览模式下点击目录触发：先切 split，再由编辑器消费） ===
   pendingJumpLine: number | null;
   setPendingJumpLine: (line: number | null) => void;
@@ -100,7 +97,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   scrollPercentPath: null,
   scrollSource: null,
   searchVisible: false,
-  singleTabMode: false,
   pendingJumpLine: null,
 
   setCursor: (cursor) => set({ cursor }),
@@ -108,7 +104,6 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setScrollPercent: (scrollPercent, source) =>
     set({ scrollPercent, scrollSource: source, scrollPercentPath: get().activeFilePath }),
   setSearchVisible: (searchVisible) => set({ searchVisible }),
-  toggleSingleTabMode: () => set((s) => ({ singleTabMode: !s.singleTabMode })),
   setPendingJumpLine: (pendingJumpLine) => set({ pendingJumpLine }),
 
   openFile: (path, title, content) => {
@@ -117,7 +112,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       useRecentStore.getState().addRecent(path, title);
     });
 
-    const { openFiles, singleTabMode } = get();
+    const { openFiles } = get();
+    // 单标签模式从 settingsStore 读取（持久化到磁盘）
+    const singleTabMode = useSettingsStore.getState().singleTabMode;
     const ext = path.split(".").pop()?.toLowerCase() ?? "md";
     const existing = openFiles.find((f) => f.path === path);
     if (existing) {
