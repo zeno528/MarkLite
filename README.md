@@ -20,13 +20,16 @@
 
 ---
 
-## 截图
+## 预览
 
-| 亮色 · 双栏编辑 | 暗色 · 双栏编辑 |
-|:---:|:---:|
-| ![亮色主题 · 双栏编辑](screenshots/light-editor.png) | ![暗色主题 · 双栏编辑](screenshots/dark-editor.png) |
-| 亮色 · 大纲视图 | 暗色 · README 预览 |
-| ![亮色 · 大纲视图](screenshots/light-outline.png) | ![暗色 · README 预览](screenshots/dark-banner.png) |
+<p align="center" style="margin: 40px 0;">
+  <img src="screenshots/overview.jpg" width="900" alt="MarkLite 亮色主控台 · 双栏编辑 + 大纲 + 预览" style="border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.20)">
+</p>
+
+<p align="center" style="margin: 32px 0 48px 0;">
+  <img src="screenshots/dark-editor.png" width="48%" alt="暗色主题 · 双栏编辑" style="border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15)">
+  <img src="screenshots/dark-banner.png" width="48%" alt="暗色 · README 预览" style="border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15)">
+</p>
 
 ---
 

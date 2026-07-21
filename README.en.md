@@ -20,13 +20,16 @@ English · [中文](./README.md)
 
 ---
 
-## Screenshots
+## Preview
 
-| Light · Split Editor | Dark · Split Editor |
-|:---:|:---:|
-| ![Light theme · Split editor](screenshots/light-editor.png) | ![Dark theme · Split editor](screenshots/dark-editor.png) |
-| Light · Outline View | Dark · README Preview |
-| ![Light theme · Outline view](screenshots/light-outline.png) | ![Dark theme · README preview](screenshots/dark-banner.png) |
+<p align="center" style="margin: 40px 0;">
+  <img src="screenshots/overview.jpg" width="900" alt="MarkLite — Light theme overview: split editor + outline + preview" style="border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.20)">
+</p>
+
+<p align="center" style="margin: 32px 0 48px 0;">
+  <img src="screenshots/dark-editor.png" width="48%" alt="Dark theme, split editor" style="border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15)">
+  <img src="screenshots/dark-banner.png" width="48%" alt="Dark theme, README preview" style="border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.15)">
+</p>
 
 ---
 
