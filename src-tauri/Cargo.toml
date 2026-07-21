@@ -2,7 +2,7 @@
 name = "marklite"
 version = "0.2.11"
 description = "MarkLite - 轻量级 Markdown 编辑器"
-authors = ["zwf"]
+authors = ["Scott"]
 edition = "2024"
 rust-version = "1.85"
 

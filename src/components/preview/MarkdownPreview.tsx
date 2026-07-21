@@ -157,6 +157,7 @@ export function MarkdownPreview() {
   useEffect(() => {
     let cancelled = false;
     let raf = 0;
+    const timers: number[] = [];
     // 切文件时 abort 旧解析（大文档 marked/dompurify 还在跑会让小文档卡一会），
     // 并立即清空 html 释放大文档 HTML 内存。
     const controller = new AbortController();
@@ -188,11 +189,24 @@ export function MarkdownPreview() {
             scrollPercentPath === filePath &&
             scrollPercent > 0
           ) {
-            const max = el.scrollHeight - el.clientHeight;
-            if (max > 0) {
-              lockScrollSync();
-              el.scrollTop = max * scrollPercent;
-            }
+            // content-visibility:auto 下新挂载 article 的屏外块按 contain-intrinsic-size 占位，
+            // 首帧 scrollHeight 是估算值，单次写入会偏顶。重试链逐轮校正，稳定后早停。
+            let lastMax = -1;
+            let settled = false;
+            const applyRestore = () => {
+              if (settled) return;
+              const max = el.scrollHeight - el.clientHeight;
+              if (max > 0) {
+                lockScrollSync();
+                el.scrollTop = max * scrollPercent;
+                if (lastMax >= 0 && Math.abs(max - lastMax) < 2) settled = true;
+                lastMax = max;
+              }
+            };
+            applyRestore(); // rAF 已推迟一帧，首帧直接应用
+            [50, 150, 400].forEach((ms) => {
+              timers.push(window.setTimeout(applyRestore, ms));
+            });
           } else {
             syncPreviewFromEditor();
           }
@@ -209,6 +223,7 @@ export function MarkdownPreview() {
       cancelled = true;
       controller.abort(); // 立即取消大文档解析，释放 CPU 给新文件
       if (raf) cancelAnimationFrame(raf);
+      timers.forEach((id) => clearTimeout(id)); // 清理滚动恢复重试链残留 timer
     };
   }, [deferredContent, resolvedTheme, filePath]);
 

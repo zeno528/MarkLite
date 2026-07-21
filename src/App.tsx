@@ -19,7 +19,8 @@ import { notify } from "@/stores/notificationStore";
 import { useUIStore, SIDEBAR_MIN_WIDTH, SIDEBAR_MAX_WIDTH, SIDEBAR_DEFAULT_WIDTH } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFileStore, FOLDERS_KEY, ACTIVE_FOLDER_KEY } from "@/stores/fileStore";
-import { useEditorStore, ACTIVE_FILE_KEY } from "@/stores/editorStore";
+import { useEditorStore, ACTIVE_FILE_KEY, setAutoSaveSuspended } from "@/stores/editorStore";
+import { useConfirmStore, type ConfirmResult } from "@/stores/confirmStore";
 import { FileService } from "@/lib/tauri/fs";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -31,6 +32,7 @@ import {
   openFileViaDialog,
   openFolderViaDialog,
   reloadCurrentFile,
+  saveAllDirty,
   saveCurrentFile,
 } from "@/lib/shortcuts/appShortcuts";
 import { useRefreshStore } from "@/stores/refreshStore";
@@ -318,6 +320,50 @@ export default function App() {
     requestAnimationFrame(() => {
       showWindow();
     });
+  }, []);
+
+  // 退出确认：有未保存文件时拦截窗口关闭，三选项（保存并退出 / 不保存 / 取消）符合 Apple HIG。
+  // 弹框期间挂起 autoSave，避免防抖到期偷偷保存导致 isDirty 消失（用户点取消后会误以为没改过）。
+  useEffect(() => {
+    const win = getMainWindow();
+    if (!win) return;
+    let unlisten: (() => void) | null = null;
+    win
+      .onCloseRequested(async (event) => {
+        const dirtyFiles = useEditorStore.getState().openFiles.filter((f) => f.isDirty);
+        if (dirtyFiles.length === 0) return; // 无未保存 → 放行正常关闭
+        event.preventDefault(); // 有未保存 → 拦截，弹确认
+        setAutoSaveSuspended(true);
+        let result: ConfirmResult;
+        try {
+          result = await useConfirmStore.getState().show({
+            title: "退出确认",
+            message:
+              dirtyFiles.length === 1
+                ? `「${dirtyFiles[0].title}」有未保存的修改，退出前是否保存？`
+                : `有 ${dirtyFiles.length} 个文件未保存，退出前是否保存？`,
+            okLabel: "保存并退出",
+            discardLabel: "不保存",
+            cancelLabel: "取消",
+          });
+        } finally {
+          setAutoSaveSuspended(false); // 无论结果都恢复 autoSave
+        }
+        if (result === "cancel") return; // 取消 → 留在 app，isDirty 保留
+        if (result === "confirm") {
+          // 保存并退出：保存所有 dirty 文件；用户取消某个 untitled 另存则中止退出
+          const saved = await saveAllDirty();
+          if (!saved) return;
+        }
+        // confirm（已保存）或 discard（不保存）→ 强制销毁窗口（绕过 close 事件，避免再次拦截）
+        await win.destroy();
+      })
+      .then((fn) => {
+        unlisten = fn;
+      });
+    return () => {
+      unlisten?.();
+    };
   }, []);
 
   // 全局快捷键（不依赖编辑器焦点，任何位置都生效）

@@ -18,6 +18,16 @@ export const previewBlocksRef: { current: { el: HTMLElement; line: number; top: 
 /** localStorage key：上次打开的文件路径（重开自动恢复） */
 export const ACTIVE_FILE_KEY = "marklite:active-file";
 
+/** 退出确认期间挂起 autoSave（避免弹框时防抖到期偷偷保存，导致 isDirty 消失误导用户）。
+ *  非响应式模块级标志：autoSave 扩展读它，不进 zustand state、不触发 re-render。 */
+let _suspendAutoSave = false;
+export function isAutoSaveSuspended(): boolean {
+  return _suspendAutoSave;
+}
+export function setAutoSaveSuspended(v: boolean): void {
+  _suspendAutoSave = v;
+}
+
 /** 增量持久化当前激活文件路径（仿 fileStore.persist；无关闭事件，故每次切换即写盘） */
 function persistActiveFile(path: string | null) {
   try {

@@ -129,9 +129,9 @@ User settings are stored in three layers:
 
 | Platform | Path |
 |---|---|
-| Windows | `C:\Users\{username}\AppData\Roaming\com.zwf.marklite\settings.json` |
-| macOS | `~/Library/Application Support/com.zwf.marklite/settings.json` |
-| Linux | `~/.local/share/com.zwf.marklite/settings.json` |
+| Windows | `C:\Users\{username}\AppData\Roaming\studio.scott.marklite\settings.json` |
+| macOS | `~/Library/Application Support/studio.scott.marklite/settings.json` |
+| Linux | `~/.local/share/studio.scott.marklite/settings.json` |
 
 ---
 

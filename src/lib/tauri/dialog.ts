@@ -5,7 +5,7 @@
  */
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { homeDir, dirname } from "@tauri-apps/api/path";
-import { customConfirm } from "@/stores/confirmStore";
+import { customConfirm, type ConfirmResult } from "@/stores/confirmStore";
 
 const LAST_DIR_KEY = "marklite:lastdir";
 
@@ -46,6 +46,6 @@ export async function confirmDialog(
   okLabel = "确定",
   cancelLabel = "取消",
   danger = false,
-): Promise<boolean> {
+): Promise<ConfirmResult> {
   return customConfirm(message, title, okLabel, cancelLabel, danger);
 }

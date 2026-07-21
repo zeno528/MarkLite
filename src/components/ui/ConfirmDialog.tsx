@@ -12,6 +12,7 @@ export function ConfirmDialog() {
   const options = useConfirmStore((s) => s.options);
   const confirm = useConfirmStore((s) => s.confirm);
   const cancel = useConfirmStore((s) => s.cancel);
+  const discard = useConfirmStore((s) => s.discard);
   const okRef = useRef<HTMLButtonElement>(null);
 
   // 自动聚焦确认按钮
@@ -40,7 +41,7 @@ export function ConfirmDialog() {
 
   if (!options) return null;
 
-  const { title, message, okLabel: rawOk, cancelLabel: rawCancel, danger } = options;
+  const { title, message, okLabel: rawOk, cancelLabel: rawCancel, discardLabel, danger } = options;
   const okLabel = rawOk ?? i18n.t("确定");
   const cancelLabel = rawCancel ?? i18n.t("取消");
 
@@ -65,27 +66,54 @@ export function ConfirmDialog() {
           </p>
         </div>
 
-        {/* 按钮 */}
-        <div className="flex justify-end gap-2 border-t border-[var(--color-border)] px-5 py-3">
-          <button
-            onClick={cancel}
-            className="h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-4 text-[12.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)]"
-          >
-            {cancelLabel}
-          </button>
-          <button
-            ref={okRef}
-            onClick={confirm}
-            className={cn(
-              "h-8 rounded-[var(--radius-md)] px-4 text-[12.5px] font-medium text-white transition-colors",
-              danger
-                ? "bg-[var(--color-danger)] hover:brightness-110"
-                : "bg-[var(--color-accent)] hover:brightness-110",
-            )}
-          >
-            {okLabel}
-          </button>
-        </div>
+        {/* 按钮：三选项时 [不保存 danger] 靠左 / [取消] [保存] 靠右（HIG：破坏性按钮远离安全按钮防误点）；
+            两选项时保持 [取消] [确认] 靠右；danger 仅在两选项时让确认按钮变红 */}
+        {discardLabel ? (
+          <div className="flex items-center justify-between gap-2 border-t border-[var(--color-border)] px-5 py-3">
+            <button
+              onClick={discard}
+              className="h-8 rounded-[var(--radius-md)] px-3 text-[12.5px] font-medium text-[var(--color-danger)] transition-colors hover:bg-[var(--color-bg-subtle)]"
+            >
+              {discardLabel}
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={cancel}
+                className="h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-4 text-[12.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)]"
+              >
+                {cancelLabel}
+              </button>
+              <button
+                ref={okRef}
+                onClick={confirm}
+                className="h-8 rounded-[var(--radius-md)] bg-[var(--color-accent)] px-4 text-[12.5px] font-medium text-white transition-colors hover:brightness-110"
+              >
+                {okLabel}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-end gap-2 border-t border-[var(--color-border)] px-5 py-3">
+            <button
+              onClick={cancel}
+              className="h-8 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-muted)] px-4 text-[12.5px] font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text)]"
+            >
+              {cancelLabel}
+            </button>
+            <button
+              ref={okRef}
+              onClick={confirm}
+              className={cn(
+                "h-8 rounded-[var(--radius-md)] px-4 text-[12.5px] font-medium text-white transition-colors",
+                danger
+                  ? "bg-[var(--color-danger)] hover:brightness-110"
+                  : "bg-[var(--color-accent)] hover:brightness-110",
+              )}
+            >
+              {okLabel}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -122,6 +122,8 @@ export function CodeEditor({
   );
 
   const viewRef = useRef<EditorView | null>(null);
+  /** 滚动恢复重试链的 timer 句柄（CodeMirror 虚拟滚动 scrollHeight 漂移，需多轮 settle 校正） */
+  const restoreTimersRef = useRef<number[]>([]);
   /** 回调的稳定引用：autoSave/shortcuts 读 ref.current，保证扩展只创建一次、闭包始终最新 */
   const cbRef = useRef({ onSave: onSave ?? null, onToggleSidebar: onToggleSidebar ?? null });
   useEffect(() => {
@@ -138,6 +140,9 @@ export function CodeEditor({
   useEffect(() => {
     return () => {
       editorViewRef.current = null;
+      // 清理滚动恢复重试链的残留 timer
+      restoreTimersRef.current.forEach((id) => clearTimeout(id));
+      restoreTimersRef.current = [];
     };
   }, []);
 
@@ -267,13 +272,24 @@ export function CodeEditor({
             useEditorStore.getState();
           if (scrollPercentPath === activeFilePath && scrollPercent > 0) {
             const dom = view.scrollDOM;
-            // 推迟一帧等 CodeMirror 完成布局，scrollHeight 才准确
-            requestAnimationFrame(() => {
+            // CodeMirror 6 视口式渲染：重建后 scrollHeight 首帧会漂移，单次 rAF 写入会偏到错误位置。
+            // 用 rAF + 重试链（与 scroll handler 的 settle 同思路）逐轮校正，scrollHeight 稳定后早停。
+            // timer 存 ref，卸载时清理。
+            let lastMax = -1;
+            let settled = false;
+            const applyRestore = () => {
+              if (settled) return;
               const max = dom.scrollHeight - dom.clientHeight;
               if (max > 0) {
-                lockScrollSync();
+                lockScrollSync(); // 续窗，防 scroll handler 把恢复误当用户滚动联动预览
                 dom.scrollTop = max * scrollPercent;
+                if (lastMax >= 0 && Math.abs(max - lastMax) < 2) settled = true;
+                lastMax = max;
               }
+            };
+            requestAnimationFrame(applyRestore);
+            [50, 150, 400].forEach((ms) => {
+              restoreTimersRef.current.push(window.setTimeout(applyRestore, ms));
             });
           }
         }}

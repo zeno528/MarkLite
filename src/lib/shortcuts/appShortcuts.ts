@@ -53,6 +53,36 @@ export async function saveCurrentFile() {
 }
 
 /**
+ * 保存所有未保存的文件（退出确认「保存并退出」用）
+ * - 有路径的直接存盘 + markSaved
+ * - untitled- 走另存为对话框；用户取消任意一个则中断，调用方应中止退出
+ * @returns true 全部保存成功（可继续退出）；false 用户取消了某个另存
+ */
+export async function saveAllDirty(): Promise<boolean> {
+  const { openFiles } = useEditorStore.getState();
+  for (const f of openFiles) {
+    if (!f.isDirty) continue;
+    if (f.path.startsWith("untitled-")) {
+      const savedPath = await FileService.saveAsFile(f.content, f.title + ".md");
+      if (!savedPath) return false; // 用户取消另存 → 中断退出
+      useEditorStore.getState().closeFile(f.path);
+      const title = savedPath.split(/[/\\]/).pop()?.replace(/\.(md|markdown|mdx)$/i, "") ?? savedPath;
+      useEditorStore.getState().openFile(savedPath, title, f.content);
+    } else {
+      try {
+        await FileService.saveFile(f.path, f.content);
+        useEditorStore.getState().markSaved(f.path);
+      } catch (e) {
+        console.error("[saveAllDirty] failed:", f.path, e);
+        notify.error(`保存失败：${f.title}`);
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
  * 刷新所有已打开的文件 + 文件树
  * @param silent 静默模式：不弹确认框、不显示通知（自动刷新用）
  * @returns 是否有文件内容变化
@@ -73,11 +103,11 @@ export async function reloadCurrentFile(silent = false): Promise<boolean> {
         .filter((f) => f.isDirty)
         .map((f) => f.title)
         .join("、");
-      const ok = await confirmDialog(
+      const result = await confirmDialog(
         `以下文件有未保存的改动：${names}\n刷新将用磁盘内容覆盖本地改动，是否继续？`,
         "刷新确认",
       );
-      if (!ok) return false;
+      if (result !== "confirm") return false;
     }
 
     // 4. 刷新所有已打开的文件

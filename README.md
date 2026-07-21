@@ -129,9 +129,9 @@
 
 | 平台 | 路径 |
 |---|---|
-| Windows | `C:\Users\{用户名}\AppData\Roaming\com.zwf.marklite\settings.json` |
-| macOS | `~/Library/Application Support/com.zwf.marklite/settings.json` |
-| Linux | `~/.local/share/com.zwf.marklite/settings.json` |
+| Windows | `C:\Users\{用户名}\AppData\Roaming\studio.scott.marklite\settings.json` |
+| macOS | `~/Library/Application Support/studio.scott.marklite/settings.json` |
+| Linux | `~/.local/share/studio.scott.marklite/settings.json` |
 
 ---
 
