@@ -1,6 +1,6 @@
 # MarkLite
 
-![Version](https://img.shields.io/badge/version-0.2.11-blue)
+![Version](https://img.shields.io/badge/version-0.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2-24f8c7?logo=tauri)
 ![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
@@ -193,7 +193,7 @@ src/
 
 ## License
 
-[MIT](./LICENSE) © 2025 Zeno528
+[MIT](./LICENSE) © 2026 Zeno528
 
 ---
 

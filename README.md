@@ -1,6 +1,6 @@
 # MarkLite
 
-![Version](https://img.shields.io/badge/version-0.3.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2-24f8c7?logo=tauri)
 ![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
@@ -75,23 +75,6 @@
 - **可拖拽分栏**：双栏比例任意调节，双击重置
 - **可拖拽侧栏**：活动栏 + 面板布局
 - **快捷键一览**：`Ctrl+Shift+H` 呼出帮助面板
-
----
-
-## 配色方案一览
-
-| 方案 | 明暗 | 预览底色 |
-|:---|:---:|:---|
-| 薰衣草 (violet) | ☀️ 亮色 | `#eef0f7` |
-| 纸白 (paper) | ☀️ 亮色 | `#faf9f6` |
-| 琥珀 (amber) | ☀️ 亮色 | `#f8f5ef` |
-| Notion | ☀️ 亮色 | `#ffffff` |
-| GitHub | ☀️ 亮色 | `#f6f8fa` |
-| 子夜 (midnight) | 🌙 暗色 | `#1b1f27` |
-| 余烬 (ember) | 🌙 暗色 | `#241e18` |
-| 墨 (ink) | 🌙 暗色 | `#1a1a1a` |
-
----
 
 ## 技术栈
 
@@ -193,4 +176,4 @@ src/
 
 ## 许可
 
-[MIT](./LICENSE) © 2025 Zeno528
+[MIT](./LICENSE) © 2026 Zeno528
