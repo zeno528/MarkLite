@@ -3,11 +3,15 @@
 ![Version](https://img.shields.io/badge/version-0.2.11-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2-24f8c7?logo=tauri)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript)
-![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707)
+![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
+![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707?logo=codemirror)
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?logo=tailwindcss)
-![Zustand](https://img.shields.io/badge/Zustand-5-443E58)
+![Zustand](https://img.shields.io/badge/Zustand-5-443E58?logo=zustand)
+![marked](https://img.shields.io/badge/marked-18-black)
+![Shiki](https://img.shields.io/badge/Shiki-4-1f2937)
+![DOMPurify](https://img.shields.io/badge/DOMPurify-3-A103D2)
 ![Bundle](https://img.shields.io/badge/bundle-%3C10MB-4ade80)
 
 > 轻量、秒开的跨平台 Markdown 编辑器。基于 Tauri 2 + React 19 + CodeMirror 6。
@@ -18,11 +22,11 @@
 
 ## 截图
 
-| 亮色主题 · 双栏布局 | 暗色主题 · 预览模式 |
-|---|---|
-| ![light](https://img.shields.io/badge/预览-亮色_双栏-f0f0f0) | ![dark](https://img.shields.io/badge/预览-暗色_预览-1a1a2e) |
-
-> *截图待补充，可自行运行 `pnpm tauri dev` 体验。*
+| 亮色 · 双栏编辑 | 暗色 · 双栏编辑 |
+|:---:|:---:|
+| ![亮色主题 · 双栏编辑](screenshots/light-editor.png) | ![暗色主题 · 双栏编辑](screenshots/dark-editor.png) |
+| 亮色 · 大纲视图 | 暗色 · README 预览 |
+| ![亮色 · 大纲视图](screenshots/light-outline.png) | ![暗色 · README 预览](screenshots/dark-banner.png) |
 
 ---
 

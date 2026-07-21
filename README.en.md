@@ -1,18 +1,32 @@
 # MarkLite
 
-![Version](https://img.shields.io/badge/version-0.2.9-blue)
+![Version](https://img.shields.io/badge/version-0.2.11-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Tauri](https://img.shields.io/badge/Tauri-2-24f8c7?logo=tauri)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript)
-![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707)
+![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
+![CodeMirror](https://img.shields.io/badge/CodeMirror-6-D30707?logo=codemirror)
 ![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?logo=tailwindcss)
-![Zustand](https://img.shields.io/badge/Zustand-5-443E58)
+![Zustand](https://img.shields.io/badge/Zustand-5-443E58?logo=zustand)
+![marked](https://img.shields.io/badge/marked-18-black)
+![Shiki](https://img.shields.io/badge/Shiki-4-1f2937)
+![DOMPurify](https://img.shields.io/badge/DOMPurify-3-A103D2)
 ![Bundle](https://img.shields.io/badge/bundle-%3C10MB-4ade80)
 
 > A lightweight, instant-launching cross-platform Markdown editor. Built with Tauri 2 + React 19 + CodeMirror 6.
 
 English · [中文](./README.md)
+
+---
+
+## Screenshots
+
+| Light · Split Editor | Dark · Split Editor |
+|:---:|:---:|
+| ![Light theme · Split editor](screenshots/light-editor.png) | ![Dark theme · Split editor](screenshots/dark-editor.png) |
+| Light · Outline View | Dark · README Preview |
+| ![Light theme · Outline view](screenshots/light-outline.png) | ![Dark theme · README preview](screenshots/dark-banner.png) |
 
 ---
 
