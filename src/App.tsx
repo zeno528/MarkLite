@@ -36,6 +36,7 @@ import {
   saveCurrentFile,
 } from "@/lib/shortcuts/appShortcuts";
 import { useRefreshStore } from "@/stores/refreshStore";
+import { Trans } from "@lingui/react/macro";
 
 // 延迟加载非首屏组件
 const SettingsDialog = lazy(() => import("@/components/settings/SettingsDialog").then(m => ({ default: m.SettingsDialog })));
@@ -259,8 +260,9 @@ export default function App() {
 
   // 拖拽文件到窗口：Tauri webview 事件做视觉反馈 + 文件读取
   // 依赖 tauri.conf.json 的 app.dragDropEnabled: true（默认）——若改为 false 以启用 HTML5 拖放，本监听将不触发
- useEffect(() => {
-   const unlistenPromise = (async () => {
+  useEffect(() => {
+    if (!(window as any).__TAURI_INTERNALS__) return;
+    const unlistenPromise = (async () => {
       try {
         const { getCurrentWebview } = await import("@tauri-apps/api/webview");
         return getCurrentWebview().onDragDropEvent(async (event) => {
@@ -275,21 +277,21 @@ export default function App() {
             case "leave":
               setDragging(false);
               break;
-           case "drop": {
-             setDragging(false);
-             const paths = event.payload.paths;
-             let handled = false;
+            case "drop": {
+              setDragging(false);
+              const paths = event.payload.paths;
+              let handled = false;
 
               // 复用 openTarget（与首启/事件路径同一逻辑：.md 文件打开，文件夹加入侧边栏）
               for (const p of paths) {
                 if (await openTarget(p)) handled = true;
               }
 
-             if (!handled) {
-               notify.warning("仅支持 .md 文件或文件夹");
-             }
-             break;
-           }
+              if (!handled) {
+                notify.warning("仅支持 .md 文件或文件夹");
+              }
+              break;
+            }
           }
         });
       } catch (e) {
@@ -328,15 +330,20 @@ export default function App() {
     const win = getMainWindow();
     if (!win) return;
     let unlisten: (() => void) | null = null;
+    let closePending = false;
     win
       .onCloseRequested(async (event) => {
+        if (closePending) {
+          event.preventDefault();
+          return;
+        }
         const dirtyFiles = useEditorStore.getState().openFiles.filter((f) => f.isDirty);
         if (dirtyFiles.length === 0) return; // 无未保存 → 放行正常关闭
         event.preventDefault(); // 有未保存 → 拦截，弹确认
+        closePending = true;
         setAutoSaveSuspended(true);
-        let result: ConfirmResult;
         try {
-          result = await useConfirmStore.getState().show({
+          const result: ConfirmResult = await useConfirmStore.getState().show({
             title: "退出确认",
             message:
               dirtyFiles.length === 1
@@ -346,17 +353,18 @@ export default function App() {
             discardLabel: "不保存",
             cancelLabel: "取消",
           });
+          if (result === "cancel") return; // 取消 → 留在 app，isDirty 保留
+          if (result === "confirm") {
+            // 保存并退出：保存所有 dirty 文件；用户取消某个 untitled 另存则中止退出
+            const saved = await saveAllDirty();
+            if (!saved) return;
+          }
+          // confirm（已保存）或 discard（不保存）→ 强制销毁窗口（绕过 close 事件，避免再次拦截）
+          await win.destroy();
         } finally {
-          setAutoSaveSuspended(false); // 无论结果都恢复 autoSave
+          setAutoSaveSuspended(false);
+          closePending = false;
         }
-        if (result === "cancel") return; // 取消 → 留在 app，isDirty 保留
-        if (result === "confirm") {
-          // 保存并退出：保存所有 dirty 文件；用户取消某个 untitled 另存则中止退出
-          const saved = await saveAllDirty();
-          if (!saved) return;
-        }
-        // confirm（已保存）或 discard（不保存）→ 强制销毁窗口（绕过 close 事件，避免再次拦截）
-        await win.destroy();
       })
       .then((fn) => {
         unlisten = fn;
@@ -485,17 +493,26 @@ export default function App() {
       <ShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
       <ToastContainer />
       <ConfirmDialog />
-      {/* 拖拽文件覆盖层 */}
+      {/* 全屏拖放反馈层：不拦截指针，避免影响 Tauri 原生拖放事件 */}
       {dragging && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-[var(--color-accent)] bg-[var(--color-bg-elevated)] px-12 py-8 shadow-lg">
-            <svg className="h-10 w-10 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="12" y1="18" x2="12" y2="12" />
-              <polyline points="9 15 12 12 15 15" />
-            </svg>
-            <span className="text-sm font-medium text-[var(--color-accent)]">释放以打开文件</span>
+        <div
+          className="fixed inset-0 z-[999] pointer-events-none bg-[color-mix(in_oklch,var(--color-accent)_12%,var(--color-bg))] p-3"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="drop-feedback-content flex h-full w-full items-center justify-center rounded-[calc(var(--radius-xl)+8px)] border-2 border-dashed border-[color-mix(in_oklch,var(--color-accent)_65%,transparent)] bg-[color-mix(in_oklch,var(--color-bg-elevated)_82%,transparent)] shadow-[inset_0_0_80px_color-mix(in_oklch,var(--color-accent)_10%,transparent)]">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--color-accent)_35%,transparent)] bg-[color-mix(in_oklch,var(--color-accent)_14%,var(--color-bg-elevated))] text-[var(--color-accent)] shadow-[0_12px_40px_color-mix(in_oklch,var(--color-accent)_18%,transparent)]">
+                <svg className="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <line x1="12" y1="18" x2="12" y2="11" />
+                  <polyline points="8.5 14.5 12 11 15.5 14.5" />
+                </svg>
+              </div>
+              <p className="text-xl font-semibold tracking-[-0.02em] text-[var(--color-text)]"><Trans>释放以打开</Trans></p>
+              <p className="mt-1.5 text-[12.5px] text-[var(--color-text-muted)]"><Trans>支持 Markdown 文件与文件夹</Trans></p>
+            </div>
           </div>
         </div>
       )}

@@ -59,9 +59,15 @@ export function SearchPanel() {
   const focusSearchTrigger = useUIStore((s) => s.focusSearchTrigger);
 
   // 切换到搜索 tab 或重复点击搜索按钮时自动聚焦输入框
-  useEffect(() => {
+// 双重保险：先在 effect 中 focus,再用 setTimeout(0) 兜底 focus,
+// 防止 WebView2 等 webview 在某些时序下 effect focus 被覆盖丢失
+useEffect(() => {
+  inputRef.current?.focus();
+  const id = setTimeout(() => {
     inputRef.current?.focus();
-  }, [focusSearchTrigger]);
+  }, 0);
+  return () => clearTimeout(id);
+}, [focusSearchTrigger]);
 
   // 仅在卸载时清理选区和高亮（与聚焦逻辑分离，防止 cleanup 抢占焦点）
   useEffect(() => {

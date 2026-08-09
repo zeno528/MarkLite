@@ -202,6 +202,13 @@ export function SidebarActivityBar({ collapsed, onToggle }: SidebarActivityBarPr
   const { i18n } = useLingui();
   const handleClick = (tab: "files" | "outline" | "search") => {
     clearSearchHighlights();
+    // 搜索按钮与 Ctrl+F 语义一致：永远展开侧栏并切到搜索 tab，
+    // 不走「点击当前 tab 折叠」逻辑——否则 input 虽聚焦但被 translateX 推到屏幕外，用户无感知
+    if (tab === "search") {
+      setSidebarTab("search");
+      if (collapsed) onToggle();
+      return;
+    }
     if (collapsed) {
       // 收缩状态：展开并切换到目标标签
       setSidebarTab(tab);

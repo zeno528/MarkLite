@@ -314,6 +314,19 @@ aside ::-webkit-scrollbar-thumb:hover {
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+@keyframes drop-feedback-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.drop-feedback-content {
+  animation: drop-feedback-in 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drop-feedback-content { animation: none; }
+}
+
 /* 设置弹窗进场动画（遮罩淡入 + 面板上浮，150ms；class 在 SettingsDialog.tsx 引用） */
 @keyframes settings-fade {
   from { opacity: 0; }
