@@ -1,7 +1,10 @@
 name: Pre-release
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -16,43 +19,25 @@ defaults:
 
 jobs:
   verify:
-    name: Verify source
+    name: Verify successful main CI
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
 
     steps:
-      - name: Require main branch
-        if: github.ref != 'refs/heads/main'
-        run: throw 'Pre-release must be run from the main branch.'
-
-      - name: Checkout verified revision
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-        with:
-          version: 11.16.0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24.14.0
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Set up Rust
+      - name: Select verified revision
+        id: source
+        env:
+          VERIFIED_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          rustup toolchain install stable --profile minimal
-          rustup default stable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build frontend
-        run: pnpm build
-
-      - name: Check Tauri backend
-        run: cargo check --manifest-path src-tauri/Cargo.toml --locked
+          if ($env:VERIFIED_SHA -notmatch '^[0-9a-f]{40}$') {
+            throw "Invalid verified revision: $env:VERIFIED_SHA"
+          }
+          "sha=$env:VERIFIED_SHA" | Add-Content -LiteralPath $env:GITHUB_OUTPUT
 
   release:
     name: Build and publish pre-release
@@ -66,15 +51,17 @@ jobs:
       - name: Checkout verified revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ needs.verify.outputs.sha }}
           fetch-depth: 0
 
       - name: Ensure verified revision is still current
+        env:
+          VERIFIED_SHA: ${{ needs.verify.outputs.sha }}
         run: |
           git fetch origin main --tags
           $mainSha = git rev-parse origin/main
-          if ($mainSha -ne $env:GITHUB_SHA) {
-            throw "main changed after this workflow started. Run the workflow again to release the new revision."
+          if ($mainSha -ne $env:VERIFIED_SHA) {
+            throw "main changed after CI completed. The newer CI run will release the current revision."
           }
 
       - name: Set up pnpm
