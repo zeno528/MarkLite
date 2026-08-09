@@ -22,7 +22,8 @@ jobs:
     name: Verify successful main CI
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push'
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: windows-latest
     timeout-minutes: 5
     outputs:
@@ -46,6 +47,9 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: write
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout verified revision
@@ -177,4 +181,141 @@ jobs:
             --verify-tag
           if ($LASTEXITCODE -ne 0) {
             throw "Failed to create GitHub pre-release $env:TAG."
+          }
+
+  notify:
+    name: Notify Feishu
+    needs: [verify, release]
+    if: >-
+      always() &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: windows-latest
+    timeout-minutes: 5
+    permissions: {}
+
+    steps:
+      - name: Send workflow result
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+          UPSTREAM_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          RELEASE_RESULT: ${{ needs.release.result }}
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+          UPSTREAM_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RELEASE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:FEISHU_WEBHOOK_URL) -or
+              [string]::IsNullOrWhiteSpace($env:FEISHU_WEBHOOK_SECRET)) {
+            throw 'Feishu secrets are not configured. Set FEISHU_WEBHOOK_URL and FEISHU_WEBHOOK_SECRET in GitHub Secrets.'
+          }
+
+          if ($env:UPSTREAM_CONCLUSION -eq 'success' -and $env:RELEASE_RESULT -eq 'success') {
+            if ([string]::IsNullOrWhiteSpace($env:RELEASE_TAG)) {
+              throw 'Release tag is missing from the successful release job.'
+            }
+            $headerTemplate = 'green'
+            $title = 'MarkLite 预发行版成功'
+            $summary = "CI 已通过，Windows 预发行版 **$env:RELEASE_TAG** 已构建并发布。`n`n提交：$env:COMMIT_SHA"
+            $assetBaseUrl = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG"
+            $actions = @(
+              @{
+                tag = 'button'
+                text = @{ tag = 'plain_text'; content = '下载便携版' }
+                type = 'primary'
+                url = "$assetBaseUrl/MarkLite-$env:RELEASE_TAG-windows-x64-portable.exe"
+              }
+              @{
+                tag = 'button'
+                text = @{ tag = 'plain_text'; content = '下载安装包' }
+                type = 'default'
+                url = "$assetBaseUrl/MarkLite-$env:RELEASE_TAG-windows-x64-setup.exe"
+              }
+            )
+          } elseif ($env:UPSTREAM_CONCLUSION -eq 'cancelled' -or $env:RELEASE_RESULT -eq 'cancelled') {
+            $headerTemplate = 'orange'
+            $title = 'MarkLite 预发行版已取消'
+            $summary = "CI 或发行版工作流被取消，未完成预发行。`n`n提交：$env:COMMIT_SHA"
+            $actions = @(
+              @{
+                tag = 'button'
+                text = @{ tag = 'plain_text'; content = '查看工作流' }
+                type = 'default'
+                url = $env:RELEASE_RUN_URL
+              }
+            )
+          } elseif ($env:UPSTREAM_CONCLUSION -ne 'success') {
+            $headerTemplate = 'red'
+            $title = 'MarkLite 预发行版失败'
+            $summary = "CI 未通过（$env:UPSTREAM_CONCLUSION），发行版未构建。`n`n提交：$env:COMMIT_SHA"
+            $actions = @(
+              @{
+                tag = 'button'
+                text = @{ tag = 'plain_text'; content = '查看 CI 工作流' }
+                type = 'primary'
+                url = $env:UPSTREAM_RUN_URL
+              }
+            )
+          } else {
+            $headerTemplate = 'red'
+            $title = 'MarkLite 预发行版失败'
+            $summary = "CI 已通过，但发行版工作流失败（verify=$env:VERIFY_RESULT, release=$env:RELEASE_RESULT）。`n`n提交：$env:COMMIT_SHA"
+            $actions = @(
+              @{
+                tag = 'button'
+                text = @{ tag = 'plain_text'; content = '查看发行工作流' }
+                type = 'primary'
+                url = $env:RELEASE_RUN_URL
+              }
+            )
+          }
+
+          $timestamp = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds().ToString()
+          $stringToSign = "$timestamp`n$env:FEISHU_WEBHOOK_SECRET"
+          $hmac = [System.Security.Cryptography.HMACSHA256]::new(
+            [System.Text.Encoding]::UTF8.GetBytes($stringToSign)
+          )
+          try {
+            $sign = [Convert]::ToBase64String(
+              $hmac.ComputeHash([byte[]]::new(0))
+            )
+          } finally {
+            $hmac.Dispose()
+          }
+
+          $card = @{
+            config = @{ wide_screen_mode = $true }
+            header = @{
+              template = $headerTemplate
+              title = @{ tag = 'plain_text'; content = $title }
+            }
+            elements = @(
+              @{
+                tag = 'div'
+                text = @{ tag = 'lark_md'; content = $summary }
+              }
+              @{
+                tag = 'action'
+                actions = $actions
+              }
+            )
+          }
+
+          $payload = @{
+            timestamp = $timestamp
+            sign = $sign
+            msg_type = 'interactive'
+            card = $card
+          } | ConvertTo-Json -Compress -Depth 10
+
+          $response = Invoke-RestMethod `
+            -Uri $env:FEISHU_WEBHOOK_URL `
+            -Method Post `
+            -ContentType 'application/json; charset=utf-8' `
+            -Body $payload
+
+          if ($null -ne $response.code -and [int]$response.code -ne 0) {
+            throw "Feishu webhook rejected the notification (code $($response.code))."
           }
