@@ -5,8 +5,8 @@
  * - 行宽限制 ~70ch 居中 + 卡片化（阅读优先排版）
  * - 跟随配色方案（resolvedTheme）
  */
-import { useDeferredValue, useEffect, useRef, useState } from "react";
-import { useEditorStore, previewContainerRef } from "@/stores/editorStore";
+import { useEffect, useRef, useState } from "react";
+import { editorViewRef, useEditorStore, previewContainerRef } from "@/stores/editorStore";
 import { useUIStore } from "@/stores/uiStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 // parser.ts（含 marked + shiki + dompurify）改为 dynamic import，bundle 不进首屏 entry
@@ -17,6 +17,10 @@ const parseMarkdown = async (md: string, theme: "light"|"dark", filePath?: strin
   const mod = await import("@/lib/markdown/parser");
   return mod.parseMarkdown(md, theme, filePath, signal);
 };
+
+// 连续输入时只在停顿后重建一次预览 DOM，避免每个字符都触发 innerHTML 全量替换造成闪屏。
+const PREVIEW_UPDATE_DELAY = 180;
+const PREVIEW_COMMIT_DELAY = 32;
 
 import { cn } from "@/lib/utils/cn";
 import { lockScrollSync, isScrollSyncing } from "@/lib/utils/scrollSyncLock";
@@ -111,8 +115,6 @@ const CHECK_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 export function MarkdownPreview() {
   const content = useEditorStore((s) => s.currentFile?.content ?? "");
-  // useDeferredValue：输入期间预览用旧值渲染（不阻塞输入），停顿后 React 后台用新值重解析（自适应，无固定延迟）——官方推荐替代防抖
-  const deferredContent = useDeferredValue(content);
   const filePath = useEditorStore((s) => s.currentFile?.path);
   const resolvedTheme = useUIStore((s) => s.resolvedTheme);
   const scrollSync = useSettingsStore((s) => s.scrollSync);
@@ -139,6 +141,22 @@ export function MarkdownPreview() {
   const lastPathRef = useRef<string | undefined>(undefined);
   // 挂载后首次解析标志：用于区分「模式切换重建 → 恢复进度」与「同文件编辑 → 跟随编辑器」
   const isFirstParseRef = useRef(true);
+  const previousFilePathRef = useRef<string | undefined>(undefined);
+  const latestParseRef = useRef(0);
+  const lastEditorInputRef = useRef(0);
+
+  useEffect(() => {
+    const onEditorInput = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest(".cm-editor")) {
+        lastEditorInputRef.current = performance.now();
+        latestParseRef.current += 1;
+      }
+    };
+    document.addEventListener("input", onEditorInput, true);
+    return () => document.removeEventListener("input", onEditorInput, true);
+  }, []);
+
   useEffect(() => {
     if (lastPathRef.current === filePath) return;
     lastPathRef.current = filePath;
@@ -153,79 +171,110 @@ export function MarkdownPreview() {
     });
   }, [filePath]);
 
-  // 解析 Markdown → HTML（用 deferredContent：输入期间 React 用旧值渲染不阻塞，停顿后后台重解析，自适应无固定延迟）
+  // 解析 Markdown → HTML：短防抖合并连续输入，让预览 DOM 只在停顿后更新一次，
+  // 避免 React deferred render 交错提交旧内容造成右侧闪屏。
   useEffect(() => {
     let cancelled = false;
     let raf = 0;
+    let commitTimer = 0;
     const timers: number[] = [];
+    const parseId = ++latestParseRef.current;
+    const editorDoc = editorViewRef.current?.state.doc;
+    const isFileSwitch = previousFilePathRef.current !== filePath;
+    previousFilePathRef.current = filePath;
     // 切文件时 abort 旧解析（大文档 marked/dompurify 还在跑会让小文档卡一会），
     // 并立即清空 html 释放大文档 HTML 内存。
     const controller = new AbortController();
-    setLoading(true);
-    // 仅在 filePath 变化时清空 html；同文件打字（deferredContent 变化）不清空，
+    if (isFileSwitch || !html) setLoading(true);
+    // 仅在 filePath 变化时清空 html；同文件打字（content 变化）不清空，
     // 让 React 用旧 html 渲染避免空白闪烁
-    const isFileSwitch = lastPathRef.current !== filePath;
     if (isFileSwitch) {
       setHtml("");
     }
-    parseMarkdown(deferredContent, resolvedTheme, filePath, controller.signal)
-      .then((h) => {
-        if (cancelled) return;
-        setHtml(h);
-        setLoading(false);
-        // HTML 更新后等 DOM 布局稳定再做位置处理
-        raf = requestAnimationFrame(() => {
-          rebuildPreviewBlocks();
-          const el = containerRef.current;
-          if (!el) {
-            isFirstParseRef.current = false;
-            return;
-          }
-          const { scrollPercent, scrollPercentPath } = useEditorStore.getState();
-          // 挂载后首次解析 + 同文件模式切换 → 按阅读进度恢复滚动位置
-          // 其余情况（编辑、配色切换、换文件后的解析）→ 对齐编辑器当前位置（解决编辑后错位）
-          if (
-            isFirstParseRef.current &&
-            scrollPercentPath === filePath &&
-            scrollPercent > 0
-          ) {
-            // content-visibility:auto 下新挂载 article 的屏外块按 contain-intrinsic-size 占位，
-            // 首帧 scrollHeight 是估算值，单次写入会偏顶。重试链逐轮校正，稳定后早停。
-            let lastMax = -1;
-            let settled = false;
-            const applyRestore = () => {
-              if (settled) return;
-              const max = el.scrollHeight - el.clientHeight;
-              if (max > 0) {
-                lockScrollSync();
-                el.scrollTop = max * scrollPercent;
-                if (lastMax >= 0 && Math.abs(max - lastMax) < 2) settled = true;
-                lastMax = max;
+    const renderPreview = () => {
+      parseMarkdown(content, resolvedTheme, filePath, controller.signal)
+        .then((h) => {
+          if (cancelled || parseId !== latestParseRef.current) return;
+          // 输入事件完成后再提交，确保编辑器 store 已同步，旧解析结果不会抢先替换预览 DOM。
+          const commitPreview = () => {
+            const idleFor = performance.now() - lastEditorInputRef.current;
+            if (idleFor < PREVIEW_UPDATE_DELAY) {
+              commitTimer = window.setTimeout(commitPreview, PREVIEW_UPDATE_DELAY - idleFor);
+              return;
+            }
+            const current = useEditorStore.getState().currentFile;
+            if (
+              cancelled ||
+              parseId !== latestParseRef.current ||
+              (current
+                ? current.path !== filePath || current.content !== content
+                : filePath !== undefined || content !== "") ||
+              (editorDoc && editorViewRef.current?.state.doc !== editorDoc)
+            ) return;
+            setHtml(h);
+            setLoading(false);
+            // HTML 更新后等 DOM 布局稳定再做位置处理
+            raf = requestAnimationFrame(() => {
+              rebuildPreviewBlocks();
+              const el = containerRef.current;
+              if (!el) {
+                isFirstParseRef.current = false;
+                return;
               }
-            };
-            applyRestore(); // rAF 已推迟一帧，首帧直接应用
-            [50, 150, 400].forEach((ms) => {
-              timers.push(window.setTimeout(applyRestore, ms));
+              const { scrollPercent, scrollPercentPath } = useEditorStore.getState();
+              // 挂载后首次解析 + 同文件模式切换 → 按阅读进度恢复滚动位置
+              // 其余情况（编辑、配色切换、换文件后的解析）→ 对齐编辑器当前位置（解决编辑后错位）
+              if (
+                isFirstParseRef.current &&
+                scrollPercentPath === filePath &&
+                scrollPercent > 0
+              ) {
+                // content-visibility:auto 下新挂载 article 的屏外块按 contain-intrinsic-size 占位，
+                // 首帧 scrollHeight 是估算值，单次写入会偏顶。重试链逐轮校正，稳定后早停。
+                let lastMax = -1;
+                let settled = false;
+                const applyRestore = () => {
+                  if (settled) return;
+                  const max = el.scrollHeight - el.clientHeight;
+                  if (max > 0) {
+                    lockScrollSync();
+                    el.scrollTop = max * scrollPercent;
+                    if (lastMax >= 0 && Math.abs(max - lastMax) < 2) settled = true;
+                    lastMax = max;
+                  }
+                };
+                applyRestore(); // rAF 已推迟一帧，首帧直接应用
+                [50, 150, 400].forEach((ms) => {
+                  timers.push(window.setTimeout(applyRestore, ms));
+                });
+              } else {
+                syncPreviewFromEditor();
+              }
+              isFirstParseRef.current = false;
             });
-          } else {
-            syncPreviewFromEditor();
-          }
-          isFirstParseRef.current = false;
+          };
+          commitTimer = window.setTimeout(commitPreview, PREVIEW_COMMIT_DELAY);
+        })
+        .catch((e) => {
+          // AbortError 是切文件时的正常取消，忽略
+          if (e instanceof DOMException && e.name === "AbortError") return;
+          console.error("[preview] parse failed:", e);
+          if (!cancelled) setLoading(false);
         });
-      })
-      .catch((e) => {
-        // AbortError 是切文件时的正常取消，忽略
-        if (e instanceof DOMException && e.name === "AbortError") return;
-        console.error("[preview] parse failed:", e);
-        if (!cancelled) setLoading(false);
-      });
+    };
+    const parseTimer = window.setTimeout(
+      renderPreview,
+      isFileSwitch ? 0 : PREVIEW_UPDATE_DELAY,
+    );
     return () => {
       cancelled = true;
+      window.clearTimeout(parseTimer);
+      if (commitTimer) window.clearTimeout(commitTimer);
       controller.abort(); // 立即取消大文档解析，释放 CPU 给新文件
       if (raf) cancelAnimationFrame(raf);
       timers.forEach((id) => clearTimeout(id)); // 清理滚动恢复重试链残留 timer
     };
-  }, [deferredContent, resolvedTheme, filePath]);
+  }, [content, resolvedTheme, filePath]);
 
   // 给每个代码块注入复制按钮（GitHub 风格：图标，hover 显示，融入代码块）
   // MutationObserver 监听 childList（不含 subtree，避免滚动时 content-visibility 重排触发高频回调）

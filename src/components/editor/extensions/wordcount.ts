@@ -47,7 +47,9 @@ export const wordCountUpdate = EditorView.updateListener.of((update) => {
 /** 初始化时计算一次 */
 export const wordCountInit = EditorView.updateListener.of((update) => {
   // 首次创建时也算一次
-  if (update.docChanged || update.startState.doc.length === 0) {
+  // 空文档的 StateEffect 更新本身不会改变文档，不能再次满足初始化条件，
+  // 否则会递归 dispatch 直到栈溢出。
+  if (update.docChanged || (update.startState.doc.length === 0 && update.state.doc.length > 0)) {
     const text = update.state.doc.toString();
     update.view.dispatch({ effects: setWordCount.of(computeCount(text)) });
   }
