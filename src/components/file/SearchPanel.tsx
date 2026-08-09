@@ -3,7 +3,7 @@
  * - 搜索所有 Markdown 文件的内容
  * - 显示匹配结果，点击跳转到文件
  */
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Search, X, FileText } from "lucide-react";
 import { EditorView } from "@codemirror/view";
 import { useFileStore, type FileNode } from "@/stores/fileStore";
@@ -58,16 +58,15 @@ export function SearchPanel() {
 
   const focusSearchTrigger = useUIStore((s) => s.focusSearchTrigger);
 
-  // 切换到搜索 tab 或重复点击搜索按钮时自动聚焦输入框
-// 双重保险：先在 effect 中 focus,再用 setTimeout(0) 兜底 focus,
-// 防止 WebView2 等 webview 在某些时序下 effect focus 被覆盖丢失
-useEffect(() => {
-  inputRef.current?.focus();
-  const id = setTimeout(() => {
-    inputRef.current?.focus();
-  }, 0);
-  return () => clearTimeout(id);
-}, [focusSearchTrigger]);
+  // 在面板提交到 DOM 后同步建立键盘焦点和文本插入点。
+  // focus() 只负责接收键盘输入；setSelectionRange() 明确建立可见 caret 的位置。
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.focus({ preventScroll: true });
+    const caret = input.value.length;
+    input.setSelectionRange(caret, caret);
+  }, [focusSearchTrigger]);
 
   // 仅在卸载时清理选区和高亮（与聚焦逻辑分离，防止 cleanup 抢占焦点）
   useEffect(() => {
