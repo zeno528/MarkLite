@@ -1,0 +1,193 @@
+name: Pre-release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marklite-prerelease
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  verify:
+    name: Verify source
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Require main branch
+        if: github.ref != 'refs/heads/main'
+        run: throw 'Pre-release must be run from the main branch.'
+
+      - name: Checkout verified revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          version: 11.16.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Set up Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm build
+
+      - name: Check Tauri backend
+        run: cargo check --manifest-path src-tauri/Cargo.toml --locked
+
+  release:
+    name: Build and publish pre-release
+    needs: verify
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout verified revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Ensure verified revision is still current
+        run: |
+          git fetch origin main --tags
+          $mainSha = git rev-parse origin/main
+          if ($mainSha -ne $env:GITHUB_SHA) {
+            throw "main changed after this workflow started. Run the workflow again to release the new revision."
+          }
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          version: 11.16.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Set up Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Increment patch version
+        id: version
+        run: |
+          $root = $env:GITHUB_WORKSPACE
+          $package = Get-Content -LiteralPath (Join-Path $root 'package.json') -Raw | ConvertFrom-Json
+          $currentVersion = [string]$package.version
+          if ($currentVersion -notmatch '^(\d+)\.(\d+)\.(\d+)$') {
+            throw "Unsupported version: $currentVersion"
+          }
+
+          $newVersion = '{0}.{1}.{2}' -f $Matches[1], $Matches[2], ([int]$Matches[3] + 1)
+          $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+
+          function Update-Version([string]$path, [string]$oldText, [string]$newText) {
+            $fullPath = Join-Path $root $path
+            $content = [System.IO.File]::ReadAllText($fullPath)
+            if (-not $content.Contains($oldText)) {
+              throw "Version marker not found in $path"
+            }
+            [System.IO.File]::WriteAllText($fullPath, $content.Replace($oldText, $newText), $utf8NoBom)
+          }
+
+          Update-Version 'package.json' `
+            ('"version": "{0}"' -f $currentVersion) `
+            ('"version": "{0}"' -f $newVersion)
+          Update-Version 'src-tauri/tauri.conf.json' `
+            ('"version": "{0}"' -f $currentVersion) `
+            ('"version": "{0}"' -f $newVersion)
+          Update-Version 'src-tauri/Cargo.toml' `
+            ('version = "{0}"' -f $currentVersion) `
+            ('version = "{0}"' -f $newVersion)
+          Update-Version 'README.md' `
+            ("version-$currentVersion-blue") `
+            ("version-$newVersion-blue")
+          Update-Version 'README.en.md' `
+            ("version-$currentVersion-blue") `
+            ("version-$newVersion-blue")
+
+          "version=$newVersion" | Add-Content -LiteralPath $env:GITHUB_OUTPUT
+          "tag=v$newVersion" | Add-Content -LiteralPath $env:GITHUB_OUTPUT
+          Write-Host "Version: $currentVersion -> $newVersion"
+
+      - name: Build Windows release
+        run: pnpm tauri build --bundles nsis
+
+      - name: Collect release assets
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $releaseDir = Join-Path $env:RUNNER_TEMP 'marklite-release'
+          New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
+
+          Copy-Item -LiteralPath 'src-tauri/target/release/marklite.exe' `
+            -Destination (Join-Path $releaseDir "MarkLite-v$env:VERSION-windows-x64-portable.exe")
+
+          $installers = @(Get-ChildItem -LiteralPath 'src-tauri/target/release/bundle/nsis' -Filter '*.exe')
+          if ($installers.Count -ne 1) {
+            throw "Expected one NSIS installer, found $($installers.Count)."
+          }
+          Copy-Item -LiteralPath $installers[0].FullName `
+            -Destination (Join-Path $releaseDir "MarkLite-v$env:VERSION-windows-x64-setup.exe")
+
+      - name: Commit version and tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json README.md README.en.md src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json
+          git diff --cached --check
+          git commit -m "🔖 chore: 发布 $env:TAG 预发行版"
+          git tag -a $env:TAG -m "MarkLite $env:TAG"
+          git push --atomic origin 'HEAD:refs/heads/main' "refs/tags/$env:TAG"
+
+      - name: Create GitHub pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath (Join-Path $env:RUNNER_TEMP 'marklite-release') -File)
+          if ($assets.Count -ne 2) {
+            throw "Expected two release assets, found $($assets.Count)."
+          }
+
+          & gh release create $env:TAG @($assets.FullName) `
+            --repo $env:GITHUB_REPOSITORY `
+            --title "MarkLite $env:TAG" `
+            --generate-notes `
+            --prerelease `
+            --latest=false `
+            --verify-tag
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to create GitHub pre-release $env:TAG."
+          }
